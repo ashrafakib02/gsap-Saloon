@@ -1,6 +1,18 @@
-/* Self-hosted font declarations */
-/* Font files will be placed in /src/assets/fonts/ */
-/* For now, using system font stack as fallback */
+/*
+ * Font declarations for The Sovereign Artisor.
+ *
+ * Primary: Google Fonts loaded via <link> in index.html (for optimal loading).
+ * This file provides @font-face declarations as fallback for self-hosted fonts.
+ *
+ * When fonts are self-hosted (recommended for production):
+ * 1. Place .woff2 files in /src/assets/fonts/
+ * 2. Update src: local() → src: url() pointing to the local files
+ * 3. Remove the Google Fonts <link> from index.html
+ *
+ * From DESIGN_SYSTEM §4:
+ * "Cormorant Garamond — warm, editorial, magazine-like authority"
+ * "DM Sans — neutral but warm, humanist, highly legible"
+ */
 
 @font-face {
   font-family: 'Cormorant Garamond';
@@ -11,9 +23,25 @@
 }
 
 @font-face {
+  font-family: 'Cormorant Garamond';
+  font-style: italic;
+  font-weight: 300 700;
+  font-display: swap;
+  src: local('Cormorant Garamond Italic');
+}
+
+@font-face {
   font-family: 'DM Sans';
   font-style: normal;
   font-weight: 300 700;
   font-display: swap;
   src: local('DM Sans');
+}
+
+@font-face {
+  font-family: 'DM Sans';
+  font-style: italic;
+  font-weight: 300 700;
+  font-display: swap;
+  src: local('DM Sans Italic');
 }

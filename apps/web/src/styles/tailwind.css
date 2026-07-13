@@ -107,7 +107,7 @@
     }
   }
 
-  /* Prefers reduced motion */
+  /* Prefers reduced motion — disable all animation globally */
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
       animation-duration: 0.01ms !important;
@@ -116,4 +116,45 @@
       scroll-behavior: auto !important;
     }
   }
+}
+
+/* === Portal Roots === */
+#modal-root,
+#toast-root {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+#modal-root {
+  z-index: 1000;
+}
+
+#toast-root {
+  z-index: 1100;
+  pointer-events: none;
+}
+
+#toast-root > * {
+  pointer-events: auto;
+}
+
+/* === Custom Cursor Infrastructure === */
+/* Visual cursor styling is applied in a future phase.
+   This establishes the infrastructure: cursor tracking via useCursor hook,
+   state management via CursorContext, and DOM elements ready for styling. */
+
+.cursor-default,
+.cursor-pointer,
+.cursor-text,
+.cursor-grab,
+.cursor-hidden {
+  /* No visual styles yet — infrastructure only.
+     When the custom cursor component is built, it will read
+     the cursor variant from CursorContext and apply styles. */
 }

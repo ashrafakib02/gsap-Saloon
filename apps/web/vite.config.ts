@@ -11,7 +11,7 @@ export default defineConfig({
       generatedRouteTree: './src/app/routeTree.gen.ts',
       quoteStyle: 'single',
       semicolons: false,
-      routeFileIgnorePattern: '(providers|routeTree)',
+      routeFileIgnorePattern: '(providers|routeTree|error-boundary)',
     }),
     react(),
     tailwindcss(),
