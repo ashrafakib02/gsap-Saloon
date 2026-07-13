@@ -9,8 +9,8 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | Phase 3 — Frontend Foundation |
-| **Current Step** | 3.6 — Global Utilities |
-| **Overall Completion** | 6.1% (5 / 82 steps) |
+| **Current Step** | 3.7 — Shared Infrastructure |
+| **Overall Completion** | 7.3% (6 / 82 steps) |
 | **Last Updated** | 2026-07-13 |
 
 ---
@@ -28,8 +28,8 @@
 | 3.3 Layout Skeleton | ✅ Completed |
 | 3.4 Navigation System | ✅ Completed |
 | 3.5 Theme Integration | ✅ Completed |
-| 3.6 Global Utilities | ⬜ Not Started |
-| 3.7 Shared Infrastructure | ⬜ Not Started |
+| 3.6 Global Utilities | ✅ Completed |
+| 3.7 Shared Infrastructure | ⏳ In Progress |
 
 ---
 
@@ -207,8 +207,8 @@
 | 3.3 | Layout Skeleton | ✅ Completed | Frontend Architect | P0 | 3.2 | Medium |
 | 3.4 | Navigation System | ✅ Completed | Frontend Architect | P0 | 3.2, 3.3 | Medium |
 | 3.5 | Theme Integration | ✅ Completed | Frontend Architect | P0 | 3.2 | Medium |
-| 3.6 | Global Utilities | ⬜ Not Started | Frontend Architect | P0 | 3.2 | Low |
-| 3.7 | Shared Infrastructure | ⬜ Not Started | Frontend Architect | P0 | 3.2, 3.3 | Medium |
+| 3.6 | Global Utilities | ✅ Completed | Frontend Architect | P0 | 3.2 | Low |
+| 3.7 | Shared Infrastructure | ⏳ In Progress | Frontend Architect | P0 | 3.2, 3.3 | Medium |
 | 4.1 | Hero Experience | ⬜ Not Started | Frontend Architect | P0 | 3.3, 3.4, 3.5 | High |
 | 4.2 | Hero Copy | ⬜ Not Started | Content Lead | P0 | None | Low |
 | 4.3 | Hero Layout | ⬜ Not Started | Frontend Architect | P0 | 4.1 | Medium |
@@ -323,6 +323,13 @@ Built the scroll-aware Navigation system (5 components + 1 hook). Created Naviga
 Status: Completed
 
 Built the global theme infrastructure (16 deliverables). Created ThemeContext with ThemeMode (light/dark/system), ResolvedTheme, and useTheme hook. Enhanced ThemeProvider with prefers-color-scheme detection via matchMedia, localStorage persistence (sovereign-theme-preference), data-theme attribute on html, Tailwind dark class management, and color-scheme CSS property for native form styling. Integrated reduced-motion detection with Redux sync. Created 6 token files mirroring CSS custom properties: color.ts (light + dark mode palette — 3-role system per DESIGN_SYSTEM §3), typography.ts (two families, six-level scale per §4), radius.ts (5-tier scale per §8), shadow.ts (warm-toned elevation per §9, warm glow for dark mode), motion.ts (durations, easings, transform limits per §14), z-index.ts (8-layer stacking system). Created convenience hooks: useResolvedTheme, useIsDark, useThemeMode, useThemeTokens, useReducedMotionTheme. Created useFontLoading hook tracking Cormorant Garamond and DM Sans via Font Loading API. Created theme utilities: getCssVar, setCssVar, getBackgroundColor, getTextColor, getAccentColor, isDarkMode, enableThemeTransition, prefersReducedMotion, getAnimationDuration, validateThemeTokens. Added dark mode CSS variables to tailwind.css with [data-theme="dark"] selector (warm charcoal surface, warm off-white text, brighter gold accent, warm glow shadows per DESIGN_SYSTEM §16 DM1-DM4). Added theme transition CSS (350ms cross-fade per DM7). Added z-index and motion CSS tokens. Updated portal root z-indexes to use CSS variables. All verified: TypeScript clean, ESLint clean, build passes.
+
+---
+
+**Phase 3.6 — Global Utilities**
+Status: Completed
+
+Built 36 global utility items across 4 categories. **16 React Hooks**: useMediaQuery (SSR-safe matchMedia), useBreakpoint (current breakpoint + convenience booleans), usePrefersReducedMotion (prefers-reduced-motion media query), useIntersectionObserver (generic observer with ref), useResizeObserver (element dimension tracking), useWindowSize (window inner dimensions), useScrollPosition (rAF-throttled scroll), useScrollProgress (normalized 0-1 progress), useDebounce (value debouncing), useThrottle (value throttling + callback throttle), usePrevious (previous value tracking), useIsMounted (mount state tracking), useLockBodyScroll (body scroll lock for modals), useClickOutside (click outside detection), useKeyPress (keyboard key detection + effect), useLocalStorage (type-safe SSR-safe localStorage). **10 Utility Functions**: cn() (clsx + tailwind-merge), deepMerge (recursive object merge), clamp/lerp/mapRange (math utilities), sleep (Promise-based delay), invariant/assertNever/safeParse (assertions with Zod), memoize/createMemoizedGetter (memoization). **5 Browser Utilities**: Device detection (isMobile/tablet/desktop/touch/fine-pointer/pixel-ratio), Feature detection (IntersectionObserver/ResizeObserver/WebGL/FontLoading/SmoothScroll/ClipPath/CSSCustomProperties/DeviceMemory/SlowConnection), Touch detection, Passive event helpers. **5 Shared Constants**: Breakpoints (BREAKPOINTS/MAX_WIDTHS/MEDIA_QUERIES), Timing Constants (STAGGER/SCROLL_THRESHOLDS/DEBOUNCE/TRANSITIONS), Responsive Helpers (getViewportWidth/Height, getCurrentBreakpoint, vw/vh, resolveResponsive, getGridColumnWidth, meetsMinWidth). Updated barrel exports. All hooks return objects per §11.3. All utilities pure, typed, tree-shakeable, SSR-safe.
 
 ---
 

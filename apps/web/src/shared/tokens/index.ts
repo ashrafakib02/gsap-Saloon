@@ -34,3 +34,24 @@ export type { DurationToken, EasingToken } from './motion';
 // Z-index layer tokens
 export { Z_INDEX } from './z-index';
 export type { ZIndexToken } from './z-index';
+
+// Breakpoint tokens
+export { BREAKPOINTS, MAX_WIDTHS, MEDIA_QUERIES } from './breakpoints';
+export type { BreakpointKey, MaxWidthKey } from './breakpoints';
+
+// Timing constants (stagger, scroll thresholds, debounce delays, transitions)
+export { STAGGER, SCROLL_THRESHOLDS, DEBOUNCE, TRANSITIONS } from './timing';
+export type { StaggerKey, ScrollThresholdKey, DebounceKey } from './timing';
+
+// Responsive helpers
+export {
+  getViewportWidth,
+  getViewportHeight,
+  getCurrentBreakpoint,
+  vw,
+  vh,
+  resolveResponsive,
+  getGridColumnWidth,
+  meetsMinWidth,
+} from './responsive';
+export type { ResponsiveValue } from './responsive';
