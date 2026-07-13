@@ -4,11 +4,12 @@ import { RouterProvider, createRouter } from '@tanstack/react-router';
 import { routeTree } from './app/routeTree.gen';
 import { RootProvider } from './app/providers/root-provider';
 
-// Styles — order matters: tailwind first, then global, fonts, animations
+// Styles — order matters: tailwind first, then global, fonts, animations, print
 import './styles/tailwind.css';
 import './styles/fonts.css';
 import './styles/global.css';
 import './styles/animations.css';
+import './styles/print.css';
 
 // ── Router Configuration ──────────────────────────────────
 

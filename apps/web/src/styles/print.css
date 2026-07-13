@@ -1,0 +1,97 @@
+/**
+ * Print stylesheet.
+ *
+ * From TECHNICAL_ARCHITECTURE §15:
+ * "Print: essential content, no animations, no 3D, no overlays."
+ *
+ * From DESIGN_SYSTEM §20:
+ * "Single-column layout, black on white, visible links."
+ *
+ * Strips all visual effects, animations, and non-essential UI.
+ * Ensures content is readable in print context.
+ */
+
+@media print {
+  *,
+  *::before,
+  *::after {
+    background: transparent !important;
+    color: #000 !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  /* Remove animations and transitions */
+  * {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+    transition-duration: 0s !important;
+    transition-delay: 0s !important;
+  }
+
+  /* Hide non-printable elements */
+  nav,
+  footer,
+  [role="navigation"],
+  [role="banner"],
+  .no-print,
+  #modal-root,
+  #toast-root {
+    display: none !important;
+  }
+
+  /* Show links with URLs */
+  a[href]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+    font-weight: normal;
+    color: #555;
+  }
+
+  /* Don't show URL for internal links */
+  a[href^="#"]::after,
+  a[href^="javascript"]::after {
+    content: "";
+  }
+
+  /* Don't show URL for mail/tel */
+  a[href^="mailto"]::after,
+  a[href^="tel"]::after {
+    content: "";
+  }
+
+  /* Ensure images are visible */
+  img {
+    max-width: 100% !important;
+    page-break-inside: avoid;
+  }
+
+  /* Page break helpers */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    page-break-after: avoid;
+    page-break-inside: avoid;
+  }
+
+  p,
+  figure,
+  blockquote {
+    orphans: 3;
+    widows: 3;
+  }
+
+  /* Single column layout */
+  body {
+    font-size: 12pt;
+    line-height: 1.5;
+  }
+
+  /* Page margins */
+  @page {
+    margin: 2cm;
+  }
+}
