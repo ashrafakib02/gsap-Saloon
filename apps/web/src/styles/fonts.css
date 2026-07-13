@@ -1,0 +1,19 @@
+/* Self-hosted font declarations */
+/* Font files will be placed in /src/assets/fonts/ */
+/* For now, using system font stack as fallback */
+
+@font-face {
+  font-family: 'Cormorant Garamond';
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: local('Cormorant Garamond');
+}
+
+@font-face {
+  font-family: 'DM Sans';
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: local('DM Sans');
+}
