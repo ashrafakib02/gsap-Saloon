@@ -3,6 +3,7 @@ import { Suspense } from 'react';
 import { RootErrorBoundary } from './error-boundary';
 import { LoadingIndicator } from '@/shared/feedback/loading-indicator';
 import { SeoHead } from '@/shared/layout/seo-head';
+import { Navigation } from '@/features/navigation';
 import { useScrollManager } from '@/shared/hooks/ui/use-scroll-manager';
 import { useWebVitals } from '@/shared/hooks/performance/use-web-vitals';
 import { usePerformanceMonitor } from '@/shared/hooks/performance/use-performance-monitor';
@@ -54,12 +55,18 @@ function RootComponent() {
         Skip to content
       </a>
 
-      {/* Main content area — all page content renders here */}
+      {/* Global navigation — sticky, scroll-aware, responsive.
+          Renders as a <header> landmark for screen reader navigation.
+          From TECHNICAL_ARCHITECTURE §16.4: "Screen reader landmarks" */}
+      <Navigation />
+
+      {/* Main content area — all page content renders here.
+          pt-[72px] compensates for the fixed navigation header height. */}
       <main
         id="main-content"
         role="main"
         tabIndex={-1}
-        className="min-h-screen outline-none"
+        className="min-h-screen pt-[72px] outline-none"
       >
         <RootErrorBoundary>
           <Suspense fallback={<LoadingIndicator fullViewport />}>
