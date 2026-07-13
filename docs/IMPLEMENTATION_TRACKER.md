@@ -9,8 +9,8 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | Phase 3 — Frontend Foundation |
-| **Current Step** | 3.5 — Theme Integration |
-| **Overall Completion** | 4.9% (4 / 82 steps) |
+| **Current Step** | 3.6 — Global Utilities |
+| **Overall Completion** | 6.1% (5 / 82 steps) |
 | **Last Updated** | 2026-07-13 |
 
 ---
@@ -27,7 +27,7 @@
 | 3.2 Application Shell | ✅ Completed |
 | 3.3 Layout Skeleton | ✅ Completed |
 | 3.4 Navigation System | ✅ Completed |
-| 3.5 Theme Integration | ⬜ Not Started |
+| 3.5 Theme Integration | ✅ Completed |
 | 3.6 Global Utilities | ⬜ Not Started |
 | 3.7 Shared Infrastructure | ⬜ Not Started |
 
@@ -206,7 +206,7 @@
 | 3.2 | Application Shell | ✅ Completed | Frontend Architect | P0 | 3.1 | Medium |
 | 3.3 | Layout Skeleton | ✅ Completed | Frontend Architect | P0 | 3.2 | Medium |
 | 3.4 | Navigation System | ✅ Completed | Frontend Architect | P0 | 3.2, 3.3 | Medium |
-| 3.5 | Theme Integration | ⬜ Not Started | Frontend Architect | P0 | 3.2 | Medium |
+| 3.5 | Theme Integration | ✅ Completed | Frontend Architect | P0 | 3.2 | Medium |
 | 3.6 | Global Utilities | ⬜ Not Started | Frontend Architect | P0 | 3.2 | Low |
 | 3.7 | Shared Infrastructure | ⬜ Not Started | Frontend Architect | P0 | 3.2, 3.3 | Medium |
 | 4.1 | Hero Experience | ⬜ Not Started | Frontend Architect | P0 | 3.3, 3.4, 3.5 | High |
@@ -316,6 +316,13 @@ Built 18 layout primitives per the Design System. Created AppLayout (root wrappe
 Status: Completed
 
 Built the scroll-aware Navigation system (5 components + 1 hook). Created Navigation types (NavItem, NavigationProps, MobileMenuProps). Created `useScrollDirection` hook with threshold-based direction detection and passive scroll listeners (requestAnimationFrame-level debouncing). Created Navigation component with scroll-aware show/hide behavior (hides on scroll down, reveals on scroll up), responsive layout (mobile hamburger → desktop links), and smooth transitions. Created NavLink component with active route detection via TanStack Router. Created MobileMenu component with slide-in overlay, focus trap, and escape key handling. Fixed TypeScript errors in `use-scroll-direction.ts` (ref access patterns). Fixed `tsconfig.node.json` `allowImportingTsExtensions` error. Fixed ESLint `vite.config.d.ts` parsing issue. All verified: TypeScript clean, ESLint clean, build passes.
+
+---
+
+**Phase 3.5 — Theme Integration**
+Status: Completed
+
+Built the global theme infrastructure (16 deliverables). Created ThemeContext with ThemeMode (light/dark/system), ResolvedTheme, and useTheme hook. Enhanced ThemeProvider with prefers-color-scheme detection via matchMedia, localStorage persistence (sovereign-theme-preference), data-theme attribute on html, Tailwind dark class management, and color-scheme CSS property for native form styling. Integrated reduced-motion detection with Redux sync. Created 6 token files mirroring CSS custom properties: color.ts (light + dark mode palette — 3-role system per DESIGN_SYSTEM §3), typography.ts (two families, six-level scale per §4), radius.ts (5-tier scale per §8), shadow.ts (warm-toned elevation per §9, warm glow for dark mode), motion.ts (durations, easings, transform limits per §14), z-index.ts (8-layer stacking system). Created convenience hooks: useResolvedTheme, useIsDark, useThemeMode, useThemeTokens, useReducedMotionTheme. Created useFontLoading hook tracking Cormorant Garamond and DM Sans via Font Loading API. Created theme utilities: getCssVar, setCssVar, getBackgroundColor, getTextColor, getAccentColor, isDarkMode, enableThemeTransition, prefersReducedMotion, getAnimationDuration, validateThemeTokens. Added dark mode CSS variables to tailwind.css with [data-theme="dark"] selector (warm charcoal surface, warm off-white text, brighter gold accent, warm glow shadows per DESIGN_SYSTEM §16 DM1-DM4). Added theme transition CSS (350ms cross-fade per DM7). Added z-index and motion CSS tokens. Updated portal root z-indexes to use CSS variables. All verified: TypeScript clean, ESLint clean, build passes.
 
 ---
 

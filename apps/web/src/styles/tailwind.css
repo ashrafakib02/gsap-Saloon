@@ -2,6 +2,8 @@
 
 @theme {
   /* === Color System (3 roles only) === */
+  /* From DESIGN_SYSTEM §3: Surface, Text, Accent — no fourth role */
+  /* All colors carry warm undertones (C1). No pure white/black (C4). */
   --color-surface: #F5F0EB;
   --color-surface-secondary: #EDE6DD;
   --color-surface-elevated: #FAF7F4;
@@ -12,47 +14,56 @@
   --color-accent-hover: #C9A86E;
   --color-accent-active: #A68448;
 
+  /* Functional colors — warm-toned per ST1 */
+  --color-error: #B85450;
+  --color-success: #7A8C5A;
+  --color-border: #D4C9BC;
+
   /* === Typography === */
+  /* From DESIGN_SYSTEM §4: Two families maximum (T1) */
   --font-serif: 'Cormorant Garamond', 'Georgia', serif;
   --font-sans: 'DM Sans', 'Helvetica Neue', Arial, sans-serif;
 
-  /* Display — Hero headlines */
+  /* Display — Hero headlines (Level 1) */
+  /* T4: Weight decreases with size. T5: Line-height increases as size decreases. */
   --text-display: 3.5rem;
   --leading-display: 1.05;
   --tracking-display: -0.01em;
   --weight-display: 600;
 
-  /* Heading — Section titles */
+  /* Heading — Section titles (Level 2) */
   --text-heading: 2.25rem;
   --leading-heading: 1.15;
   --tracking-heading: 0em;
   --weight-heading: 500;
 
-  /* Subheading — Descriptions, introductions */
+  /* Subheading — Descriptions, introductions (Level 3) */
   --text-subheading: 1.5rem;
   --leading-subheading: 1.35;
   --tracking-subheading: 0em;
   --weight-subheading: 400;
 
-  /* Body — Primary content */
+  /* Body — Primary content (Level 4) */
+  /* T8: Minimum 16px at any viewport */
   --text-body: 1rem;
   --leading-body: 1.7;
   --tracking-body: 0em;
   --weight-body: 400;
 
-  /* Caption — Image labels, metadata */
+  /* Caption — Image labels, metadata (Level 5) */
   --text-caption: 0.875rem;
   --leading-caption: 1.45;
   --tracking-caption: 0.01em;
   --weight-caption: 400;
 
-  /* Micro — Timestamps, legal text */
+  /* Micro — Timestamps, legal text (Level 6) */
   --text-micro: 0.75rem;
   --leading-micro: 1.35;
   --tracking-micro: 0.02em;
   --weight-micro: 300;
 
   /* === Spacing Scale (5 tiers) === */
+  /* From DESIGN_SYSTEM §5: The breathing principle */
   --spacing-intimate: 0.5rem;    /* Tier 1: label-value, image-caption */
   --spacing-personal: 1rem;      /* Tier 2: title-description */
   --spacing-social: 1.5rem;      /* Tier 3: heading-body, image-text */
@@ -60,6 +71,7 @@
   --spacing-public: 5rem;        /* Tier 5: between major regions */
 
   /* === Border Radius === */
+  /* From DESIGN_SYSTEM §8: R1-R6 */
   --radius-none: 0px;
   --radius-small: 4px;
   --radius-medium: 8px;
@@ -67,10 +79,98 @@
   --radius-full: 9999px;
 
   /* === Shadows (warm-toned: brown-grey, not blue-grey) === */
+  /* From DESIGN_SYSTEM §9: S1 — all shadows warm-toned */
   --shadow-none: none;
   --shadow-subtle: 0 1px 3px rgba(92, 79, 69, 0.08);
   --shadow-medium: 0 4px 12px rgba(92, 79, 69, 0.12);
   --shadow-elevated: 0 8px 24px rgba(92, 79, 69, 0.16);
+
+  /* === Z-Index Layers === */
+  /* From DESIGN_SYSTEM §9: Elevation communicates spatial relationship */
+  --z-base: 0;
+  --z-sticky: 100;
+  --z-dropdown: 200;
+  --z-floating: 300;
+  --z-overlay: 900;
+  --z-modal: 1000;
+  --z-toast: 1100;
+  --z-skip: 9999;
+
+  /* === Motion Tokens === */
+  /* From DESIGN_SYSTEM §14: Motion serves content, never decorates it */
+  /* Durations in ms — never exceed 600ms for content reveals */
+  --duration-instant: 0ms;
+  --duration-fast: 200ms;
+  --duration-normal: 500ms;
+  --duration-slow: 1200ms;
+  --duration-confirmation: 1000ms;
+
+  /* Easings — per Law 2: Ease and Weight */
+  /* Entry: ease-out (decelerate to rest) */
+  /* Exit: ease-in (accelerate away) */
+  /* State changes: ease-in-out (symmetric) */
+  --easing-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --easing-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --easing-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --easing-standard: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* === Dark Mode CSS Variables === */
+/*
+ * From DESIGN_SYSTEM §16 (Dark Mode):
+ * DM1: Dark background is warm charcoal — shifted toward brown, never blue
+ * DM2: Text is warm off-white — not pure white (#FFFFFF)
+ * DM3: Gold accent becomes slightly brighter and warmer
+ * DM4: Shadows replaced with warm glow effects
+ *
+ * Activated by ThemeProvider via data-theme="dark" attribute on <html>.
+ * DM7: Transition animated with smooth cross-fade (300-400ms).
+ */
+[data-theme="dark"] {
+  /* Surface colors — deep warm charcoal (DM1) */
+  --color-surface: #1C1816;
+  --color-surface-secondary: #252019;
+  --color-surface-elevated: #2E2720;
+
+  /* Text colors — warm off-white (DM2) */
+  --color-text: #EDE6DD;
+  --color-text-secondary: #BFB5A8;
+  --color-text-muted: #8A7D72;
+
+  /* Accent — brighter, warmer gold (DM3) */
+  --color-accent: #D4AF6A;
+  --color-accent-hover: #E0C07E;
+  --color-accent-active: #C09A54;
+
+  /* Functional colors — adjusted for dark background */
+  --color-error: #D4706C;
+  --color-success: #96A872;
+  --color-border: #3D342C;
+
+  /* Shadows — warm glow effects (DM4) */
+  --shadow-subtle: 0 0 8px rgba(184, 150, 90, 0.06);
+  --shadow-medium: 0 0 16px rgba(184, 150, 90, 0.10);
+  --shadow-elevated: 0 0 32px rgba(184, 150, 90, 0.14);
+}
+
+/* === Theme Transition === */
+/*
+ * From DESIGN_SYSTEM §16 (Dark Mode, DM7):
+ * "The transition between light and dark mode is animated with a
+ *  smooth, warm-toned cross-fade (300–400ms)."
+ *
+ * Applied only to color-affecting properties to avoid performance impact.
+ * Removed when prefers-reduced-motion is active (handled by reduced-motion media query).
+ */
+html.theme-transition,
+html.theme-transition *,
+html.theme-transition *::before,
+html.theme-transition *::after {
+  transition:
+    background-color 350ms cubic-bezier(0.65, 0, 0.35, 1),
+    color 350ms cubic-bezier(0.65, 0, 0.35, 1),
+    border-color 350ms cubic-bezier(0.65, 0, 0.35, 1),
+    box-shadow 350ms cubic-bezier(0.65, 0, 0.35, 1) !important;
 }
 
 /* === Base Styles === */
@@ -128,15 +228,15 @@
   height: 0;
   overflow: visible;
   pointer-events: none;
-  z-index: 1000;
+  z-index: var(--z-modal);
 }
 
 #modal-root {
-  z-index: 1000;
+  z-index: var(--z-modal);
 }
 
 #toast-root {
-  z-index: 1100;
+  z-index: var(--z-toast);
   pointer-events: none;
 }
 
