@@ -63,3 +63,13 @@ export {
   nonPassiveOptions,
   addScrollListener,
 } from './passive-events';
+
+// ── Error Utilities ──────────────────────────────────────
+export {
+  isAppError,
+  toAppError,
+  getErrorMessage,
+  getErrorSeverity,
+  logError,
+  createErrorHandler,
+} from './error-utils';

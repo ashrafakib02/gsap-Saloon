@@ -9,8 +9,8 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | Phase 3 — Frontend Foundation |
-| **Current Step** | 3.7 — Shared Infrastructure |
-| **Overall Completion** | 7.3% (6 / 82 steps) |
+| **Current Step** | 4.1 — Hero Experience |
+| **Overall Completion** | 8.5% (7 / 82 steps) |
 | **Last Updated** | 2026-07-13 |
 
 ---
@@ -29,7 +29,7 @@
 | 3.4 Navigation System | ✅ Completed |
 | 3.5 Theme Integration | ✅ Completed |
 | 3.6 Global Utilities | ✅ Completed |
-| 3.7 Shared Infrastructure | ⏳ In Progress |
+| 3.7 Shared Infrastructure | ✅ Completed |
 
 ---
 
@@ -208,7 +208,7 @@
 | 3.4 | Navigation System | ✅ Completed | Frontend Architect | P0 | 3.2, 3.3 | Medium |
 | 3.5 | Theme Integration | ✅ Completed | Frontend Architect | P0 | 3.2 | Medium |
 | 3.6 | Global Utilities | ✅ Completed | Frontend Architect | P0 | 3.2 | Low |
-| 3.7 | Shared Infrastructure | ⏳ In Progress | Frontend Architect | P0 | 3.2, 3.3 | Medium |
+| 3.7 | Shared Infrastructure | ✅ Completed | Frontend Architect | P0 | 3.2, 3.3 | Medium |
 | 4.1 | Hero Experience | ⬜ Not Started | Frontend Architect | P0 | 3.3, 3.4, 3.5 | High |
 | 4.2 | Hero Copy | ⬜ Not Started | Content Lead | P0 | None | Low |
 | 4.3 | Hero Layout | ⬜ Not Started | Frontend Architect | P0 | 4.1 | Medium |
@@ -330,6 +330,13 @@ Built the global theme infrastructure (16 deliverables). Created ThemeContext wi
 Status: Completed
 
 Built 36 global utility items across 4 categories. **16 React Hooks**: useMediaQuery (SSR-safe matchMedia), useBreakpoint (current breakpoint + convenience booleans), usePrefersReducedMotion (prefers-reduced-motion media query), useIntersectionObserver (generic observer with ref), useResizeObserver (element dimension tracking), useWindowSize (window inner dimensions), useScrollPosition (rAF-throttled scroll), useScrollProgress (normalized 0-1 progress), useDebounce (value debouncing), useThrottle (value throttling + callback throttle), usePrevious (previous value tracking), useIsMounted (mount state tracking), useLockBodyScroll (body scroll lock for modals), useClickOutside (click outside detection), useKeyPress (keyboard key detection + effect), useLocalStorage (type-safe SSR-safe localStorage). **10 Utility Functions**: cn() (clsx + tailwind-merge), deepMerge (recursive object merge), clamp/lerp/mapRange (math utilities), sleep (Promise-based delay), invariant/assertNever/safeParse (assertions with Zod), memoize/createMemoizedGetter (memoization). **5 Browser Utilities**: Device detection (isMobile/tablet/desktop/touch/fine-pointer/pixel-ratio), Feature detection (IntersectionObserver/ResizeObserver/WebGL/FontLoading/SmoothScroll/ClipPath/CSSCustomProperties/DeviceMemory/SlowConnection), Touch detection, Passive event helpers. **5 Shared Constants**: Breakpoints (BREAKPOINTS/MAX_WIDTHS/MEDIA_QUERIES), Timing Constants (STAGGER/SCROLL_THRESHOLDS/DEBOUNCE/TRANSITIONS), Responsive Helpers (getViewportWidth/Height, getCurrentBreakpoint, vw/vh, resolveResponsive, getGridColumnWidth, meetsMinWidth). Updated barrel exports. All hooks return objects per §11.3. All utilities pure, typed, tree-shakeable, SSR-safe.
+
+---
+
+**Phase 3.7 — Shared Infrastructure**
+Status: Completed
+
+Built 35 shared infrastructure items across 7 categories. **Application Infrastructure (8)**: Global Configuration (frozen APP_CONFIG with name, URLs, performance budgets, lazy feature flags), Runtime Environment Helpers (SSR-safe isBrowser/isServer/isDev/isProd, getEnvVar, requireEnvVar, getBaseUrl), Feature Flag System (typed FeatureFlag union, localStorage-backed get/set/reset/isEnabled), Environment Validation (Zod schema, cached getEnvConfig singleton), Shared Error Types (AppError class, ErrorSeverity/ErrorCategory unions, ApiResponse discriminated union), Error Utilities (isAppError, toAppError, getErrorMessage, logError, createErrorHandler factory), Logger Infrastructure (4-level logger with [Sovereign] prefix, 100-entry circular history, level filtering), Application Event System (typed pub/sub eventBus with on/off/emit/once/removeAllListeners, 8 typed events). **Asset Infrastructure (6)**: Asset Registry (generic createAssetRegistry with register/get/getAll/remove/preload), Asset Loader Utilities (loadImage, loadFont, preloadImages, preloadFonts, getImageDimensions, createImageLoader with AbortController), Font Registry (Cormorant Garamond + DM Sans definitions, weight sources, CSS variable map), Image Registry (category-based with aspect ratios: hero 16/9, service 4/3, portrait 3/4, detail 1/1), Icon Registry (line-based, single-color, size presets), Lazy Asset Helpers (createLazyLoader, createAssetPreloader, deferredImport). **Animation Infrastructure (6)**: GSAP Registration Layer (idempotent initGSAP, getGSAP, getScrollTrigger, refreshScrollTrigger, killAllAnimations — single registration point via @/lib/gsap-config), Animation Registry (createAnimationRegistry with VISUAL_RULES validation), Animation Presets (SCROLL_REVEAL_UP/FADE/SCALE, HOVER_WARM_REVEAL, HERO_REVEAL, SECTION_STAGGER, INSTANT — all M1-M6 compliant), Timeline Factory (createTimeline, createScrollTimeline, createStaggerTimeline, killTimeline, batchKill), ScrollTrigger Registration (createScrollTrigger with lifecycle management, refreshAll, disable/enable per-instance or bulk, isScrollTriggerActive), Reduced Motion Integration (prefersReducedMotion function, getAnimationDuration, shouldAnimate per animation type, getTransitionCSS, getReducedMotionFallback). **Provider Infrastructure (5)**: Provider Composition (composeProviders, createProviderStack, ProviderDevTool), Provider Factory (createProvider<T> with Provider/useConsumer/useConsumerOrNull), Context Utilities (createSafeContext, useContextSelector, useContextFactory), Enhanced Error Boundary (extends ErrorBoundary with retry tracking, isolation, level-based fallbacks), Suspense Wrapper (SuspenseWrapper, LoadingFallback with branded warm gold pulse, SectionSuspense). **Performance Infrastructure (5)**: Dynamic Import Helpers (dynamicImport with retry/fallback, dynamicImportNamed, preloadRoute, preloadRouteOnHover), Lazy Component Helpers (lazyComponent, lazySection, lazyFeature, preloadComponent), Resource Preloading (preloadImage/Font/Script/Stylesheet, prefetchRoute, dnsPrefetch, preconnect — all SSR-safe DOM manipulation), Performance Measurement (measure, measureAsync, measureSync, reportMetric — performance.mark/measure API), Performance Budget Constants (PERFORMANCE_BUDGET with lcp/inp/cls/ttfb/bundle/image/font/memory thresholds, checkBudget, violation tracking). **Future Integration Points (5)**: R3F Bootstrap (R3F_CONFIG, canUseR3F WebGL/mobile/motion checks, getR3FPixelRatio, getDefaultMountConfig), Booking Interfaces (BookingSlot/Request/Confirmation/State, ServiceOption, ArtisanOption types), API Client Infrastructure (createApiClient with stub methods, DEFAULT_API_CONFIG, type interfaces), Analytics Abstraction (AnalyticsProvider interface, Noop/Console providers, analytics singleton, trackEvent/trackPageView), Monitoring Abstraction (MonitoringProvider interface, Noop/Console providers, monitoring singleton, captureError/captureMessage/addBreadcrumb). Created barrel exports for all 7 new directories plus shared/types. Updated shared/utils/index.ts with error-utils exports. All files TypeScript strict mode clean. All tree-shakeable. All SSR-safe. Build passes. No business UI implemented.
 
 ---
 
