@@ -53,6 +53,8 @@ import { HeroOverlay } from './hero-overlay';
 import { HeroContent } from './hero-content';
 import { HeroLoading } from './hero-loading';
 import { Hero3DMount } from './hero-3d-mount';
+import { HeroInteractionProvider } from './hero-interaction-context';
+import { HeroScrollIndicator } from './hero-scroll-indicator';
 import { useHeroState } from './hooks/use-hero-state';
 import { useHeroViewport } from './hooks/use-hero-viewport';
 import { useHeroAnimation } from './hooks/use-hero-animation';
@@ -135,123 +137,106 @@ export function HeroSection({
 
   return (
     <HeroErrorBoundary>
-      <section
-        id="hero"
-        aria-label={HERO_COPY_EN.a11y.sectionAriaLabel}
-        className={`hero-section relative overflow-hidden ${className}`}
-        style={{
-          /* Full viewport height — the hero IS the viewport.
-           * Using 100svh for mobile address bar compensation. */
-          height: HERO_LAYOUT.height,
-          /* Prevent horizontal overflow from any layer */
-          width: '100%',
-          /* Ensure the hero sits above the page surface */
-          backgroundColor: 'var(--color-surface)',
-          /* Safe-area support for notched/rounded-corner devices.
-           * env() returns 0px when not applicable — zero visual impact. */
-          paddingBottom: HERO_LAYOUT.safeArea.bottom,
-          paddingLeft: HERO_LAYOUT.safeArea.left,
-          paddingRight: HERO_LAYOUT.safeArea.right,
-        }}
+      <HeroInteractionProvider
+        prefersReducedMotion={viewport.prefersReducedMotion}
       >
-        {/* ── Layer 0: Ambient Background ─────────────────
-         * The warm canvas behind everything.
-         * Always visible — the hero's safety net. */}
-        <HeroBackground
-          prefersReducedMotion={viewport.prefersReducedMotion}
-        />
-
-        {/* ── Layer 1: Hero Image / Media ─────────────────
-         * Full-viewport editorial image.
-         * Shows warm placeholder while loading. */}
-        <HeroMedia
-          loadState={heroState.loadState}
-          onImageLoad={() => assets.startLoading()}
-          onImageError={(err) => heroState.markError(err)}
-        />
-
-        {/* ── Layer 1.5: 3D Mounting Point ────────────────
-         * Optional atmospheric effects (Phase 6).
-         * Invisible when disabled — zero visual impact. */}
-        <Hero3DMount
-          is3DEnabled={false} /* Phase 6: connect to feature flag */
-          hasWebGL={viewport.maySupportWebGL}
-        />
-
-        {/* ── Layer 2: Atmospheric Overlays ────────────────
-         * Composited warm treatments.
-         * Functional (legibility) not decorative (N30). */}
-        <HeroOverlay />
-
-        {/* ── Layer 10: Content ────────────────────────────
-         * Brand name (h1), tagline, CTAs.
-         * Centered per DESIGN_SYSTEM §6.
-         *
-         * Phase 4.3: Responsive vertical positioning.
-         * Desktop: Extra bottom padding pushes content above center
-         * to ~42% from top (golden-section composition).
-         * Mobile/Tablet: Content centers at mathematical 50%. */}
-        <div
-          className="absolute inset-0 flex items-center justify-center"
+        <section
+          id="hero"
+          role="banner"
+          aria-label={HERO_COPY_EN.a11y.sectionAriaLabel}
+          className={`hero-section relative overflow-hidden ${className}`}
           style={{
-            zIndex: 10,
-            paddingBottom: HERO_LAYOUT.contentPaddingBottom[viewport.variant],
+            /* Full viewport height — the hero IS the viewport.
+             * Using 100svh for mobile address bar compensation. */
+            height: HERO_LAYOUT.height,
+            /* Prevent horizontal overflow from any layer */
+            width: '100%',
+            /* Ensure the hero sits above the page surface */
+            backgroundColor: 'var(--color-surface)',
+            /* Safe-area support for notched/rounded-corner devices.
+             * env() returns 0px when not applicable — zero visual impact. */
+            paddingBottom: HERO_LAYOUT.safeArea.bottom,
+            paddingLeft: HERO_LAYOUT.safeArea.left,
+            paddingRight: HERO_LAYOUT.safeArea.right,
           }}
         >
-          <HeroContent
-            brandName={config.brandName}
-            tagline={config.tagline}
-            cta={config.cta}
-            secondaryCta={config.secondaryCta}
-            isReady={heroState.isReady}
-            variant={viewport.variant}
+          {/* ── Layer 0: Ambient Background ─────────────────
+           * The warm canvas behind everything.
+           * Always visible — the hero's safety net. */}
+          <HeroBackground
+            prefersReducedMotion={viewport.prefersReducedMotion}
           />
-        </div>
 
-        {/* ── Layer 100: Loading Threshold ─────────────────
-         * The designed entrance moment.
-         * Fades out when hero is ready. */}
-        <HeroLoading isVisible={heroState.isLoading} />
+          {/* ── Layer 1: Hero Image / Media ─────────────────
+           * Full-viewport editorial image.
+           * Shows warm placeholder while loading. */}
+          <HeroMedia
+            loadState={heroState.loadState}
+            onImageLoad={() => assets.startLoading()}
+            onImageError={(err) => heroState.markError(err)}
+          />
 
-        {/* ── Scroll Indicator ─────────────────────────────
-         * A subtle downward chevron indicating scroll.
-         * Communicates: "There is more to discover."
-         * Hidden when hero is loading, visible when ready.
-         *
-         * From DESIGN_SYSTEM §14 Law 3:
-         * "Most visitors should not consciously notice the motion."
-         *
-         * Phase 4.3: Responsive bottom positioning per breakpoint.
-         * Mobile: 1rem (compact), Tablet: 1.5rem, Desktop: 3rem.
-         *
-         * Phase 9 may add a subtle bob animation. */}
-        {heroState.isReady && !viewport.prefersReducedMotion && (
+          {/* ── Layer 1.5: 3D Mounting Point ────────────────
+           * Optional atmospheric effects (Phase 6).
+           * Invisible when disabled — zero visual impact. */}
+          <Hero3DMount
+            is3DEnabled={false} /* Phase 6: connect to feature flag */
+            hasWebGL={viewport.maySupportWebGL}
+          />
+
+          {/* ── Layer 2: Atmospheric Overlays ────────────────
+           * Composited warm treatments.
+           * Functional (legibility) not decorative (N30). */}
+          <HeroOverlay />
+
+          {/* ── Layer 10: Content ────────────────────────────
+           * Brand name (h1), tagline, CTAs.
+           * Centered per DESIGN_SYSTEM §6.
+           *
+           * Phase 4.3: Responsive vertical positioning.
+           * Desktop: Extra bottom padding pushes content above center
+           * to ~42% from top (golden-section composition).
+           * Mobile/Tablet: Content centers at mathematical 50%. */}
           <div
-            className="hero-scroll-indicator absolute left-1/2 -translate-x-1/2"
+            className="absolute inset-0 flex items-center justify-center"
             style={{
               zIndex: 10,
-              opacity: 0.5,
-              transition: 'opacity 0.6s ease-out',
-              bottom: HERO_LAYOUT.scrollIndicator[viewport.variant].bottom,
+              paddingBottom: HERO_LAYOUT.contentPaddingBottom[viewport.variant],
             }}
-            aria-hidden="true"
-            title={HERO_COPY_EN.a11y.scrollIndicatorLabel}
           >
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="var(--color-text-muted)"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M12 5v14M5 12l7 7 7-7" />
-            </svg>
+            <HeroContent
+              brandName={config.brandName}
+              tagline={config.tagline}
+              cta={config.cta}
+              secondaryCta={config.secondaryCta}
+              isReady={heroState.isReady}
+              variant={viewport.variant}
+            />
           </div>
-        )}
-      </section>
+
+          {/* ── Layer 100: Loading Threshold ─────────────────
+           * The designed entrance moment.
+           * Fades out when hero is ready. */}
+          <HeroLoading isVisible={heroState.isLoading} />
+
+          {/* ── Scroll Indicator ─────────────────────────────
+           * A subtle downward chevron indicating scroll.
+           * Communicates: "There is more to discover."
+           * Hidden when hero is loading, visible when ready.
+           *
+           * From DESIGN_SYSTEM §14 Law 3:
+           * "Most visitors should not consciously notice the motion."
+           *
+           * Phase 4.4: Now uses HeroScrollIndicator component
+           * with hover intent and GSAP registration. */}
+          <HeroScrollIndicator
+            label={HERO_COPY_EN.a11y.scrollIndicatorLabel}
+            bottom={HERO_LAYOUT.scrollIndicator[viewport.variant].bottom}
+            isVisible={heroState.isReady && !viewport.prefersReducedMotion}
+            targetId="services"
+          />
+        </section>
+      </HeroInteractionProvider>
     </HeroErrorBoundary>
   );
 }

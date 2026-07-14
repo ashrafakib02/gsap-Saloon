@@ -35,6 +35,7 @@
 
 import type { HeroContentProps } from './hero.types';
 import { HERO_LAYOUT } from './hero.config';
+import { HeroCTA } from './hero-cta';
 
 // ── Component ─────────────────────────────────────────────
 
@@ -74,7 +75,6 @@ export function HeroContent({
     ? 'column' as const
     : 'row' as const;
   const ctaGap = HERO_LAYOUT.ctaGap[variant];
-  const ctaMinWidth = HERO_LAYOUT.ctaMinWidth[variant];
 
   return (
     <div
@@ -147,8 +147,8 @@ export function HeroContent({
        * Mobile: Vertical stack — full-width buttons, thumb-friendly.
        * Tablet/Desktop: Horizontal row — side-by-side, visual hierarchy.
        *
-       * TODO Phase 4.4: Hero Interactions (hover states, focus management).
-       * TODO Phase 9: CTA fade-in after tagline.
+       * Phase 4.4: Interaction architecture via HeroCTA components.
+       * Hover intent, focus management, GSAP refs handled by components.
        */}
       <div
         className="hero-cta-group"
@@ -163,71 +163,20 @@ export function HeroContent({
           transition: 'opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.5s',
         }}
       >
-        {/* Primary CTA — Book your experience */}
-        <a
+        <HeroCTA
           href={cta.href}
+          label={cta.label}
+          variant="primary"
+          isVisible={isReady}
           className="hero-cta-primary"
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            minHeight: '48px',
-            minWidth: ctaMinWidth,
-            padding: '14px 36px',
-            fontFamily: 'var(--font-sans)',
-            fontSize: 'var(--text-body)',
-            fontWeight: 500,
-            letterSpacing: '0.01em',
-            color: 'var(--color-surface)',
-            backgroundColor: 'var(--color-accent)',
-            borderRadius: 'var(--radius-small)',
-            textDecoration: 'none',
-            cursor: 'pointer',
-            border: 'none',
-            transition: 'background-color 200ms cubic-bezier(0.65, 0, 0.35, 1)',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = 'var(--color-accent-hover)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = 'var(--color-accent)';
-          }}
-        >
-          {cta.label}
-        </a>
-
-        {/* Secondary CTA — Explore our craft */}
-        <a
+        />
+        <HeroCTA
           href={secondaryCta.href}
+          label={secondaryCta.label}
+          variant="ghost"
+          isVisible={isReady}
           className="hero-cta-secondary"
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            minHeight: '44px',
-            minWidth: ctaMinWidth,
-            padding: '10px 24px',
-            fontFamily: 'var(--font-sans)',
-            fontSize: 'var(--text-body)',
-            fontWeight: 400,
-            letterSpacing: '0.01em',
-            color: 'var(--color-text-secondary)',
-            backgroundColor: 'transparent',
-            borderRadius: 'var(--radius-small)',
-            textDecoration: 'none',
-            cursor: 'pointer',
-            border: 'none',
-            transition: 'color 200ms cubic-bezier(0.65, 0, 0.35, 1)',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.color = 'var(--color-accent)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.color = 'var(--color-text-secondary)';
-          }}
-        >
-          {secondaryCta.label}
-        </a>
+        />
       </div>
     </div>
   );

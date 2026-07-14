@@ -33,6 +33,9 @@ export { HeroOverlay } from './hero-overlay';
 export { HeroLoading } from './hero-loading';
 export { Hero3DMount } from './hero-3d-mount';
 export { HeroErrorBoundary } from './hero-error-boundary';
+export { HeroCTA } from './hero-cta';
+export { HeroScrollIndicator } from './hero-scroll-indicator';
+export { HeroInteractionProvider, useHeroInteractionContext } from './hero-interaction-context';
 
 // ── Hooks ──────────────────────────────────────────────────
 // Exported for use in custom hero compositions or testing
@@ -41,6 +44,8 @@ export { useHeroState } from './hooks/use-hero-state';
 export { useHeroViewport } from './hooks/use-hero-viewport';
 export { useHeroAnimation } from './hooks/use-hero-animation';
 export { useHeroAssets } from './hooks/use-hero-assets';
+export { useHeroInteraction } from './hooks/use-hero-interaction';
+export { useHoverIntent } from './hooks/use-hover-intent';
 
 // ── Copy Module ────────────────────────────────────────────
 // Centralized copy management — the single source of truth for hero text.
@@ -82,6 +87,19 @@ export type {
   HeroSeoCopy,
   HeroStructuredData,
 } from './hero.copy.types';
+
+export type {
+  InteractionMode,
+  CTAVisualState,
+  HeroCTAProps,
+  HeroScrollIndicatorProps,
+  HoverIntentOptions,
+  UseHoverIntentReturn,
+  UseHeroInteractionReturn,
+  HeroInteractionContextValue,
+} from './hero-interaction.types';
+
+export { HERO_INTERACTION } from './hero-interaction.config';
 
 // ── Config ─────────────────────────────────────────────────
 // Exported for consumers who need hero constants
