@@ -8,10 +8,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Current Phase** | Phase 3 — Frontend Foundation |
-| **Current Step** | 4.1 — Hero Experience |
-| **Overall Completion** | 8.5% (7 / 82 steps) |
-| **Last Updated** | 2026-07-13 |
+| **Current Phase** | Phase 4 — Experience Layer |
+| **Current Step** | 4.2 — Hero Copy |
+| **Overall Completion** | 9.8% (8 / 82 steps) |
+| **Last Updated** | 2026-07-14 |
 
 ---
 
@@ -19,7 +19,7 @@
 
 ### Phase 3 — Frontend Foundation
 
-**Status:** In Progress
+**Status:** ✅ Completed
 
 | Step | Status |
 |------|--------|
@@ -35,11 +35,11 @@
 
 ### Phase 4 — Experience Layer
 
-**Status:** Not Started
+**Status:** In Progress
 
 | Step | Status |
 |------|--------|
-| 4.1 Hero Experience | ⬜ Not Started |
+| 4.1 Hero Experience | ✅ Completed |
 | 4.2 Hero Copy | ⬜ Not Started |
 | 4.3 Hero Layout | ⬜ Not Started |
 | 4.4 Hero Interactions | ⬜ Not Started |
@@ -209,7 +209,7 @@
 | 3.5 | Theme Integration | ✅ Completed | Frontend Architect | P0 | 3.2 | Medium |
 | 3.6 | Global Utilities | ✅ Completed | Frontend Architect | P0 | 3.2 | Low |
 | 3.7 | Shared Infrastructure | ✅ Completed | Frontend Architect | P0 | 3.2, 3.3 | Medium |
-| 4.1 | Hero Experience | ⬜ Not Started | Frontend Architect | P0 | 3.3, 3.4, 3.5 | High |
+| 4.1 | Hero Experience | ✅ Completed | Frontend Architect | P0 | 3.3, 3.4, 3.5 | High |
 | 4.2 | Hero Copy | ⬜ Not Started | Content Lead | P0 | None | Low |
 | 4.3 | Hero Layout | ⬜ Not Started | Frontend Architect | P0 | 4.1 | Medium |
 | 4.4 | Hero Interactions | ⬜ Not Started | Frontend Architect | P1 | 4.1, 3.5 | Medium |
@@ -288,6 +288,15 @@
 ---
 
 ## Changelog
+
+### 2026-07-14
+
+**Phase 4.1 — Hero Experience**
+Status: Completed
+
+Built the Hero Experience — the cinematic "Scene 1: Threshold" of The Sovereign Artisor website. Created 14 new files in `features/hero/` with a layered composition architecture (error boundary → section landmark → background → media → 3D mount → overlay → content → loading). **Types** (`hero.types.ts`): Complete type system — HeroLoadState, HeroAnimationState, HeroVariant, HeroConfig, props interfaces for all 7 sub-components, HERO_PERFORMANCE_BUDGET (LCP <2.5s, CLS <0.05), HERO_A11Y constants. **Config** (`hero.config.ts`): HERO_DEFAULT_CONFIG with brand name "The Sovereign Artisor", tagline, CTAs; HERO_ANIMATION with Warm Reveal parameters (startOpacity 0.85, duration 1200ms, power2.out easing); HERO_LAYOUT (100svh height, 65ch max content width, 72px nav offset); HERO_IMAGE (16/9, center 30% object position, eager loading, high fetch priority). **7 Sub-Components**: HeroErrorBoundary (class component, branded warm fallback with retry), HeroBackground (ambient warm surface with radial gradient depth), HeroMedia (3-state: warm placeholder → full image → warm error fallback, CLS prevention via explicit dimensions), HeroOverlay (3 functional layers: warm-vignette, golden-atmosphere, content-legibility — all GPU-accelerated opacity), HeroContent (h1 brand name serif, tagline sans, primary/secondary CTAs with 48px touch targets), HeroLoading (branded LoadingIndicator at z:100 with 600ms fade-out), Hero3DMount (conditional R3F mounting point, disabled until Phase 6). **4 Hooks**: useHeroState (state machine: idle→loading→loaded→revealing→revealed), useHeroViewport (variant detection, reduced motion, WebGL capability, orientation), useHeroAnimation (PLACEHOLDER for Phase 9 GSAP timeline — state machine + instant reduced-motion fallback), useHeroAssets (PLACEHOLDER for Phase 4.7 — font/image tracking with AbortController). **Composition** (`hero.tsx`): Layered rendering with z-index stacking (0→1→2→10→100), lifecycle hooks coordinating load→reveal→ready, scroll indicator. **Barrel export** (`index.ts`): Default + named exports for all components, hooks, types, config. Integrated Hero into homepage (`app/index.tsx`) as Scene 1. All files follow VISUAL_RULES: no shimmer skeletons (N23), overlays functional not decorative (N30), single h1 (AC15), hero is only time-linked animation (M2), no text over busy backgrounds (N9). Ready for Phase 4.2 (Hero Copy) to replace tasteful temporary content with final copy.
+
+---
 
 ### 2026-07-13
 
