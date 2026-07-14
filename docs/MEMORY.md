@@ -413,4 +413,26 @@ Before writing any code in this project, verify:
 
 ---
 
+## 16. Narrative Architecture (Phase 5.1)
+
+**System:** Scroll-linked narrative registry with 16 homepage sections, following a three-act dramatic structure.
+
+**Sections (scroll order):** threshold(0) → hero(1) → whisper(2) → atmosphere(3) → breathing-space-arrival(4) → hair(5) → transformation(6) → bridal(7) → spa(8) → artisans(9) → testimonials(10) → breathing-space-commitment(11) → booking(12) → gift(13) → closing(14) → footer(15)
+
+**Architecture Pattern:** `narrative.types.ts` (12 unions, 6 interfaces) → `narrative.constants.ts` (centralized IDs, groups, orders) → `narrative.config.ts` (immutable singleton registry via `createNarrativeRegistry()` factory) → `narrative-context-internal.ts` + `narrative-context.tsx` (React context + provider) → 3 hooks (useNarrative, useNarrativeRegistry, useNarrativeOrder)
+
+**Key Types:** SectionId, SectionCategory (act-one/two/three/structural/transitional), NarrativeStage (prologue/act-one/two/three/epilogue), SectionImportance (peak/signature/standard/structural), ThemeVariant (warm/deep/light/rich), AnimationKey (8 presets for Phase 9), PreloadKey (7 bundles for Phase 11), ScrollParticipation (scroll-linked/trigger-only/fixed/none)
+
+**Registry API:** get(id), getAll(), getByCategory(), getByStage(), getEnabled(), getNarrativeParticipants(), count(), has(id), getPreloadOrder() — all O(1) via Map indices
+
+**Hooks:** Pure data access only — zero effects, zero listeners, zero side effects. useNarrativeOrder uses useCallback for stable function references.
+
+**Import Pattern:** `import { NARRATIVE_REGISTRY, useNarrative, SECTION_IDS, type SectionId } from '@/features/narrative'`
+
+**Future Phase Hooks (populated, not implemented):** animationKey (Phase 9), preloadKey (Phase 11), AnimationRegistration, PreloadRegistration
+
+**Files Created:** narrative.types.ts, narrative.constants.ts, narrative.config.ts, narrative-context-internal.ts, narrative-context.tsx, hooks/use-narrative.ts, hooks/use-narrative-registry.ts, hooks/use-narrative-order.ts, hooks/index.ts, index.ts
+
+---
+
 *This document is immutable project memory. It is updated only when permanent architectural or design decisions change. It does not track progress, implementation history, or temporary state.*

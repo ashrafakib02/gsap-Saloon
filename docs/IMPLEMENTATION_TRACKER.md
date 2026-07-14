@@ -9,8 +9,8 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | Phase 5 — Narrative Architecture |
-| **Current Step** | 5.1 — Narrative Structure |
-| **Overall Completion** | 17.1% (14 / 82 steps) |
+| **Current Step** | 5.2 — Section Transitions |
+| **Overall Completion** | 18.3% (15 / 82 steps) |
 | **Last Updated** | 2026-07-14 |
 
 ---
@@ -35,7 +35,7 @@
 
 ### Phase 4 — Experience Layer
 
-**Status:** In Progress
+**Status:** ✅ Completed
 
 | Step | Status |
 |------|--------|
@@ -51,11 +51,11 @@
 
 ### Phase 5 — Scroll Storytelling
 
-**Status:** Not Started
+**Status:** In Progress
 
 | Step | Status |
 |------|--------|
-| 5.1 Narrative Structure | ⬜ Not Started |
+| 5.1 Narrative Structure | ✅ Completed |
 | 5.2 Section Transitions | ⬜ Not Started |
 | 5.3 Scroll Timeline | ⬜ Not Started |
 | 5.4 Scroll Triggers | ⬜ Not Started |
@@ -216,7 +216,7 @@
 | 4.5 | Hero Responsive Behavior | ✅ Completed | Frontend Architect | P0 | 4.1, 3.5 | Medium |
 | 4.6 | Hero Accessibility | ✅ Completed | Frontend Architect | P0 | 4.1 | Medium |
 | 4.7 | Hero Performance | ✅ Completed | Frontend Architect | P0 | 4.1 | High |
-| 5.1 | Narrative Structure | ⬜ Not Started | Frontend Architect | P0 | 4.1, 3.3 | Medium |
+| 5.1 | Narrative Structure | ✅ Completed | Frontend Architect | P0 | 4.1, 3.3 | Medium |
 | 5.2 | Section Transitions | ⬜ Not Started | Frontend Architect | P0 | 5.1, 3.5 | Medium |
 | 5.3 | Scroll Timeline | ⬜ Not Started | Frontend Architect | P0 | 5.1 | Medium |
 | 5.4 | Scroll Triggers | ⬜ Not Started | Frontend Architect | P0 | 5.3 | Medium |
@@ -291,7 +291,10 @@
 
 ### 2026-07-14
 
-**Phase 4.7 — Hero Performance**
+**Phase 5.1 — Narrative Structure**
+Status: Completed
+
+Built the scroll-linked narrative architecture — the scalable, strongly-typed system that every future section will follow. Created 8 new files in `features/narrative/`. **Narrative Types** (`narrative.types.ts`): Complete type system with 12 union types and 6 interfaces — SectionId (16 literal union), SectionCategory (5 categories), NarrativeStage (5 stages), SectionImportance (4 levels), ThemeVariant (4 variants), AnimationKey (8 future keys), PreloadKey (7 future keys), TransitionName (7 presets), ScrollParticipation (4 modes), AccessibilityMetadata (ariaLabel, headingLevel, role, prefersReducedMotion), AnalyticsMetadata (analyticsId, displayName, trackScrollDepth, trackTimeSpent, customEvents), NarrativeSection (17-field immutable definition), NarrativeRegistry (9-method interface), NarrativeContextValue, AnimationRegistration (Phase 9 placeholder), PreloadRegistration (Phase 11 placeholder). Zero `any`, zero string duplication, all unions over literals. **Narrative Constants** (`narrative.constants.ts`): Centralized section IDs in scroll order, category groupings (ACT_ONE/ACT_TWO/ACT_THREE/PROLOGUE/EPILOGUE), breathing space IDs, peak sections, signature sections, scroll sections, preload order, display names. All re-exported for tree-shakeable consumption. **Narrative Config** (`narrative.config.ts`): Immutable section registry with all 16 homepage sections — each with id, title, order, featureFolder, sceneNumber, category, stage, importance, enabled, themeVariant, animationKey, preloadKey, scrollParticipation, isNarrativeParticipant, accessibility metadata, analytics metadata. Factory pattern `createNarrativeRegistry()` with O(1) lookups by ID, category, and stage. Singleton NARRATIVE_REGISTRY frozen at module load. Development-mode validation for unique IDs, sequential orders, and expected count. **Narrative Context** (`narrative-context-internal.ts` + `narrative-context.tsx`): Context creation and NarrativeProvider with memoized context value. Split into two files for react-refresh/only-export-components compliance. Provider derives all data from singleton registry once, memoized. **Three Hooks**: `useNarrative` (main context access), `useNarrativeRegistry` (registry lookups — get/getAll/getByCategory/getByStage/getEnabled/getNarrativeParticipants/count/has/getPreloadOrder), `useNarrativeOrder` (ordered section data — getIndex/getNext/getPrevious). All pure data access — zero effects, zero listeners, zero side effects. `useNarrativeOrder` functions stabilized with useCallback. **Barrel Exports** (`index.ts`): Clean public API — provider, hooks, registry, 22 constants, 15 type exports. Verification: ESLint passes (zero errors in narrative files), TypeScript compiles (zero narrative errors), pre-existing hero/dev errors only.
 Status: Completed
 
 Implemented complete hero performance architecture — render optimization, deferred loading, asset strategy, GSAP lazy initialization, and Core Web Vitals monitoring. **Render Optimization**: Added React.memo to 7 components (HeroContent, HeroMedia, HeroLoading, Hero3DMount, HeroScrollIndicator, HeroCTA — HeroBackground and HeroOverlay already had memo). Added useMemo to 6 computed objects (hero config merge in HeroSection, 4 style objects in HeroContent, context value in HeroInteractionProvider). Added useCallback to 4 callbacks (handleImageLoad, handleImageError in HeroSection). **Deferred Loading**: Created `useDeferredLoad` hook — defers non-critical component loading until browser idle via requestIdleCallback with setTimeout fallback. SSR-safe, AbortController cleanup. Applied to Hero3DMount to delay 3D scene mounting until after hero image (LCP) renders. **Asset Loading Strategy**: Replaced `<img>` in HeroMedia with `<picture>` element for format negotiation (AVIF > WebP > JPEG). Prepared srcset architecture using HERO_ASSETS.formatPriority from hero-perf.config.ts. **GSAP Lazy Initialization**: Created `use-gsap-lazy.ts` utility module — singleton pattern for lazy GSAP/ScrollTrigger loading via dynamic import(). Includes idle preloading via requestIdleCallback, retry-on-failure, and status check functions. **Performance Documentation**: Created HERO_PERFORMANCE.md documenting render pipeline, component tree, optimization strategies, budget configuration, measurement infrastructure, and phase responsibilities. **Re-render Audit**: Full audit of all 8 components and 8 hooks confirmed correct memo/callback/ref patterns. Only optimization needed was HeroCTA memo (added). All zero TypeScript errors across modified files.
