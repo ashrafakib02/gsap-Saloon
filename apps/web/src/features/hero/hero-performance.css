@@ -1,0 +1,249 @@
+/**
+ * Hero Performance — Centralized Performance Styles
+ *
+ * From DESIGN_SYSTEM §Performance:
+ * P1: "LCP under 2.5 seconds — hero image visible within 2.5s"
+ * P2: "CLS under 0.1 — no layout shifts after initial render"
+ * P7: "Fonts load without blocking text rendering (font-display: swap)"
+ *
+ * This file handles performance optimizations that require CSS:
+ *   - Layout shift prevention (CLS budget)
+ *   - Font loading optimization (FOUT prevention)
+ *   - Content visibility for rendering performance
+ *   - GPU acceleration hints
+ *   - Image rendering optimization
+ *   - Scroll performance optimization
+ *
+ * Architecture:
+ *   hero-performance.css → performance CSS (this file)
+ *   hero-responsive.css  → responsive layout CSS
+ *   hero-accessibility.css → accessibility CSS
+ *
+ * From TECHNICAL_ARCHITECTURE §14:
+ * "Performance budgets are enforced at build time via
+ *  bundle analysis and at runtime via PerformanceObserver."
+ */
+
+/* ═══════════════════════════════════════════════════════════
+   1. LAYOUT SHIFT PREVENTION (P2 — CLS < 0.05)
+   ═══════════════════════════════════════════════════════════
+   The hero MUST have zero layout shift. It's the first thing
+   the visitor sees. Any shift breaks the "entrance" moment.
+
+   From DESIGN_SYSTEM §Performance P2:
+   "CLS under 0.1 — no layout shifts after initial render"
+
+   From TECHNICAL_ARCHITECTURE §14:
+   "CLS prevention: explicit dimensions, aspect-ratio, size-adjust" */
+
+/* Hero media container — reserve space for the image */
+.hero-media {
+  /* Aspect ratio reservation prevents CLS when image loads */
+  contain-intrinsic-size: 100vw 100svh;
+}
+
+/* Hero content wrapper — minimum height prevents shift during font swap */
+.hero-content-wrapper {
+  /* Minimum height ensures content area doesn't shift when fonts load.
+   * The font swap (font-display: swap) can cause size differences
+   * between fallback and web font metrics. */
+  min-height: 200px;
+}
+
+@media (min-width: 768px) {
+  .hero-content-wrapper {
+    min-height: 280px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero-content-wrapper {
+    min-height: 320px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   2. FONT LOADING OPTIMIZATION (P7)
+   ═══════════════════════════════════════════════════════════
+   Font-display: swap is declared in @font-face rules.
+   This CSS reinforces the strategy and adds fallback handling.
+
+   From DESIGN_SYSTEM §Performance P7:
+   "Fonts load without blocking text rendering (font-display: swap)"
+
+   From DESIGN_SYSTEM §4:
+   "Two font families: Cormorant Garamond (serif) and DM Sans (sans-serif)." */
+
+/* Hero text uses the brand fonts — ensure swap is smooth */
+.hero-brand-name,
+.hero-tagline {
+  /* text-rendering optimization for faster glyph resolution */
+  text-rendering: optimizeLegibility;
+
+  /* Font smoothing for web fonts — prevents blurry text on macOS */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Prevent font swap flash by maintaining line-height consistency.
+   * The line-height is set via CSS custom properties that remain
+   * stable across font swap — the custom property values don't change,
+   * only the font face does. */
+}
+
+/* ═══════════════════════════════════════════════════════════
+   3. GPU ACCELERATION HINTS (P10)
+   ═══════════════════════════════════════════════════════════
+   Elements that will be animated (Phase 9) should promote
+   to their own compositing layer for smooth 60fps.
+
+   From DESIGN_SYSTEM §Performance P10:
+   "GPU-accelerated: opacity and transform only.
+    No layout properties (width, height, margin, padding)." */
+
+/* Hero media — will animate opacity during Warm Reveal (Phase 9) */
+.hero-image {
+  /* Promote to compositor layer for opacity animation */
+  will-change: opacity;
+
+  /* Prevent image from causing layout during animation */
+  transform: translateZ(0);
+}
+
+/* Hero overlay layers — already have will-change: opacity */
+/* (set inline in hero-overlay.tsx) */
+
+/* Hero content — will animate opacity and translateY (Phase 9) */
+.hero-brand-name,
+.hero-tagline,
+.hero-cta-group {
+  /* Promote to compositor layer for Phase 9 animations.
+   * These are lightweight compositing hints — the browser
+   * will only create a layer when animation actually starts. */
+  will-change: opacity;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   4. CONTENT VISIBILITY — RENDERING PERFORMANCE
+   ═══════════════════════════════════════════════════════════
+   content-visibility: auto enables the browser to skip layout
+   and paint for off-screen content, improving initial render.
+
+   The hero is ABOVE the fold, so it uses content-visibility: visible.
+   Below-fold sections (Phase 7+) will use content-visibility: auto.
+
+   This section defines the pattern for future sections. */
+
+/* Hero — always visible (above the fold) */
+.hero-section {
+  content-visibility: visible;
+  /* Contain layout to prevent hero from affecting page layout */
+  contain: layout style;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   5. IMAGE RENDERING OPTIMIZATION
+   ═══════════════════════════════════════════════════════════
+   Optimize how the browser renders the hero image for
+   quality and performance. */
+
+/* Hero image — high quality rendering */
+.hero-image {
+  /* High quality scaling algorithm for large hero images */
+  image-rendering: auto;
+
+  /* Prevent image from being stretched beyond natural size */
+  max-width: 100%;
+  max-height: 100%;
+}
+
+/* Placeholder — render as flat color (no smoothing needed) */
+.hero-placeholder {
+  /* Optimize placeholder rendering — it's a solid color */
+  image-rendering: pixelated;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   6. SCROLL PERFORMANCE
+   ═══════════════════════════════════════════════════════════
+   Optimize scroll-related performance for the hero section.
+
+   From DESIGN_SYSTEM §14 Law 1:
+   "Scroll-linked, not time-linked." */
+
+/* Hero section — prevent scroll jank */
+.hero-section {
+  /* Prevent overscroll bounce in the hero (iOS Safari) */
+  overscroll-behavior: contain;
+
+  /* Prevent scroll chaining to parent when hero is at scroll limit */
+  overflow: hidden;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   7. PAINT OPTIMIZATION
+   ═══════════════════════════════════════════════════════════
+   Reduce paint complexity for better frame rates. */
+
+/* Hero background — composite only (no repaint on scroll) */
+.hero-background {
+  /* Background is static — never repaints */
+  contain: strict;
+}
+
+/* Overlay layers — composite only */
+.hero-overlay {
+  /* Overlays are static atmospheric layers */
+  contain: layout paint;
+}
+
+/* Loading overlay — will transition opacity */
+.hero-loading {
+  /* Promote for smooth opacity transition */
+  will-change: opacity;
+  contain: layout style;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   8. FONT SIZE ADJUSTMENT FOR CLS PREVENTION
+   ═══════════════════════════════════════════════════════════
+   size-adjust in @font-face helps align fallback font metrics
+   with web font metrics to minimize CLS during font swap.
+
+   Phase 11.7 will implement actual size-adjust values.
+   Phase 4.7 defines the CSS layer. */
+
+/* Placeholder comments for Phase 11.7:
+ * @font-face {
+ *   font-family: 'Cormorant Garamond';
+ *   size-adjust: 100% 100%;  ← actual value TBD
+ *   ascent-override: 100%;
+ *   descent-override: 100%;
+ *   line-gap-override: 100%;
+ * }
+ */
+
+/* ═══════════════════════════════════════════════════════════
+   9. REDUCED MOTION — PERFORMANCE LAYER
+   ═══════════════════════════════════════════════════════════
+   When reduced motion is active, disable all animation-related
+   CSS properties for maximum rendering performance.
+
+   From VISUAL_RULES AC5:
+   "prefers-reduced-motion is always respected." */
+
+@media (prefers-reduced-motion: reduce) {
+  /* Remove all will-change hints when animations are disabled */
+  .hero-image,
+  .hero-brand-name,
+  .hero-tagline,
+  .hero-cta-group,
+  .hero-loading {
+    will-change: auto !important;
+    transform: none !important;
+  }
+
+  /* Remove containment hints that were only needed for animation */
+  .hero-loading {
+    contain: layout style;
+  }
+}

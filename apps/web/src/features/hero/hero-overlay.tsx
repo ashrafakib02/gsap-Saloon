@@ -18,6 +18,7 @@
  * - Reduced motion: instant opacity (AC5)
  */
 
+import { memo } from 'react';
 import type { HeroOverlayProps } from './hero.types';
 
 // ── Overlay Layer Configurations ──────────────────────────
@@ -98,7 +99,7 @@ const OVERLAY_LAYERS = [
  *
  * TODO Phase 9: Optional subtle opacity animation on scroll
  */
-export function HeroOverlay({ layers = OVERLAY_LAYERS.length }: HeroOverlayProps) {
+export const HeroOverlay = memo(function HeroOverlay({ layers = OVERLAY_LAYERS.length }: HeroOverlayProps) {
   const visibleLayers = OVERLAY_LAYERS.slice(0, layers);
 
   return (
@@ -120,4 +121,4 @@ export function HeroOverlay({ layers = OVERLAY_LAYERS.length }: HeroOverlayProps
       ))}
     </div>
   );
-}
+});

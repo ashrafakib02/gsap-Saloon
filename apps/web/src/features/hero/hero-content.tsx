@@ -34,6 +34,7 @@
  * Components receive `isReady` to know when content should be visible.
  */
 
+import { memo, useMemo } from 'react';
 import type { HeroContentProps } from './hero.types';
 import { HERO_LAYOUT } from './hero.config';
 import { HeroCTA } from './hero-cta';
@@ -42,6 +43,11 @@ import { HeroCTA } from './hero-cta';
 
 /**
  * The hero's text and CTA region — responsive composition.
+ *
+ * Wrapped in React.memo — props (brandName, tagline, cta, secondaryCta,
+ * isReady, variant) change infrequently. Prevents re-renders when
+ * parent hero state transitions (loading → loaded → revealed)
+ * do not affect content props.
  *
  * Contains:
  * 1. Brand name (h1) — the page's single heading
@@ -60,7 +66,7 @@ import { HeroCTA } from './hero-cta';
  * - CTA layout switches from vertical (mobile) to horizontal (tablet+)
  * - Horizontal padding prevents edge-touching at all widths
  */
-export function HeroContent({
+export const HeroContent = memo(function HeroContent({
   brandName,
   tagline,
   cta,
@@ -92,14 +98,54 @@ export function HeroContent({
    */
   const maxWidth = HERO_LAYOUT.maxContentWidth[variant];
 
+  /* ── Memoized Styles (Phase 4.7) ──────────────────────
+   * These style objects are recreated on every render without useMemo.
+   * Memoizing by variant prevents unnecessary re-renders of child
+   * components that receive these as props or inline styles. */
+  const containerStyle = useMemo(() => ({
+    maxWidth,
+    paddingLeft: padding,
+    paddingRight: padding,
+  }), [maxWidth, padding]);
+
+  const headlineStyle = useMemo(() => ({
+    fontFamily: 'var(--font-serif)',
+    fontSize: 'var(--text-display)',
+    lineHeight: 'var(--leading-display)',
+    letterSpacing: 'var(--tracking-display)',
+    fontWeight: brandName.weight,
+    color: 'var(--color-text)',
+    opacity: isReady ? 1 : 0,
+    transition: 'opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1)',
+  }), [brandName.weight, isReady]);
+
+  const taglineStyle = useMemo(() => ({
+    fontFamily: 'var(--font-sans)',
+    fontSize: 'var(--text-subheading)',
+    lineHeight: 'var(--leading-subheading)',
+    letterSpacing: 'var(--tracking-subheading)',
+    fontWeight: tagline.weight,
+    color: 'var(--color-text-secondary)',
+    marginTop: headlineToTaglineGap,
+    opacity: isReady ? 1 : 0,
+    transition: 'opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.3s',
+  }), [tagline.weight, headlineToTaglineGap, isReady]);
+
+  const ctaGroupStyle = useMemo(() => ({
+    marginTop: taglineToCtaGap,
+    display: 'flex',
+    flexDirection: ctaDirection,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: ctaGap,
+    opacity: isReady ? 1 : 0,
+    transition: 'opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.5s',
+  }), [taglineToCtaGap, ctaDirection, ctaGap, isReady]);
+
   return (
     <div
       className="hero-content relative z-10 flex flex-col items-center text-center"
-      style={{
-        maxWidth,
-        paddingLeft: padding,
-        paddingRight: padding,
-      }}
+      style={containerStyle}
     >
       {/* ── Brand Name (h1) ──────────────────────────────
        * One h1 per page (VISUAL_RULES AC15).
@@ -113,16 +159,7 @@ export function HeroContent({
        */}
       <h1
         className="hero-brand-name"
-        style={{
-          fontFamily: 'var(--font-serif)',
-          fontSize: 'var(--text-display)',
-          lineHeight: 'var(--leading-display)',
-          letterSpacing: 'var(--tracking-display)',
-          fontWeight: brandName.weight,
-          color: 'var(--color-text)',
-          opacity: isReady ? 1 : 0,
-          transition: 'opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1)',
-        }}
+        style={headlineStyle}
       >
         {brandName.text}
       </h1>
@@ -139,17 +176,7 @@ export function HeroContent({
        */}
       <p
         className="hero-tagline"
-        style={{
-          fontFamily: 'var(--font-sans)',
-          fontSize: 'var(--text-subheading)',
-          lineHeight: 'var(--leading-subheading)',
-          letterSpacing: 'var(--tracking-subheading)',
-          fontWeight: tagline.weight,
-          color: 'var(--color-text-secondary)',
-          marginTop: headlineToTaglineGap,
-          opacity: isReady ? 1 : 0,
-          transition: 'opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.3s',
-        }}
+        style={taglineStyle}
       >
         {tagline.text}
       </p>
@@ -168,16 +195,7 @@ export function HeroContent({
        */}
       <div
         className="hero-cta-group"
-        style={{
-          marginTop: taglineToCtaGap,
-          display: 'flex',
-          flexDirection: ctaDirection,
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: ctaGap,
-          opacity: isReady ? 1 : 0,
-          transition: 'opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.5s',
-        }}
+        style={ctaGroupStyle}
       >
         <HeroCTA
           href={cta.href}
@@ -196,4 +214,4 @@ export function HeroContent({
       </div>
     </div>
   );
-}
+});

@@ -30,6 +30,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
   type ReactNode,
@@ -169,17 +170,30 @@ export function HeroInteractionProvider({
     };
   }, []);
 
-  /* ── Context Value ──────────────────────────────────────── */
-  const value: HeroInteractionContextValue = {
-    interactionMode,
-    showFocusRing,
-    supportsHover,
-    isTouch,
-    prefersReducedMotion,
-    gsapContextRef,
-    animationTargetRefs: animationTargetRefs.current,
-    registerAnimationTarget,
-  };
+  /* ── Context Value ────────────────────────────────────────
+   * Memoized to prevent unnecessary re-renders of all consumers.
+   * Only recreates when interaction mode or preferences change.
+   * animationTargetRefs is a ref — its .current is stable. */
+  const value: HeroInteractionContextValue = useMemo(
+    () => ({
+      interactionMode,
+      showFocusRing,
+      supportsHover,
+      isTouch,
+      prefersReducedMotion,
+      gsapContextRef,
+      animationTargetRefs: animationTargetRefs.current,
+      registerAnimationTarget,
+    }),
+    [
+      interactionMode,
+      showFocusRing,
+      supportsHover,
+      isTouch,
+      prefersReducedMotion,
+      registerAnimationTarget,
+    ],
+  );
 
   return (
     <HeroInteractionContext.Provider value={value}>

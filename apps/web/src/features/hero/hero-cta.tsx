@@ -19,7 +19,7 @@
  * - Accessible: visible focus ring, keyboard operable
  */
 
-import { useCallback, useEffect, useRef } from 'react';
+import { memo, useCallback, useEffect, useRef } from 'react';
 import { useHeroInteractionContext } from './hero-interaction-context';
 import { useHoverIntent } from './hooks/use-hover-intent';
 import { HERO_INTERACTION } from './hero-interaction.config';
@@ -44,6 +44,11 @@ interface HeroCTAProps {
 /**
  * Interactive CTA button with hover intent and focus management.
  *
+ * Wrapped in React.memo — props (href, label, variant, isVisible, className)
+ * are stable. Prevents re-renders when parent re-renders but props are
+ * unchanged. Note: context changes (interaction mode) still trigger
+ * re-renders regardless of memo — this is expected (1-2 times per session).
+ *
  * This component:
  * - Uses useHoverIntent for hover state (delayed activation)
  * - Uses context for interaction mode (showFocusRing, isTouch)
@@ -54,7 +59,7 @@ interface HeroCTAProps {
  * From VISUAL_RULES AC5:
  * "Every interactive element has a visible hover/focus state."
  */
-export function HeroCTA({
+export const HeroCTA = memo(function HeroCTA({
   href,
   label,
   variant,
@@ -120,4 +125,4 @@ export function HeroCTA({
       {label}
     </a>
   );
-}
+});

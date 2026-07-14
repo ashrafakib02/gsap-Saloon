@@ -24,6 +24,8 @@
  * - All copy from hero.copy.ts — zero hardcoded text
  */
 
+import { memo } from 'react';
+import { memo } from 'react';
 import { LoadingIndicator } from '@/shared/feedback/loading-indicator';
 import { HERO_COPY_EN } from './hero.copy';
 import type { HeroLoadingProps } from './hero.types';
@@ -32,6 +34,10 @@ import type { HeroLoadingProps } from './hero.types';
 
 /**
  * The hero's loading threshold — the designed entrance moment.
+ *
+ * Wrapped in React.memo — only prop is isVisible, which transitions
+ * once (true → false). Prevents re-renders when parent hero state
+ * changes do not affect loading visibility.
  *
  * This is NOT a generic loading spinner. This IS the brand's
  * first impression — a designed moment of anticipation.
@@ -51,7 +57,7 @@ import type { HeroLoadingProps } from './hero.types';
  * 4. Smooth fade-out transition when hero is ready
  * 5. z-index above everything during load, then below content
  */
-export function HeroLoading({ isVisible }: HeroLoadingProps) {
+export const HeroLoading = memo(function HeroLoading({ isVisible }: HeroLoadingProps) {
   return (
     <div
       className="hero-loading absolute inset-0 flex items-center justify-center"
@@ -73,4 +79,4 @@ export function HeroLoading({ isVisible }: HeroLoadingProps) {
       />
     </div>
   );
-}
+});

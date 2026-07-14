@@ -51,7 +51,7 @@
  * Components do NOT hardcode breakpoint logic.
  */
 
-import { useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { HeroErrorBoundary } from './hero-error-boundary';
 import { HeroBackground } from './hero-background';
 import { HeroMedia } from './hero-media';
@@ -129,13 +129,14 @@ export function HeroSection({
   config: configOverrides,
   className = '',
 }: HeroSectionProps) {
-  /* Merge config with defaults */
-  const config = {
+  /* Merge config with defaults — memoized to prevent child re-renders.
+   * Only depends on configOverrides which changes rarely (once from parent). */
+  const config = useMemo(() => ({
     brandName: { ...HERO_DEFAULT_CONFIG.brandName, ...configOverrides?.brandName },
     tagline: { ...HERO_DEFAULT_CONFIG.tagline, ...configOverrides?.tagline },
     cta: { ...HERO_DEFAULT_CONFIG.cta, ...configOverrides?.cta },
     secondaryCta: { ...HERO_DEFAULT_CONFIG.secondaryCta, ...configOverrides?.secondaryCta },
-  };
+  }), [configOverrides]);
 
   /* ── Hooks ────────────────────────────────────────────── */
   const heroState = useHeroState();
@@ -181,6 +182,18 @@ export function HeroSection({
     }
   }, [animation.animationState]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  /* ── Stable Callbacks ────────────────────────────────────
+   * Wrapped in useCallback to prevent unnecessary re-renders
+   * of HeroMedia, which is memoized. These callbacks depend on
+   * refs and stable functions, so they never change after mount. */
+  const handleImageLoad = useCallback(() => {
+    assets.startLoading();
+  }, [assets]);
+
+  const handleImageError = useCallback((err: Error) => {
+    heroState.markError(err);
+  }, [heroState]);
+
   /* ── Render ───────────────────────────────────────────── */
 
   return (
@@ -225,8 +238,8 @@ export function HeroSection({
            * logic centralized in CSS. */}
           <HeroMedia
             loadState={heroState.loadState}
-            onImageLoad={() => assets.startLoading()}
-            onImageError={(err) => heroState.markError(err)}
+            onImageLoad={handleImageLoad}
+            onImageError={handleImageError}
           />
 
           {/* ── Layer 1.5: 3D Mounting Point ────────────────

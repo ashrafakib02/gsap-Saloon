@@ -31,13 +31,20 @@
  * Phase 9 handles the Warm Unveiling animation on this element.
  */
 
+import { memo } from 'react';
 import { HERO_IMAGE, HERO_A11Y_CONFIG } from './hero.config';
+import { HERO_ASSETS } from './hero-perf.config';
 import type { HeroMediaProps } from './hero.types';
 
 // ── Component ─────────────────────────────────────────────
 
 /**
  * The hero's media region — full-viewport editorial image.
+ *
+ * Wrapped in React.memo — props (loadState, onImageLoad, onImageImage)
+ * change infrequently (loadState transitions once, callbacks are stable
+ * from useCallback). Prevents re-renders when parent hero state
+ * transitions do not affect media props.
  *
  * Architecture decisions:
  * 1. Uses CSS `aspect-ratio` for dimension reservation (CLS prevention)
@@ -52,7 +59,7 @@ import type { HeroMediaProps } from './hero.types';
  * TODO Phase 4.7: Add blur-up LQIP placeholder
  * TODO Phase 9: Warm Reveal animation (opacity 0.85 → 1, 1200ms)
  */
-export function HeroMedia({
+export const HeroMedia = memo(function HeroMedia({
   loadState,
   onImageLoad,
   onImageError,
@@ -96,9 +103,16 @@ export function HeroMedia({
        * "Photography is the primary content of our design.
        *  It carries more emotional weight than any headline."
        *
-       * When no real image is available (Phase 4.1), the warm
-       * placeholder IS the visual — it communicates warmth and
-       * considered design even without photography.
+       * From DESIGN_SYSTEM §Performance P5:
+       * "Images served in modern formats (WebP/AVIF) with fallbacks"
+       *
+       * Uses <picture> for format negotiation:
+       * - AVIF: smallest file size, best compression (where supported)
+       * - WebP: good compression, wide support
+       * - JPEG: universal fallback
+       *
+       * Browser evaluates <source> elements top-to-bottom and uses
+       * the first format it supports. The <img> is the fallback.
        *
        * Phase 4.5: object-position is handled by CSS
        * (hero-responsive.css) for responsive crop behavior:
@@ -107,29 +121,56 @@ export function HeroMedia({
        * - Mobile portrait: center 40% — subject visibility
        * - Mobile landscape: center 45% — wider view
        *
-       * TODO Phase 4.7: Replace with <picture> element for format negotiation
-       * TODO Phase 4.7: Add responsive srcset
+       * TODO Phase 11.6: Generate actual srcset images at breakpoints
+       * TODO Phase 11.6: Add blur-up LQIP placeholder
        * TODO Phase 9: Transform-based animation for GPU acceleration (P10)
        */}
       {loadState === 'loaded' && (
-        <img
-          src="/images/hero/hero-main.webp"
-          alt={HERO_A11Y_CONFIG.imageAlt}
+        <picture
           className="hero-image absolute inset-0 h-full w-full"
           style={{
             objectFit: HERO_IMAGE.objectFit,
           }}
-          /* CLS prevention — reserve dimensions */
-          width={1920}
-          height={1080}
-          /* Above the fold — load immediately */
-          loading={HERO_IMAGE.loading}
-          fetchPriority={HERO_IMAGE.fetchPriority}
-          onLoad={() => onImageLoad()}
-          onError={() =>
-            onImageError(new Error('Hero image failed to load'))
-          }
-        />
+        >
+          {/* ── Format Sources ────────────────────────────────
+           * Each source provides the image in a modern format.
+           * The browser picks the first supported format.
+           * Phase 11.6 will generate actual files at these paths. */}
+          {HERO_ASSETS.formatPriority.map((format) => (
+            <source
+              key={format}
+              /* TODO Phase 11.6: Replace with actual srcset paths
+               * e.g. "/images/hero/hero-main-1920.avif 1920w, ..."
+               * For now, use the single WebP path as a placeholder. */
+              srcSet={`/images/hero/hero-main.${format === 'jpeg' ? 'jpg' : format}`}
+              type={`image/${format}`}
+            />
+          ))}
+
+          {/* ── Fallback <img> ───────────────────────────────
+           * The <img> serves as both the format fallback and the
+           * element that triggers onLoad/onError callbacks.
+           * CLS prevention — explicit width/height reserve dimensions.
+           * Above the fold — load eagerly with high fetch priority. */}
+          <img
+            src={HERO_ASSETS.image.src}
+            alt={HERO_A11Y_CONFIG.imageAlt}
+            className="hero-image absolute inset-0 h-full w-full"
+            style={{
+              objectFit: HERO_IMAGE.objectFit,
+            }}
+            /* CLS prevention — reserve dimensions */
+            width={HERO_ASSETS.image.width}
+            height={HERO_ASSETS.image.height}
+            /* Above the fold — load immediately */
+            loading={HERO_IMAGE.loading}
+            fetchPriority={HERO_IMAGE.fetchPriority}
+            onLoad={() => onImageLoad()}
+            onError={() =>
+              onImageError(new Error('Hero image failed to load'))
+            }
+          />
+        </picture>
       )}
 
       {/* ── Error State ────────────────────────────────────
@@ -155,4 +196,4 @@ export function HeroMedia({
       )}
     </div>
   );
-}
+});

@@ -8,9 +8,9 @@
 
 | Field | Value |
 |-------|-------|
-| **Current Phase** | Phase 4 — Experience Layer |
-| **Current Step** | 4.7 — Hero Performance |
-| **Overall Completion** | 15.9% (13 / 82 steps) |
+| **Current Phase** | Phase 5 — Narrative Architecture |
+| **Current Step** | 5.1 — Narrative Structure |
+| **Overall Completion** | 17.1% (14 / 82 steps) |
 | **Last Updated** | 2026-07-14 |
 
 ---
@@ -45,7 +45,7 @@
 | 4.4 Hero Interactions | ✅ Completed |
 | 4.5 Hero Responsive Behavior | ✅ Completed |
 | 4.6 Hero Accessibility | ✅ Completed |
-| 4.7 Hero Performance | ⬜ Not Started |
+| 4.7 Hero Performance | ✅ Completed |
 
 ---
 
@@ -215,7 +215,7 @@
 | 4.4 | Hero Interactions | ✅ Completed | Frontend Architect | P1 | 4.1, 3.5 | Medium |
 | 4.5 | Hero Responsive Behavior | ✅ Completed | Frontend Architect | P0 | 4.1, 3.5 | Medium |
 | 4.6 | Hero Accessibility | ✅ Completed | Frontend Architect | P0 | 4.1 | Medium |
-| 4.7 | Hero Performance | ⬜ Not Started | Frontend Architect | P0 | 4.1 | High |
+| 4.7 | Hero Performance | ✅ Completed | Frontend Architect | P0 | 4.1 | High |
 | 5.1 | Narrative Structure | ⬜ Not Started | Frontend Architect | P0 | 4.1, 3.3 | Medium |
 | 5.2 | Section Transitions | ⬜ Not Started | Frontend Architect | P0 | 5.1, 3.5 | Medium |
 | 5.3 | Scroll Timeline | ⬜ Not Started | Frontend Architect | P0 | 5.1 | Medium |
@@ -290,6 +290,11 @@
 ## Changelog
 
 ### 2026-07-14
+
+**Phase 4.7 — Hero Performance**
+Status: Completed
+
+Implemented complete hero performance architecture — render optimization, deferred loading, asset strategy, GSAP lazy initialization, and Core Web Vitals monitoring. **Render Optimization**: Added React.memo to 7 components (HeroContent, HeroMedia, HeroLoading, Hero3DMount, HeroScrollIndicator, HeroCTA — HeroBackground and HeroOverlay already had memo). Added useMemo to 6 computed objects (hero config merge in HeroSection, 4 style objects in HeroContent, context value in HeroInteractionProvider). Added useCallback to 4 callbacks (handleImageLoad, handleImageError in HeroSection). **Deferred Loading**: Created `useDeferredLoad` hook — defers non-critical component loading until browser idle via requestIdleCallback with setTimeout fallback. SSR-safe, AbortController cleanup. Applied to Hero3DMount to delay 3D scene mounting until after hero image (LCP) renders. **Asset Loading Strategy**: Replaced `<img>` in HeroMedia with `<picture>` element for format negotiation (AVIF > WebP > JPEG). Prepared srcset architecture using HERO_ASSETS.formatPriority from hero-perf.config.ts. **GSAP Lazy Initialization**: Created `use-gsap-lazy.ts` utility module — singleton pattern for lazy GSAP/ScrollTrigger loading via dynamic import(). Includes idle preloading via requestIdleCallback, retry-on-failure, and status check functions. **Performance Documentation**: Created HERO_PERFORMANCE.md documenting render pipeline, component tree, optimization strategies, budget configuration, measurement infrastructure, and phase responsibilities. **Re-render Audit**: Full audit of all 8 components and 8 hooks confirmed correct memo/callback/ref patterns. Only optimization needed was HeroCTA memo (added). All zero TypeScript errors across modified files.
 
 **Phase 4.6 — Hero Accessibility**
 Status: Completed

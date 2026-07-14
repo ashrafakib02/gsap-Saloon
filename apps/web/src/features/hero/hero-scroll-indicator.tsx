@@ -17,7 +17,7 @@
  * - AC12: "Interactive elements have visible focus indicators"
  */
 
-import { useCallback, useRef, useEffect } from 'react';
+import { memo, useCallback, useRef, useEffect } from 'react';
 import { useHeroInteractionContext } from './hero-interaction-context';
 import { useHoverIntent } from './hooks/use-hover-intent';
 
@@ -39,6 +39,10 @@ interface HeroScrollIndicatorProps {
 /**
  * Scroll indicator with hover state and click-to-scroll.
  *
+ * Wrapped in React.memo — props (label, bottom, isVisible, targetId)
+ * change infrequently. Prevents re-renders when parent hero state
+ * transitions do not affect scroll indicator props.
+ *
  * This component:
  * - Scrolls to the target section on click
  * - Uses useHoverIntent for hover state
@@ -49,7 +53,7 @@ interface HeroScrollIndicatorProps {
  * From EXPERIENCE_STORYBOARD SCENE 2:
  * "The scroll indicator is an invitation, not a command."
  */
-export function HeroScrollIndicator({
+export const HeroScrollIndicator = memo(function HeroScrollIndicator({
   label,
   bottom,
   isVisible,
@@ -127,4 +131,4 @@ export function HeroScrollIndicator({
       </span>
     </button>
   );
-}
+});

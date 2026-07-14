@@ -23,6 +23,7 @@
  * Our surface IS the background — warm off-white (#F5F0EB).
  */
 
+import { memo } from 'react';
 import type { HeroBackgroundProps } from './hero.types';
 
 // ── Component ─────────────────────────────────────────────
@@ -41,9 +42,12 @@ import type { HeroBackgroundProps } from './hero.types';
  * 3. The gradient is subtle enough to be "felt, not seen" (DESIGN_SYSTEM §14 Law 3)
  * 4. Full-viewport coverage — no gaps at any viewport size
  *
+ * Wrapped in React.memo — props rarely change (only prefersReducedMotion).
+ * Prevents re-renders during hero state transitions.
+ *
  * TODO Phase 9: Optional warm color shift animation during load threshold
  */
-export function HeroBackground({ prefersReducedMotion }: HeroBackgroundProps) {
+export const HeroBackground = memo(function HeroBackground({ prefersReducedMotion }: HeroBackgroundProps) {
   return (
     <div
       className="hero-background absolute inset-0"
@@ -75,4 +79,4 @@ export function HeroBackground({ prefersReducedMotion }: HeroBackgroundProps) {
       }}
     />
   );
-}
+});
