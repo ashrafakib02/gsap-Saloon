@@ -15,10 +15,12 @@
  *   - useNarrative: main context hook
  *   - useNarrativeRegistry: registry access hook
  *   - useNarrativeOrder: ordered sections hook
- *   - NARRATIVE_REGISTRY: singleton registry instance
- *   - Section constants and types
+ *   - TRANSITION_REGISTRY: singleton transition registry
+ *   - Transition hooks: useSectionTransition, useEntryTransition, etc.
+ *   - Section constants, transition constants, and types
  *
- * Phase 5.1: Structure and metadata only.
+ * Phase 5.1: Structure and metadata.
+ * Phase 5.2: Section transitions and breathing spaces.
  */
 
 // ── Provider ───────────────────────────────────────────────
@@ -32,11 +34,37 @@ export { useNarrativeRegistry } from './hooks/use-narrative-registry';
 export { useNarrativeOrder } from './hooks/use-narrative-order';
 export type { NarrativeOrderAPI } from './hooks/use-narrative-order';
 
-// ── Registry ───────────────────────────────────────────────
+// ── Transition Hooks ───────────────────────────────────────
+
+export {
+  useSectionTransition,
+  useEntryTransition,
+  useExitTransition,
+} from './hooks/use-section-transition';
+export type { UseSectionTransitionResult } from './hooks/use-section-transition';
+
+export { useTransitionRegistry } from './hooks/use-transition-registry';
+
+export {
+  useTransitionsByType,
+  useTransitionsByMood,
+  useTransitionsByPriority,
+  useEnabledTransitions,
+  useActTransitions,
+} from './hooks/use-transition-metadata';
+
+export {
+  useTransitionSequence,
+  useTransitionDefinition,
+} from './hooks/use-transition-sequence';
+export type { UseTransitionSequenceResult } from './hooks/use-transition-sequence';
+
+// ── Registries ─────────────────────────────────────────────
 
 export { NARRATIVE_REGISTRY } from './narrative.config';
+export { TRANSITION_REGISTRY } from './narrative-transitions.config';
 
-// ── Constants ──────────────────────────────────────────────
+// ── Section Constants ──────────────────────────────────────
 
 export {
   SECTION_IDS,
@@ -63,7 +91,29 @@ export {
   SECTION_DISPLAY_NAMES,
 } from './narrative.constants';
 
-// ── Types ──────────────────────────────────────────────────
+// ── Transition Constants ───────────────────────────────────
+
+export {
+  TRANSITION_TYPES,
+  TRANSITION_DIRECTIONS,
+  TRANSITION_SPEEDS,
+  TRANSITION_MOODS,
+  TRANSITION_PRIORITIES,
+  TRANSITION_TRIGGERS,
+  SECTION_BOUNDARIES,
+  TRANSITION_STATES,
+  BREATHING_PURPOSES,
+  REDUCED_MOTION_STRATEGIES,
+  MOOD_DESCRIPTIONS,
+  SPEED_DURATIONS,
+  PRIORITY_DESCRIPTIONS,
+  TYPE_DESCRIPTIONS,
+  BOUNDARY_DESCRIPTIONS,
+  REDUCED_MOTION_DESCRIPTIONS,
+  BREATHING_PURPOSE_DESCRIPTIONS,
+} from './narrative-transitions.constants';
+
+// ── Section Types ──────────────────────────────────────────
 
 export type {
   SectionId,
@@ -83,3 +133,24 @@ export type {
   AnimationRegistration,
   PreloadRegistration,
 } from './narrative.types';
+
+// ── Transition Types ───────────────────────────────────────
+
+export type {
+  TransitionType,
+  TransitionDirection,
+  TransitionSpeed,
+  TransitionMood,
+  TransitionPriority,
+  TransitionTrigger,
+  SectionBoundary,
+  TransitionState,
+  BreathingPurpose,
+  ReducedMotionStrategy,
+  TransitionMetadata,
+  TransitionRegistry,
+  TransitionDefinition,
+  TransitionContextValue,
+  BreathingSpaceConfig,
+  SectionBoundaryConfig,
+} from './narrative-transitions.types';

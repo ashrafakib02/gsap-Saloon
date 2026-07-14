@@ -433,6 +433,41 @@ Before writing any code in this project, verify:
 
 **Files Created:** narrative.types.ts, narrative.constants.ts, narrative.config.ts, narrative-context-internal.ts, narrative-context.tsx, hooks/use-narrative.ts, hooks/use-narrative-registry.ts, hooks/use-narrative-order.ts, hooks/index.ts, index.ts
 
+### 17. Phase 5.2 — Section Transitions
+
+**System:** Transition architecture modeling section-to-section relationships with emotional moods, pacing, boundaries, and future phase hooks.
+
+**Transition Model:** 15 section-to-section transitions (one for each consecutive pair in the 16-section scroll order). Each transition has: id (from→to), type (10 types), direction, speed, mood (7 moods), priority, trigger, enabled flag, entry/exit boundaries, act/chapter/breathing flags, and future phase keys (animationKey, cameraKey, preloadKey, soundKey, analyticsKey).
+
+**Transition Types:** fade, dissolve, reveal, parallax-reveal, word-reveal, portrait-stagger, text-cascade, warm-reveal, instant, none
+
+**Breathing Spaces:** 2 first-class breathing space configurations (breathing-space-arrival, breathing-space-commitment) with purpose, entry/exit strategies, mood, and reduced motion behavior. Breathing spaces are architectural pauses between acts.
+
+**Architecture Pattern:** `narrative-transitions.types.ts` (10 union types, 6 interfaces) → `narrative-transitions.constants.ts` (re-exports + 7 description records) → `narrative-transitions.config.ts` (immutable singleton `TRANSITION_REGISTRY` via `createTransitionRegistry()` factory) → 4 hooks
+
+**Registry API:** get(id), getBetween(from, to), getEntry(sectionId), getExit(sectionId), getAll(), getByType(), getByMood(), getByPriority(), getEnabled(), getActTransitions(), getSequence(), getDefinition(from, to), getBreathingSpaces(), getBreathingSpace(sectionId), count(), has(id) — O(1) lookups via Map indices
+
+**Hooks (all pure data, zero side effects):**
+- `useSectionTransition(from, to)` — transition data between two sections
+- `useEntryTransition(sectionId)` / `useExitTransition(sectionId)` — transition entering/exiting a section
+- `useTransitionRegistry()` — global registry access
+- `useTransitionsByType/mood/priority()` — filtered queries
+- `useEnabledTransitions()` / `useActTransitions()` — pre-filtered collections
+- `useTransitionSequence()` — full ordered sequence with count/isEmpty
+- `useTransitionDefinition(from, to)` — metadata + boundary config
+
+**Import Pattern:** `import { TRANSITION_REGISTRY, useSectionTransition, TRANSITION_TYPES, type TransitionMetadata } from '@/features/narrative'`
+
+**Reduced Motion Strategies:** none (complete removal), simplified (reduced duration), instant (content appears immediately)
+
+**Future Phase Hooks (populated, not implemented):** animationKey (Phase 9), cameraKey (Phase 6), preloadKey (Phase 11), soundKey (future audio), analyticsKey (analytics)
+
+**Files Created:** narrative-transitions.types.ts, narrative-transitions.constants.ts, narrative-transitions.config.ts, hooks/use-section-transition.ts, hooks/use-transition-registry.ts, hooks/use-transition-metadata.ts, hooks/use-transition-sequence.ts
+
+**Files Modified:** hooks/index.ts (added 7 transition hook exports), index.ts (added transition hooks, registry, constants, and types exports)
+
+**Key Pattern:** React context split — narrative-context-internal.ts (context + hook, no JSX) + narrative-context.tsx (provider only, has JSX) for react-refresh compliance. This same split pattern should be used for the transition provider in Phase 9.
+
 ---
 
 *This document is immutable project memory. It is updated only when permanent architectural or design decisions change. It does not track progress, implementation history, or temporary state.*
