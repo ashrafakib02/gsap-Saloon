@@ -31,3 +31,32 @@ export {
   useTransitionDefinition,
 } from './use-transition-sequence';
 export type { UseTransitionSequenceResult } from './use-transition-sequence';
+
+// ── Timeline Hooks ────────────────────────────────────────
+
+export { useTimeline } from './use-timeline';
+export type { UseTimelineResult } from './use-timeline';
+
+export { useTimelineRegistry } from './use-timeline-registry';
+
+export {
+  useAllTimelineTracks,
+  useEnabledTimelineTracks,
+  useTimelineTrack,
+  useTimelineTracksByPriority,
+  useTimelineSegments,
+  useTimelineSegmentsForSection,
+} from './use-timeline-tracks';
+
+export {
+  useAllTimelineMarkers,
+  useTimelineMarkersByType,
+  useTimelineMarkersForSection,
+  useTimelineMarker,
+} from './use-timeline-markers';
+
+export {
+  useTimelineProgress,
+  useActiveSegments,
+  useSectionProgress,
+} from './use-timeline-progress';

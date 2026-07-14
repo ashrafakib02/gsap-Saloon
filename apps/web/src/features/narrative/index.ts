@@ -17,10 +17,13 @@
  *   - useNarrativeOrder: ordered sections hook
  *   - TRANSITION_REGISTRY: singleton transition registry
  *   - Transition hooks: useSectionTransition, useEntryTransition, etc.
- *   - Section constants, transition constants, and types
+ *   - TIMELINE_REGISTRY: singleton timeline registry
+ *   - Timeline hooks: useTimeline, useTimelineTracks, etc.
+ *   - Section constants, transition constants, timeline constants, and types
  *
  * Phase 5.1: Structure and metadata.
  * Phase 5.2: Section transitions and breathing spaces.
+ * Phase 5.3: Scroll timeline architecture.
  */
 
 // ── Provider ───────────────────────────────────────────────
@@ -59,10 +62,40 @@ export {
 } from './hooks/use-transition-sequence';
 export type { UseTransitionSequenceResult } from './hooks/use-transition-sequence';
 
+// ── Timeline Hooks ─────────────────────────────────────────
+
+export { useTimeline } from './hooks/use-timeline';
+export type { UseTimelineResult } from './hooks/use-timeline';
+
+export { useTimelineRegistry } from './hooks/use-timeline-registry';
+
+export {
+  useAllTimelineTracks,
+  useEnabledTimelineTracks,
+  useTimelineTrack,
+  useTimelineTracksByPriority,
+  useTimelineSegments,
+  useTimelineSegmentsForSection,
+} from './hooks/use-timeline-tracks';
+
+export {
+  useAllTimelineMarkers,
+  useTimelineMarkersByType,
+  useTimelineMarkersForSection,
+  useTimelineMarker,
+} from './hooks/use-timeline-markers';
+
+export {
+  useTimelineProgress,
+  useActiveSegments,
+  useSectionProgress,
+} from './hooks/use-timeline-progress';
+
 // ── Registries ─────────────────────────────────────────────
 
 export { NARRATIVE_REGISTRY } from './narrative.config';
 export { TRANSITION_REGISTRY } from './narrative-transitions.config';
+export { TIMELINE_REGISTRY } from './narrative-timeline.config';
 
 // ── Section Constants ──────────────────────────────────────
 
@@ -113,6 +146,32 @@ export {
   BREATHING_PURPOSE_DESCRIPTIONS,
 } from './narrative-transitions.constants';
 
+// ── Timeline Constants ─────────────────────────────────────
+
+export {
+  TIMELINE_TRACK_TYPES,
+  TIMELINE_STATES,
+  TIMELINE_PRIORITIES,
+  TIMELINE_PLAYBACK_MODES,
+  TIMELINE_DIRECTIONS,
+  TIMELINE_DURATION_CATEGORIES,
+  TIMELINE_MARKER_TYPES,
+  TIMELINE_OFFSET_UNITS,
+  TIMELINE_SYNC_MODES,
+  KEYFRAME_INTERPOLATIONS,
+  TRACK_TYPE_DESCRIPTIONS,
+  STATE_DESCRIPTIONS,
+  TIMELINE_PRIORITY_DESCRIPTIONS,
+  PLAYBACK_MODE_DESCRIPTIONS,
+  DIRECTION_DESCRIPTIONS,
+  DURATION_DESCRIPTIONS,
+  DURATION_RANGES,
+  MARKER_TYPE_DESCRIPTIONS,
+  SYNC_MODE_DESCRIPTIONS,
+  INTERPOLATION_DESCRIPTIONS,
+  NARRATIVE_TRACK_ID,
+} from './narrative-timeline.constants';
+
 // ── Section Types ──────────────────────────────────────────
 
 export type {
@@ -154,3 +213,32 @@ export type {
   BreathingSpaceConfig,
   SectionBoundaryConfig,
 } from './narrative-transitions.types';
+
+// ── Timeline Types ─────────────────────────────────────────
+
+export type {
+  TimelineTrackType,
+  TimelineState,
+  TimelinePriority,
+  TimelinePlaybackMode,
+  TimelineDirection,
+  TimelineDurationCategory,
+  TimelineMarkerType,
+  TimelineOffsetUnit,
+  TimelineSyncMode,
+  KeyframeInterpolation,
+  TimelineRange,
+  TimelineOffset,
+  TimelineLabel,
+  TimelineKeyframe,
+  TimelineCue,
+  TimelineSegment,
+  TimelineMarker,
+  TimelineTrack,
+  TimelineGroup,
+  TimelineProgress,
+  TimelineMetadata,
+  TimelineDefinition,
+  TimelineRegistry,
+  TimelineContextValue,
+} from './narrative-timeline.types';

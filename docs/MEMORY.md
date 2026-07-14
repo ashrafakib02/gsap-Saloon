@@ -470,4 +470,42 @@ Before writing any code in this project, verify:
 
 ---
 
+### 18. Phase 5.3 — Scroll Timeline
+
+**System:** Cinematic editing timeline model mapping the narrative structure into parallel tracks with scroll-linked segments, keyframes, cues, and markers. Pure data architecture — no animation code.
+
+**Timeline Model:** 11 parallel tracks (narrative, UI, camera, lighting, environment, 3D, particle, audio, analytics, accessibility, preload). Each track contains segments mapping scroll ranges (normalized 0–1) to sections. Segments contain keyframes (property values at positions with interpolation) and cues (discrete events). Markers are semantic reference points scattered across the scroll range (60+ markers: section-start/center/end, act-start/end, breathing-point, preload-point, camera-cue, analytics-cue).
+
+**Tracks:** Narrative (auto-generated 16 segments), UI (content entrance animations), camera (parallax/focus), lighting (ambient shifts), environment (background atmosphere), 3D (Three.js scene changes), particle (ambient particles), audio (sound transitions), analytics (view tracking), accessibility (landmark announcements), preload (asset loading triggers).
+
+**Synchronization Modes:** global-progress, narrative-locked, marker-locked, independent, threshold-triggered.
+
+**Progress Model:** Static `INITIAL_PROGRESS` (overall:0, direction:'forward', isScrolling:false). Phase 9 (Scroll Engine) will provide live updates. Hooks like useActiveSegments and useSectionProgress work against any progress value.
+
+**Architecture Pattern:** `narrative-timeline.types.ts` (10 unions, 13+ interfaces) → `narrative-timeline.constants.ts` (re-exports + 12 description records + default IDs) → `narrative-timeline.config.ts` (factory `createTimelineRegistry()`, singleton `TIMELINE_REGISTRY`) → 5 hook files (15 hooks total)
+
+**Registry API:** getTrack(type), getTracks(), getEnabledTracks(), getTracksByPriority(), getSegment(id), getSegmentsForTrack(type), getSegmentsForSection(sectionId), getSegmentsInRange(range), getMarker(id), getMarkers(), getMarkersByType(type), getMarkersForSection(sectionId), getGroup(id), getGroups(), getProgress(), getMetadata(), countSegments(), countMarkers(), hasTrack(type), hasMarker(id) — O(1) Map-indexed lookups
+
+**Hooks (all pure data, zero side effects):**
+- `useTimeline()` — full timeline definition, tracks, markers, groups, metadata, counts
+- `useTimelineRegistry()` — raw registry access
+- `useAllTimelineTracks()` / `useEnabledTimelineTracks()` / `useTimelineTrack(type)` / `useTimelineTracksByPriority()` — track queries
+- `useTimelineSegments(trackType)` / `useTimelineSegmentsForSection(sectionId)` — segment queries
+- `useAllTimelineMarkers()` / `useTimelineMarkersByType()` / `useTimelineMarkersForSection()` / `useTimelineMarker(id)` — marker queries
+- `useTimelineProgress()` / `useActiveSegments(progress)` / `useSectionProgress(sectionId, overallProgress)` — progress queries
+
+**Keyframe Pattern:** Per-section opacity (0→1 or 0.85→1 for hero) and translateY (30px→0) keyframes with linear interpolation, distributed into parent segments via `attachDataToSegments()`.
+
+**Cue Pattern:** Analytics cues (`section-view`), preload cues (`preload-section-assets`), accessibility cues (`section-entered`) generated per section and distributed into segments.
+
+**Import Pattern:** `import { TIMELINE_REGISTRY, useTimeline, useTimelineProgress, TIMELINE_TRACK_TYPES, type TimelineTrack, type TimelineProgress } from '@/features/narrative'`
+
+**Future Phase Hooks (populated, not implemented):** Live scroll progress (Phase 9), camera animation (Phase 6), 3D scene changes (Phase 8), particle effects (Phase 8), audio transitions, analytics tracking.
+
+**Files Created:** narrative-timeline.types.ts, narrative-timeline.constants.ts, narrative-timeline.config.ts, hooks/use-timeline.ts, hooks/use-timeline-registry.ts, hooks/use-timeline-tracks.ts, hooks/use-timeline-markers.ts, hooks/use-timeline-progress.ts
+
+**Files Modified:** hooks/index.ts (added 15 timeline hook exports), index.ts (added timeline hooks, TIMELINE_REGISTRY, timeline constants, timeline types exports)
+
+---
+
 *This document is immutable project memory. It is updated only when permanent architectural or design decisions change. It does not track progress, implementation history, or temporary state.*

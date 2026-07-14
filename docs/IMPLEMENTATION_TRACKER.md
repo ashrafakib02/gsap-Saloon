@@ -9,8 +9,8 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | Phase 5 — Narrative Architecture |
-| **Current Step** | 5.2 — Section Transitions |
-| **Overall Completion** | 19.5% (16 / 82 steps) |
+| **Current Step** | 5.3 — Scroll Timeline |
+| **Overall Completion** | 20.7% (17 / 82 steps) |
 | **Last Updated** | 2026-07-14 |
 
 ---
@@ -57,7 +57,7 @@
 |------|--------|
 | 5.1 Narrative Structure | ✅ Completed |
 | 5.2 Section Transitions | ✅ Completed |
-| 5.3 Scroll Timeline | ⬜ Not Started |
+| 5.3 Scroll Timeline | ✅ Completed |
 | 5.4 Scroll Triggers | ⬜ Not Started |
 | 5.5 Scroll State | ⬜ Not Started |
 | 5.6 Progressive Reveal | ⬜ Not Started |
@@ -217,7 +217,7 @@
 | 4.6 | Hero Accessibility | ✅ Completed | Frontend Architect | P0 | 4.1 | Medium |
 | 4.7 | Hero Performance | ✅ Completed | Frontend Architect | P0 | 4.1 | High |
 | 5.1 | Narrative Structure | ✅ Completed | Frontend Architect | P0 | 4.1, 3.3 | Medium |
-| 5.2 | Section Transitions | ⬜ Not Started | Frontend Architect | P0 | 5.1, 3.5 | Medium |
+| 5.2 | Section Transitions | ✅ Completed | Frontend Architect | P0 | 5.1, 3.5 | Medium |
 | 5.3 | Scroll Timeline | ⬜ Not Started | Frontend Architect | P0 | 5.1 | Medium |
 | 5.4 | Scroll Triggers | ⬜ Not Started | Frontend Architect | P0 | 5.3 | Medium |
 | 5.5 | Scroll State | ⬜ Not Started | Frontend Architect | P1 | 5.3 | Low |
@@ -326,6 +326,16 @@ Centralized all hero text into a dedicated copy module — the single source of 
 Status: Completed
 
 Built the Hero Experience — the cinematic "Scene 1: Threshold" of The Sovereign Artisor website. Created 14 new files in `features/hero/` with a layered composition architecture (error boundary → section landmark → background → media → 3D mount → overlay → content → loading). **Types** (`hero.types.ts`): Complete type system — HeroLoadState, HeroAnimationState, HeroVariant, HeroConfig, props interfaces for all 7 sub-components, HERO_PERFORMANCE_BUDGET (LCP <2.5s, CLS <0.05), HERO_A11Y constants. **Config** (`hero.config.ts`): HERO_DEFAULT_CONFIG with brand name "The Sovereign Artisor", tagline, CTAs; HERO_ANIMATION with Warm Reveal parameters (startOpacity 0.85, duration 1200ms, power2.out easing); HERO_LAYOUT (100svh height, 65ch max content width, 72px nav offset); HERO_IMAGE (16/9, center 30% object position, eager loading, high fetch priority). **7 Sub-Components**: HeroErrorBoundary (class component, branded warm fallback with retry), HeroBackground (ambient warm surface with radial gradient depth), HeroMedia (3-state: warm placeholder → full image → warm error fallback, CLS prevention via explicit dimensions), HeroOverlay (3 functional layers: warm-vignette, golden-atmosphere, content-legibility — all GPU-accelerated opacity), HeroContent (h1 brand name serif, tagline sans, primary/secondary CTAs with 48px touch targets), HeroLoading (branded LoadingIndicator at z:100 with 600ms fade-out), Hero3DMount (conditional R3F mounting point, disabled until Phase 6). **4 Hooks**: useHeroState (state machine: idle→loading→loaded→revealing→revealed), useHeroViewport (variant detection, reduced motion, WebGL capability, orientation), useHeroAnimation (PLACEHOLDER for Phase 9 GSAP timeline — state machine + instant reduced-motion fallback), useHeroAssets (PLACEHOLDER for Phase 4.7 — font/image tracking with AbortController). **Composition** (`hero.tsx`): Layered rendering with z-index stacking (0→1→2→10→100), lifecycle hooks coordinating load→reveal→ready, scroll indicator. **Barrel export** (`index.ts`): Default + named exports for all components, hooks, types, config. Integrated Hero into homepage (`app/index.tsx`) as Scene 1. All files follow VISUAL_RULES: no shimmer skeletons (N23), overlays functional not decorative (N30), single h1 (AC15), hero is only time-linked animation (M2), no text over busy backgrounds (N9). Ready for Phase 4.2 (Hero Copy) to replace tasteful temporary content with final copy.
+
+**Phase 5.2 — Section Transitions**
+Status: Completed
+
+Built the Section Transitions system — the cinematic cut/fade/dissolve architecture between all 16 homepage sections. Created 1 new config file and 4 new hook files in `features/narrative/`. **Config** (`narrative-transitions.config.ts`): 15 transition definitions between consecutive section pairs, each specifying type (crossfade/cut/dissolve/morph/reveal), speed (instant/fast/medium/slow/cinematic), mood (dramatic/serene/energetic/mysterious/warm/neutral), priority, breathing space config, boundary config, and reduced-motion strategies. 2 breathing space configs for act transitions. Singleton `TRANSITION_REGISTRY` with O(1) lookups via Map indices. **Hooks**: useSectionTransition (get transition between any two sections), useEntryTransition/useExitTransition (convenience wrappers), useTransitionRegistry (raw registry access), useTransitionsByType/useTransitionsByMood/useTransitionPriority/useEnabledTransitions/useActTransitions (metadata queries), useTransitionSequence/useTransitionDefinition (ordered sequence access). All hooks are pure data-access with zero effects/listeners. Updated all barrel exports (hooks/index.ts, index.ts). Fixed 7 ESLint errors (5 unused type imports in config, 2 unused type imports in types). All verification passes: 0 narrative ESLint errors, 0 narrative TypeScript errors.
+
+**Phase 5.3 — Scroll Timeline**
+Status: Completed
+
+Built the Scroll Timeline architecture — a cinematic editing timeline model that future animation engines (GSAP, ScrollTrigger, React Three Fiber, Lenis) will consume. Created 1 new config file and 5 new hook files in `features/narrative/`. **Types** (`narrative-timeline.types.ts`): 10 union constants (TIMELINE_TRACK_TYPES, TIMELINE_STATES, TIMELINE_PRIORITIES, TIMELINE_PLAYBACK_MODES, TIMELINE_DIRECTIONS, TIMELINE_DURATION_CATEGORIES, TIMELINE_MARKER_TYPES, TIMELINE_OFFSET_UNITS, TIMELINE_SYNC_MODES, KEYFRAME_INTERPOLATIONS) + 13 interfaces (TimelineRange, TimelineOffset, TimelineLabel, TimelineKeyframe, TimelineCue, TimelineSegment, TimelineMarker, TimelineTrack, TimelineGroup, TimelineProgress, TimelineMetadata, TimelineDefinition, TimelineRegistry with 20+ methods, TimelineContextValue). **Constants** (`narrative-timeline.constants.ts`): Re-exports all unions + 12 description records + default track/group IDs. **Config** (`narrative-timeline.config.ts`): 11 parallel tracks (narrative, UI, camera, lighting, environment, 3D, particle, audio, analytics, accessibility, preload), 16 narrative segments auto-generated from section metadata, 60+ semantic markers (section-start/center/end, act-start/end, breathing-point, preload-point, camera-cue, analytics-cue), keyframes with interpolation modes per section, discrete event cues for analytics/preload/accessibility, 3 groups (visual, 3D, infrastructure). Factory pattern `createTimelineRegistry()` with singleton frozen `TIMELINE_REGISTRY`. O(1) Map-indexed lookups. **Hooks**: useTimeline (main timeline definition access), useTimelineRegistry (raw registry), 6 track hooks (useAllTimelineTracks, useEnabledTimelineTracks, useTimelineTrack, useTimelineTracksByPriority, useTimelineSegments, useTimelineSegmentsForSection), 4 marker hooks (useAllTimelineMarkers, useTimelineMarkersByType, useTimelineMarkersForSection, useTimelineMarker), 3 progress hooks (useTimelineProgress returns static initial state for Phase 9, useActiveSegments, useSectionProgress). All hooks are pure data-access — zero effects, zero listeners, zero side effects. Updated all barrel exports. Fixed 6 ESLint/config errors (unused imports, unused function, unused params). All verification passes: 0 narrative ESLint errors, 0 narrative TypeScript errors, 0 build errors.
 
 ---
 
