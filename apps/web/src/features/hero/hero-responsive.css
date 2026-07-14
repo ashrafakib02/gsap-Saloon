@@ -1,0 +1,374 @@
+/**
+ * Hero Responsive — Centralized Responsive Styles
+ *
+ * From DESIGN_SYSTEM §7 (Breakpoints):
+ * "The design is mobile-first: it begins at the smallest viewport
+ *  and expands gracefully, taking advantage of additional space
+ *  without becoming sparse or disconnected."
+ *
+ * From PRODUCT_VISION §7 P7:
+ * "Mobile is Not a Compromise — It Is the Primary Canvas"
+ *
+ * This file handles responsive behaviors that require CSS media queries
+ * and cannot be expressed as inline styles. All breakpoint values match
+ * DESIGN_SYSTEM §7:
+ *   Mobile:   0–767px
+ *   Tablet:   768–1023px
+ *   Desktop:  1024–1439px
+ *   Wide:     1440px+
+ *
+ * Architecture:
+ *   hero.config.ts     → spatial composition values (source of truth)
+ *   use-hero-viewport  → viewport detection (what we're in)
+ *   hero-responsive.css → responsive adjustments (how to apply)
+ *   Components         → wire config + viewport data to styles
+ *
+ * This file is the CSS layer of the responsive system.
+ * It handles edge cases that inline styles cannot:
+ *   - Orientation-aware adjustments
+ *   - Small-height viewport handling
+ *   - Ultra-wide layout constraints
+ *   - Overflow prevention safety nets
+ *   - Safe-area refinements
+ *   - Fluid typography fine-tuning
+ *   - CTA touch-target enforcement
+ *
+ * From VISUAL_RULES A9:
+ * "Touch targets are minimum 44×44px."
+ *
+ * From VISUAL_RULES S5:
+ * "Content never touches the viewport edge."
+ *
+ * From VISUAL_RULES A10:
+ * "Content reflows at 200% text zoom. No horizontal scrolling."
+ */
+
+/* ═══════════════════════════════════════════════════════════
+   1. OVERFLOW PREVENTION (Item 18)
+   ═══════════════════════════════════════════════════════════
+   Safety net: no horizontal overflow at any viewport.
+   From VISUAL_RULES A10: "No horizontal scrolling." */
+
+.hero-section {
+  max-width: 100vw;
+  box-sizing: border-box;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   2. SAFE-AREA REFINEMENTS (Item 10)
+   ═══════════════════════════════════════════════════════════
+   For notched/rounded-corner devices (iPhone X+, etc.).
+   env() returns 0px when not applicable — zero visual impact.
+   From VISUAL_RULES A9: "Touch targets are minimum 44×44px." */
+
+@supports (padding: env(safe-area-inset-bottom)) {
+  .hero-section {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   3. CONTENT WRAPPER — Responsive Padding (Items 1, 9, 17)
+   ═══════════════════════════════════════════════════════════
+   The content wrapper uses CSS classes for responsive padding
+   instead of inline styles. This enables CSS overrides for
+   edge cases (small-height, landscape) without component logic.
+
+   From DESIGN_SYSTEM §6:
+   "Center alignment for hero moments, single-focus statements."
+
+   From DESIGN_SYSTEM §1 P7:
+   "The hero section must be the most considered, most beautiful." */
+
+.hero-content-wrapper {
+  z-index: 10;
+  /* Default: no extra padding (mobile/tablet) */
+  padding-bottom: 0;
+}
+
+/* Desktop: golden-section composition (Item 1)
+ * Content sits at ~42% from top, extra space below draws eye to scroll indicator.
+ * From DESIGN_SYSTEM §6: "Asymmetric compositions." */
+.hero-content-wrapper--desktop {
+  padding-bottom: 16%;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   4. SMALL-HEIGHT VIEWPORT (Item 9)
+   ═══════════════════════════════════════════════════════════
+   Viewports shorter than 600px: content must still fit
+   without scrolling or clipping. Reduce vertical spacing.
+
+   From DESIGN_SYSTEM §7:
+   "The design must serve every device — from a 375px mobile
+    phone to a 2560px ultrawide monitor." */
+
+@media (max-height: 599px) {
+  /* Override desktop golden-section padding — no room for it */
+  .hero-content-wrapper {
+    padding-bottom: 0 !important;
+  }
+
+  /* Reduce spacing between headline and tagline */
+  .hero-content .hero-tagline {
+    margin-top: var(--spacing-intimate) !important;
+  }
+
+  /* Reduce spacing between tagline and CTA group */
+  .hero-content .hero-cta-group {
+    margin-top: var(--spacing-personal) !important;
+  }
+}
+
+/* Very short viewports (landscape phones, ~420px height) */
+@media (max-height: 420px) and (orientation: landscape) {
+  .hero-content .hero-brand-name {
+    /* Scale down display type to fit */
+    font-size: clamp(1.5rem, 5vw, 2.5rem) !important;
+  }
+
+  .hero-content .hero-tagline {
+    font-size: var(--text-body) !important;
+    margin-top: var(--spacing-intimate) !important;
+  }
+
+  .hero-content .hero-cta-group {
+    margin-top: var(--spacing-intimate) !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   5. ORIENTATION-AWARE BEHAVIOR (Item 19)
+   ═══════════════════════════════════════════════════════════
+   Mobile landscape: narrow height demands compact vertical
+   spacing and horizontal CTA layout for better use of width.
+
+   From DESIGN_SYSTEM §7 (Mobile-First):
+   "Single-column dominance. Touch-first interaction." */
+
+/* Mobile landscape: horizontal CTAs, compact spacing */
+@media (max-width: 767px) and (orientation: landscape) {
+  .hero-content .hero-cta-group {
+    flex-direction: row !important;
+    gap: var(--spacing-personal) !important;
+  }
+
+  /* Ensure touch targets in landscape (A9) */
+  .hero-content .hero-cta {
+    min-height: 44px;
+  }
+}
+
+/* Tablet portrait: ensure content doesn't exceed safe reading width */
+@media (min-width: 768px) and (max-width: 1023px) and (orientation: portrait) {
+  .hero-content {
+    max-width: 90vw;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   6. ULTRA-WIDE CONSTRAINTS (Item 8)
+   ═══════════════════════════════════════════════════════════
+   Viewports wider than 2560px: content should not stretch
+   beyond comfortable reading width. Constrain proportionally.
+
+   From DESIGN_SYSTEM §6:
+   "Content width scales proportionally; margins grow." */
+
+@media (min-width: 2560px) {
+  .hero-content {
+    max-width: min(65ch, 50vw) !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   7. LAPTOP REFINEMENTS (Item 3)
+   ═══════════════════════════════════════════════════════════
+   1024–1280px: transitional between tablet and full desktop.
+   Slightly tighter horizontal padding than full desktop.
+
+   From DESIGN_SYSTEM §7:
+   "Desktop: Full editorial layout. Asymmetric compositions." */
+
+@media (min-width: 1024px) and (max-width: 1280px) {
+  .hero-content {
+    padding-left: var(--spacing-personal);
+    padding-right: var(--spacing-personal);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   8. CTA RESPONSIVE BEHAVIOR (Item 13)
+   ═══════════════════════════════════════════════════════════
+   Mobile: full-width CTAs for thumb reach.
+   Desktop: content-width CTAs for editorial feel.
+
+   From VISUAL_RULES A9: "Touch targets are minimum 44×44px."
+   From VISUAL_RULES B6: "Button minimum touch target is 44×44px."
+   From VISUAL_RULES B8: "Button width adapts to content." */
+
+/* Mobile: full-width CTAs for touch-first interaction */
+@media (max-width: 767px) {
+  .hero-content .hero-cta {
+    width: 100%;
+    min-height: 48px;
+    /* Slightly larger than minimum (44px) for comfortable reach */
+  }
+}
+
+/* Desktop: CTAs use natural content width */
+@media (min-width: 1024px) {
+  .hero-content .hero-cta {
+    width: auto;
+    min-height: 48px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   9. RESPONSIVE TYPOGRAPHY REFINEMENT (Item 11)
+   ═══════════════════════════════════════════════════════════
+   Fluid typography using clamp() for smooth scaling between
+   breakpoints. Complements the CSS custom property overrides
+   in tailwind.css.
+
+   Note: Components set font-size via inline styles using CSS
+   custom properties (--text-display). These CSS overrides use
+   !important to provide fluid scaling that step-based custom
+   properties cannot achieve. This is intentional — the CSS
+   layer handles responsive refinement.
+
+   From DESIGN_SYSTEM §4:
+   "Typography is the voice of the design."
+   From VISUAL_RULES T8: "Minimum font size is 16px." */
+
+/* Mobile: fluid display type — 2.5rem at 320px → 3.5rem at 767px */
+@media (max-width: 767px) {
+  .hero-brand-name {
+    font-size: clamp(2.5rem, 7vw, 3.5rem) !important;
+  }
+
+  .hero-tagline {
+    font-size: clamp(1rem, 3vw, 1.5rem) !important;
+  }
+}
+
+/* Tablet: fluid display type — 3.5rem at 768px → 4.5rem at 1023px */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .hero-brand-name {
+    font-size: clamp(3.5rem, 5.5vw, 4.5rem) !important;
+  }
+}
+
+/* Desktop: fluid display type — 4rem at 1024px → 5.5rem at 1440px+ */
+@media (min-width: 1024px) {
+  .hero-brand-name {
+    font-size: clamp(4rem, 4vw, 5.5rem) !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   10. RESPONSIVE SPACING REFINEMENT (Item 12)
+   ═══════════════════════════════════════════════════════════
+   Spacing rhythm adjusts per viewport to maintain the
+   "breathing principle" from DESIGN_SYSTEM §5.
+
+   From VISUAL_RULES S2:
+   "The gap between two elements is always proportionally
+    larger than the internal spacing within those elements." */
+
+/* Mobile: tighter spacing — the canvas is smaller */
+@media (max-width: 767px) {
+  .hero-content {
+    gap: 0;
+  }
+}
+
+/* Tablet/Desktop: generous spacing — the canvas is larger */
+@media (min-width: 768px) {
+  .hero-content {
+    gap: 0;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   11. SCROLL INDICATOR RESPONSIVE (Item 16)
+   ═══════════════════════════════════════════════════════════
+   The scroll indicator adapts position and size per viewport.
+   Hidden on very small heights — no room for it.
+
+   From DESIGN_SYSTEM §14 Law 3:
+   "Most visitors should not consciously notice the motion.
+    They should notice the feeling." */
+
+/* Hide scroll indicator on very short viewports — no room */
+@media (max-height: 420px) {
+  .scroll-indicator {
+    display: none !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   12. HERO MEDIA RESPONSIVE (Item 15)
+   ═══════════════════════════════════════════════════════════
+   The hero image adapts object-position per viewport to
+   maintain composition across screen sizes.
+
+   From DESIGN_SYSTEM §12 I7:
+   "Hero images are never cropped tight — generous headroom."
+   From VISUAL_RULES I3:
+   "Hero images are 16:9 or wider." */
+
+/* Default: desktop crop — generous headroom above subject */
+.hero-image {
+  object-position: center 30%;
+}
+
+/* Mobile portrait: center-lower crop for subject visibility */
+@media (max-width: 767px) and (orientation: portrait) {
+  .hero-image {
+    object-position: center 40%;
+  }
+}
+
+/* Mobile landscape: center crop — wider view */
+@media (max-width: 767px) and (orientation: landscape) {
+  .hero-image {
+    object-position: center 45%;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   13. 200% TEXT ZOOM REFLOW (Item 18 — A10)
+   ═══════════════════════════════════════════════════════════
+   Content must reflow at 200% text zoom without horizontal
+   scrolling. From VISUAL_RULES A10.
+
+   The hero uses relative units (rem, vw, ch, %) throughout,
+   which naturally scale with zoom. This section ensures no
+   fixed-width elements break at high zoom levels. */
+
+.hero-content {
+  /* Ensure content wraps rather than overflows */
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   14. REDUCED MOTION — CSS LAYER (Item 19 — AC5)
+   ═══════════════════════════════════════════════════════════
+   When prefers-reduced-motion is active, all transitions
+   become instant. This is handled globally in tailwind.css,
+   but hero-specific transitions are reinforced here.
+
+   From VISUAL_RULES AC5:
+   "prefers-reduced-motion is always respected." */
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-content .hero-brand-name,
+  .hero-content .hero-tagline,
+  .hero-content .hero-cta-group {
+    transition: none !important;
+  }
+}

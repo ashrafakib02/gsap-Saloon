@@ -16,16 +16,17 @@
  * - CTA in sentence case per VISUAL_RULES B2
  * - No exclamation marks per VISUAL_RULES B10 and L7
  *
- * Responsive layout (Phase 4.3):
- * - Uses HeroVariant to drive spacing, CTA layout, and padding
- * - Mobile: stacked CTAs, compact spacing, full-width buttons
- * - Tablet: horizontal CTAs, moderate spacing
+ * Responsive layout (Phase 4.3 + 4.5):
+ * - Uses HeroVariant to drive spacing, CTA layout, padding, and max-width
+ * - Mobile: stacked CTAs, compact spacing, full-width buttons, 90vw max-width
+ * - Tablet: horizontal CTAs, moderate spacing, 80ch max-width
  * - Desktop: horizontal CTAs, generous spacing, 65ch max-width
+ * - Ultra-wide: CSS constrains to min(65ch, 50vw) via hero-responsive.css
  *
  * Typography scaling is handled by global CSS custom properties:
- * - Mobile: --text-display: 3.5rem
- * - Tablet: --text-display: 4.5rem
- * - Desktop: --text-display: 5.5rem
+ * - Mobile: --text-display: 3.5rem (fluid via clamp in hero-responsive.css)
+ * - Tablet: --text-display: 4.5rem (fluid via clamp in hero-responsive.css)
+ * - Desktop: --text-display: 5.5rem (fluid via clamp in hero-responsive.css)
  * This component uses the tokens, not hardcoded sizes.
  *
  * Phase 4.1 builds the ARCHITECTURE. The warm reveal animation
@@ -76,11 +77,26 @@ export function HeroContent({
     : 'row' as const;
   const ctaGap = HERO_LAYOUT.ctaGap[variant];
 
+  /**
+   * Max content width per variant.
+   *
+   * From VISUAL_RULES T7: "Body copy maximum line length is 65-75 characters."
+   * From DESIGN_SYSTEM §7: "Content width scales proportionally; margins grow."
+   *
+   * Mobile: 90vw — near-full viewport, generous margins prevent edge-touching.
+   * Tablet: 80ch — wider than desktop for the transitional layout.
+   * Desktop: 65ch — optimal reading width for centered hero typography.
+   *
+   * Ultra-wide (> 2560px): CSS constrains further to min(65ch, 50vw)
+   * via hero-responsive.css. This is a CSS-level override, not JS logic.
+   */
+  const maxWidth = HERO_LAYOUT.maxContentWidth[variant];
+
   return (
     <div
       className="hero-content relative z-10 flex flex-col items-center text-center"
       style={{
-        maxWidth: HERO_LAYOUT.maxContentWidth,
+        maxWidth,
         paddingLeft: padding,
         paddingRight: padding,
       }}

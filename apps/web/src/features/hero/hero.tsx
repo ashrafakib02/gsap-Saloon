@@ -43,6 +43,12 @@
  *     ├── HeroOverlay (z:2) — atmospheric layers
  *     ├── HeroContent (z:10) — text + CTAs
  *     └── HeroLoading (z:100) — loading threshold
+ *
+ * Phase 4.5: Responsive behavior is handled by:
+ * - hero-responsive.css — CSS media queries for edge cases
+ * - use-hero-viewport — extended viewport detection
+ * - hero.config.ts — centralized responsive values
+ * Components do NOT hardcode breakpoint logic.
  */
 
 import { useEffect } from 'react';
@@ -62,6 +68,24 @@ import { useHeroAssets } from './hooks/use-hero-assets';
 import { HERO_DEFAULT_CONFIG, HERO_LAYOUT } from './hero.config';
 import { HERO_COPY_EN } from './hero.copy';
 import type { HeroSectionProps } from './hero.types';
+
+/* ── Responsive Styles (Phase 4.5) ─────────────────────────
+ * Import the centralized responsive CSS.
+ * This file handles:
+ * - Overflow prevention (A10)
+ * - Safe-area refinements (A9)
+ * - Small-height viewport handling (Item 9)
+ * - Orientation-aware adjustments (Item 19)
+ * - Ultra-wide layout constraints (Item 8)
+ * - CTA responsive behavior (Item 13)
+ * - Fluid typography refinement (Item 11)
+ * - Responsive spacing refinement (Item 12)
+ * - Scroll indicator responsive (Item 16)
+ * - Hero media responsive (Item 15)
+ * - 200% text zoom reflow (A10)
+ * - Reduced motion CSS layer (AC5)
+ */
+import './hero-responsive.css';
 
 // ── Component ─────────────────────────────────────────────
 
@@ -169,7 +193,12 @@ export function HeroSection({
 
           {/* ── Layer 1: Hero Image / Media ─────────────────
            * Full-viewport editorial image.
-           * Shows warm placeholder while loading. */}
+           * Shows warm placeholder while loading.
+           *
+           * Phase 4.5: Responsive object-position is handled by
+           * hero-responsive.css media queries, not inline styles.
+           * This keeps the component simple and the responsive
+           * logic centralized in CSS. */}
           <HeroMedia
             loadState={heroState.loadState}
             onImageLoad={() => assets.startLoading()}
@@ -196,13 +225,13 @@ export function HeroSection({
            * Phase 4.3: Responsive vertical positioning.
            * Desktop: Extra bottom padding pushes content above center
            * to ~42% from top (golden-section composition).
-           * Mobile/Tablet: Content centers at mathematical 50%. */}
+           * Mobile/Tablet: Content centers at mathematical 50%.
+           *
+           * Phase 4.5: Padding moved to CSS classes (hero-responsive.css).
+           * CSS handles edge cases (small-height, landscape) without
+           * component-level breakpoint logic. */}
           <div
-            className="absolute inset-0 flex items-center justify-center"
-            style={{
-              zIndex: 10,
-              paddingBottom: HERO_LAYOUT.contentPaddingBottom[viewport.variant],
-            }}
+            className={`hero-content-wrapper absolute inset-0 flex items-center justify-center hero-content-wrapper--${viewport.variant}`}
           >
             <HeroContent
               brandName={config.brandName}

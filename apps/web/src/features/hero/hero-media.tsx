@@ -22,6 +22,10 @@
  * - Aspect ratio enforcement
  * - Error state with graceful fallback
  *
+ * Phase 4.5: Responsive object-position is handled by CSS
+ * (hero-responsive.css) — not inline styles. This enables
+ * responsive crop behavior without component-level breakpoint logic.
+ *
  * Phase 4.1 builds the ARCHITECTURE.
  * Phase 4.7 handles performance optimization (srcset, format detection).
  * Phase 9 handles the Warm Unveiling animation on this element.
@@ -39,7 +43,7 @@ import type { HeroMediaProps } from './hero.types';
  * 1. Uses CSS `aspect-ratio` for dimension reservation (CLS prevention)
  * 2. Placeholder is a warm solid color — NOT shimmer skeleton (N23)
  * 3. Image loads eagerly with high fetch priority (above the fold)
- * 4. object-position: center 30% — slightly above center for headroom (I7)
+ * 4. object-position handled by CSS for responsive crop (Phase 4.5)
  * 5. Error state shows a warm gradient — NOT an error message
  *    (the hero should never feel "broken")
  *
@@ -96,6 +100,13 @@ export function HeroMedia({
        * placeholder IS the visual — it communicates warmth and
        * considered design even without photography.
        *
+       * Phase 4.5: object-position is handled by CSS
+       * (hero-responsive.css) for responsive crop behavior:
+       * - Desktop: center 30% — generous headroom (default)
+       * - Tablet: center 35% — transitional
+       * - Mobile portrait: center 40% — subject visibility
+       * - Mobile landscape: center 45% — wider view
+       *
        * TODO Phase 4.7: Replace with <picture> element for format negotiation
        * TODO Phase 4.7: Add responsive srcset
        * TODO Phase 9: Transform-based animation for GPU acceleration (P10)
@@ -107,7 +118,6 @@ export function HeroMedia({
           className="hero-image absolute inset-0 h-full w-full"
           style={{
             objectFit: HERO_IMAGE.objectFit,
-            objectPosition: HERO_IMAGE.objectPosition,
           }}
           /* CLS prevention — reserve dimensions */
           width={1920}

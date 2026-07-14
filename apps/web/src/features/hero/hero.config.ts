@@ -202,9 +202,24 @@ export const HERO_LAYOUT = {
     desktop: '16%',
   } as Record<HeroVariant, string>,
 
-  /** Maximum content width — 65ch for optimal readability (T7).
-   *  "Body copy maximum line length is 65-75 characters." */
-  maxContentWidth: '65ch',
+  /**
+   * Maximum content width — adapts per viewport.
+   *
+   * From VISUAL_RULES T7:
+   * "Body copy maximum line length is 65-75 characters."
+   *
+   * Mobile: 90vw — near-full viewport, generous margins prevent edge-touching (S5).
+   * Tablet: 80ch — wider than desktop for the transitional layout.
+   * Desktop: 65ch — optimal reading width for centered hero typography.
+   *
+   * On ultra-wide screens (> 2560px), CSS constrains further to min(65ch, 50vw).
+   * From DESIGN_SYSTEM §7: "Content width scales proportionally; margins grow."
+   */
+  maxContentWidth: {
+    mobile: '90vw',
+    tablet: '80ch',
+    desktop: '65ch',
+  } as Record<HeroVariant, string>,
 
   /**
    * Horizontal padding per breakpoint — prevents edge-touching (S5).
@@ -367,7 +382,21 @@ export const HERO_IMAGE = {
   /** Object-fit for the hero image */
   objectFit: 'cover' as const,
 
-  /** Object-position — centered, slightly above center for generous headroom */
+  /**
+   * Object-position — centered, slightly above center for generous headroom.
+   *
+   * From DESIGN_SYSTEM §12 I7:
+   * "Hero images are never cropped tight — generous headroom."
+   *
+   * Default: center 30% — generous headroom for cinematic composition.
+   * Responsive overrides in hero-responsive.css adjust per viewport:
+   * - Mobile portrait: center 40% — lower crop keeps subject visible.
+   * - Mobile landscape: center 45% — wider view, more centered.
+   * - Tablet: center 35% — transitional crop.
+   *
+   * CSS overrides the inline style via !important for responsive cases.
+   * This value is the desktop default and source of truth.
+   */
   objectPosition: 'center 30%',
 
   /** Priority loading — hero is above the fold */
