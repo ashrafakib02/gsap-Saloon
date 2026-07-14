@@ -21,9 +21,11 @@
  * - Covers full viewport during load
  * - Gracefully fades out when hero is ready
  * - Reduced motion: instant appearance/disappearance
+ * - All copy from hero.copy.ts — zero hardcoded text
  */
 
 import { LoadingIndicator } from '@/shared/feedback/loading-indicator';
+import { HERO_COPY_EN } from './hero.copy';
 import type { HeroLoadingProps } from './hero.types';
 
 // ── Component ─────────────────────────────────────────────
@@ -39,7 +41,7 @@ import type { HeroLoadingProps } from './hero.types';
  *  a subtle particle of light, a gentle bloom of warmth, or the
  *  brand mark emerging from softness."
  *
- * For Phase 4.1, we use the branded LoadingIndicator (warm gold pulse).
+ * Copy sourced from HERO_COPY_EN.state — the single source of truth.
  * Phase 9 will enhance this with the full threshold animation.
  *
  * Design decisions:
@@ -54,7 +56,7 @@ export function HeroLoading({ isVisible }: HeroLoadingProps) {
     <div
       className="hero-loading absolute inset-0 flex items-center justify-center"
       role="status"
-      aria-label="Loading the experience"
+      aria-label={HERO_COPY_EN.state.loadingAriaLabel}
       style={{
         backgroundColor: 'var(--color-surface)',
         /* Above all hero layers during load */
@@ -66,7 +68,7 @@ export function HeroLoading({ isVisible }: HeroLoadingProps) {
       }}
     >
       <LoadingIndicator
-        label="Preparing your experience"
+        label={HERO_COPY_EN.state.loadingMessage}
       />
     </div>
   );

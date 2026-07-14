@@ -11,9 +11,13 @@
  *
  * This file defines ALL types for the Hero feature module.
  * No implementation — only structural truth.
+ *
+ * Copy types are defined in hero.copy.types.ts.
+ * This file references them for component props.
  */
 
 import type { ReactNode } from 'react';
+import { HERO_COPY_EN } from './hero.copy';
 
 // ── Hero State ────────────────────────────────────────────
 
@@ -45,6 +49,17 @@ export type HeroVariant = 'mobile' | 'tablet' | 'desktop';
 /**
  * Complete hero configuration.
  * All visual and behavioral parameters in one place.
+ *
+ * From DESIGN_SYSTEM §1:
+ * "Every design decision should feel warm, restrained, considered,
+ *  editorial, and enduring."
+ *
+ * The config is derived from HERO_COPY (hero.copy.ts).
+ * Components receive config via props — they never import copy directly.
+ * This indirection enables:
+ * - Theming (different brands using the same component)
+ * - A/B testing (different copy variants)
+ * - CMS integration (config loaded from API)
  */
 export interface HeroConfig {
   /** Display typography for the brand name */
@@ -78,6 +93,13 @@ export interface HeroConfig {
     readonly variant: 'ghost';
   };
 }
+
+/**
+ * Re-export HeroCopy type for consumers who need the full copy shape.
+ * Individual components should use HeroConfig (via props), not HeroCopy directly.
+ * HeroCopy is used by the copy module and config derivation.
+ */
+export type { HeroCopy } from './hero.copy.types';
 
 // ── Component Props ───────────────────────────────────────
 
@@ -177,17 +199,20 @@ export const HERO_PERFORMANCE_BUDGET = {
  * Accessibility constants for the hero section.
  *
  * From VISUAL_RULES AC1-AC15 and DESIGN_SYSTEM §15.
+ *
+ * Copy sourced from hero.copy.ts via HERO_COPY_EN.
+ * These constants are convenience re-exports for components
+ * that need a11y values without importing the full copy module.
  */
 export const HERO_A11Y = {
   /** Landmark label for the hero section */
-  landmarkLabel: 'Hero — Welcome to The Sovereign Artisor',
+  landmarkLabel: `Hero — ${HERO_COPY_EN.a11y.sectionAriaLabel}`,
 
   /** Screen reader text for the hero image */
-  imageAlt:
-    'The salon interior bathed in warm afternoon light — brass fixtures, soft linens, and the quiet luxury of a space designed for care',
+  imageAlt: HERO_COPY_EN.a11y.imageAlt,
 
   /** aria-live region for load state announcements */
-  liveRegion: 'polite' as const,
+  liveRegion: HERO_COPY_EN.a11y.ariaLive,
 
   /** Skip target — hero content is the first section */
   skipTarget: 'main-content',

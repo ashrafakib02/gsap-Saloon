@@ -58,6 +58,7 @@ import { useHeroViewport } from './hooks/use-hero-viewport';
 import { useHeroAnimation } from './hooks/use-hero-animation';
 import { useHeroAssets } from './hooks/use-hero-assets';
 import { HERO_DEFAULT_CONFIG, HERO_LAYOUT } from './hero.config';
+import { HERO_COPY_EN } from './hero.copy';
 import type { HeroSectionProps } from './hero.types';
 
 // ── Component ─────────────────────────────────────────────
@@ -136,7 +137,7 @@ export function HeroSection({
     <HeroErrorBoundary>
       <section
         id="hero"
-        aria-label="Welcome to The Sovereign Artisor"
+        aria-label={HERO_COPY_EN.a11y.sectionAriaLabel}
         className={`hero-section relative overflow-hidden ${className}`}
         style={{
           /* Full viewport height — the hero IS the viewport.
@@ -217,6 +218,7 @@ export function HeroSection({
               transition: 'opacity 0.6s ease-out',
             }}
             aria-hidden="true"
+            title={HERO_COPY_EN.a11y.scrollIndicatorLabel}
           >
             <svg
               width="24"

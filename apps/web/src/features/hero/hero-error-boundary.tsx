@@ -19,10 +19,12 @@
  * - Provides retry mechanism
  * - Logs errors to monitoring infrastructure
  * - Does NOT show technical details to the user
+ * - All copy from hero.copy.ts — zero hardcoded text
  */
 
 import { Component } from 'react';
 import type { ErrorInfo } from 'react';
+import { HERO_COPY_EN } from './hero.copy';
 import type { HeroErrorBoundaryProps } from './hero.types';
 
 // ── State ─────────────────────────────────────────────────
@@ -74,11 +76,13 @@ export class HeroErrorBoundary extends Component<
 
   render() {
     if (this.state.hasError) {
+      const copy = HERO_COPY_EN;
+
       return (
         <section
           className="hero-error-fallback flex min-h-[100svh] items-center justify-center"
           role="alert"
-          aria-label="The hero section encountered an issue"
+          aria-label={copy.state.errorAriaLabel}
           style={{
             backgroundColor: 'var(--color-surface)',
             /* Warm atmospheric gradient — the brand's visual signature
@@ -109,7 +113,7 @@ export class HeroErrorBoundary extends Component<
                 color: 'var(--color-text)',
               }}
             >
-              The Sovereign Artisor
+              {copy.state.errorBrandName}
             </h1>
 
             {/* Warm, non-technical message */}
@@ -120,11 +124,10 @@ export class HeroErrorBoundary extends Component<
                 lineHeight: 'var(--type-leading-body)',
                 color: 'var(--color-text-secondary)',
                 marginTop: 'var(--spacing-social)',
+                whiteSpace: 'pre-line',
               }}
             >
-              Something didn't load as expected.
-              <br />
-              We invite you to try again.
+              {copy.state.errorMessage}
             </p>
 
             {/* Retry button — Primary CTA style */}
@@ -148,7 +151,7 @@ export class HeroErrorBoundary extends Component<
                 cursor: 'pointer',
               }}
             >
-              Try again
+              {copy.state.errorRetryLabel}
             </button>
           </div>
         </section>

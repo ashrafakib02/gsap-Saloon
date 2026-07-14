@@ -9,8 +9,8 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | Phase 4 — Experience Layer |
-| **Current Step** | 4.2 — Hero Copy |
-| **Overall Completion** | 9.8% (8 / 82 steps) |
+| **Current Step** | 4.3 — Hero Layout |
+| **Overall Completion** | 11.0% (9 / 82 steps) |
 | **Last Updated** | 2026-07-14 |
 
 ---
@@ -40,7 +40,7 @@
 | Step | Status |
 |------|--------|
 | 4.1 Hero Experience | ✅ Completed |
-| 4.2 Hero Copy | ⬜ Not Started |
+| 4.2 Hero Copy | ✅ Completed |
 | 4.3 Hero Layout | ⬜ Not Started |
 | 4.4 Hero Interactions | ⬜ Not Started |
 | 4.5 Hero Responsive Behavior | ⬜ Not Started |
@@ -210,7 +210,7 @@
 | 3.6 | Global Utilities | ✅ Completed | Frontend Architect | P0 | 3.2 | Low |
 | 3.7 | Shared Infrastructure | ✅ Completed | Frontend Architect | P0 | 3.2, 3.3 | Medium |
 | 4.1 | Hero Experience | ✅ Completed | Frontend Architect | P0 | 3.3, 3.4, 3.5 | High |
-| 4.2 | Hero Copy | ⬜ Not Started | Content Lead | P0 | None | Low |
+| 4.2 | Hero Copy | ✅ Completed | Content Lead | P0 | None | Low |
 | 4.3 | Hero Layout | ⬜ Not Started | Frontend Architect | P0 | 4.1 | Medium |
 | 4.4 | Hero Interactions | ⬜ Not Started | Frontend Architect | P1 | 4.1, 3.5 | Medium |
 | 4.5 | Hero Responsive Behavior | ⬜ Not Started | Frontend Architect | P0 | 4.1, 3.5 | Medium |
@@ -290,6 +290,11 @@
 ## Changelog
 
 ### 2026-07-14
+
+**Phase 4.2 — Hero Copy**
+Status: Completed
+
+Centralized all hero text into a dedicated copy module — the single source of truth for every word the hero displays. Created 2 new files (`hero.copy.types.ts`, `hero.copy.ts`) and updated 6 existing files to source all text from the copy module instead of hardcoding. **Copy Types** (`hero.copy.types.ts`): 8 interfaces defining the complete copy contract — HeroCoreCopy (headline, tagline, eyebrow), HeroCtaCopy (label, href), HeroStateCopy (loading/error messages), HeroA11yCopy (ARIA labels, alt text), HeroSeoCopy (title, description, OG), HeroStructuredData (Schema.org), HeroCopy (complete contract), HeroLocale/heroCopyProvider (localization types). **Copy Module** (`hero.copy.ts`): Complete English copy set — headline "The Sovereign Artisor", tagline "Where artistry meets intention", primary CTA "Book your experience", secondary CTA "Explore our craft", loading message "Preparing your experience", error fallback with warm non-technical messaging, ARIA labels for screen readers, SEO metadata under 160 chars, Schema.org structured data. Locale registry architecture with getHeroCopy() function supporting locale fallback. All copy passes brand voice tests (Hermès/Aesop/dinner party filter). **Config Updated** (`hero.config.ts`): HERO_DEFAULT_CONFIG now derives all text from HERO_COPY_EN — zero hardcoded strings. HERO_A11Y_CONFIG sources ARIA labels from copy module. **Types Updated** (`hero.types.ts`): HeroConfig documented as derived from copy. HERO_A11Y constants source from HERO_COPY_EN. Re-exports HeroCopy type. **Components Updated**: hero-loading.tsx (loading messages from copy), hero-error-boundary.tsx (error text from copy), hero.tsx (ARIA labels and scroll indicator from copy). **Barrel Export** (`index.ts`): Exports getHeroCopy, HERO_COPY_EN, locale utilities, and all copy types. Localization-ready: adding a locale means adding a copy set to the registry — no component changes needed. TypeScript strict mode clean.
 
 **Phase 4.1 — Hero Experience**
 Status: Completed

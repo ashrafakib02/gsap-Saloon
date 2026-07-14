@@ -11,9 +11,12 @@
  *
  * Architecture:
  * - Default export: HeroSection (the composition)
- * - Named exports: Types, config, and sub-components for flexibility
+ * - Named exports: Types, config, copy, and sub-components for flexibility
  * - All imports from outside the feature go through this barrel
  * - Internal imports within the feature bypass this barrel
+ *
+ * Phase 4.2: Added copy module exports for centralized text management.
+ * All hero text is now sourced from hero.copy.ts via this barrel.
  */
 
 // ── Composition ────────────────────────────────────────────
@@ -39,6 +42,18 @@ export { useHeroViewport } from './hooks/use-hero-viewport';
 export { useHeroAnimation } from './hooks/use-hero-animation';
 export { useHeroAssets } from './hooks/use-hero-assets';
 
+// ── Copy Module ────────────────────────────────────────────
+// Centralized copy management — the single source of truth for hero text.
+// External consumers should use getHeroCopy() for locale-aware access.
+
+export {
+  getHeroCopy,
+  HERO_COPY_EN,
+  getActiveHeroLocale,
+  AVAILABLE_HERO_LOCALES,
+  DEFAULT_HERO_LOCALE,
+} from './hero.copy';
+
 // ── Types ──────────────────────────────────────────────────
 // Exported for consumers who need to reference hero types
 
@@ -55,6 +70,18 @@ export type {
   HeroLoadingProps,
   Hero3DMountProps,
 } from './hero.types';
+
+export type {
+  HeroCopy,
+  HeroCopyProvider,
+  HeroLocale,
+  HeroCoreCopy,
+  HeroCtaCopy,
+  HeroStateCopy,
+  HeroA11yCopy,
+  HeroSeoCopy,
+  HeroStructuredData,
+} from './hero.copy.types';
 
 // ── Config ─────────────────────────────────────────────────
 // Exported for consumers who need hero constants

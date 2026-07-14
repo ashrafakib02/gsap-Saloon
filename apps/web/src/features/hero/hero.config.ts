@@ -8,16 +8,22 @@
  * "Each feature is a self-contained module: component, animation config,
  *  types, entry point."
  *
- * Copy is tasteful and premium — not lorem ipsum, not "Coming Soon."
- * Every word communicates the brand: warm, considered, unhurried.
+ * Copy is sourced from hero.copy.ts — the single source of truth.
+ * This config file imports that copy and formats it for component consumption.
+ *
+ * Architecture:
+ * - hero.copy.ts → raw copy strings (locale-aware)
+ * - hero.config.ts → derived config (component-ready)
+ * - Components receive config via props, never import copy or config directly
  */
 
 import type { HeroConfig } from './hero.types';
+import { HERO_COPY_EN } from './hero.copy';
 
 // ── Default Hero Configuration ────────────────────────────
 
 /**
- * The hero's default configuration.
+ * The hero's default configuration — derived from HERO_COPY_EN.
  *
  * From EXPERIENCE_STORYBOARD SCENE 1:
  * "One image. Full viewport. The composition is cinematic."
@@ -33,29 +39,32 @@ import type { HeroConfig } from './hero.types';
  *   Per DESIGN_SYSTEM §4: "Neutral but warm. Highly legible."
  * - CTA: Sentence case per VISUAL_RULES B2
  * - No exclamation marks per VISUAL_RULES B10 and L7
+ *
+ * Copy sourced from hero.copy.ts — never hardcoded here.
+ * This indirection enables locale switching without touching config.
  */
 export const HERO_DEFAULT_CONFIG: HeroConfig = {
   brandName: {
-    text: 'The Sovereign Artisor',
+    text: HERO_COPY_EN.core.headline,
     family: 'serif',
     weight: 600,
   },
 
   tagline: {
-    text: 'Where artistry meets intention',
+    text: HERO_COPY_EN.core.tagline,
     family: 'sans',
     weight: 300,
   },
 
   cta: {
-    label: 'Book your experience',
-    href: '#booking',
+    label: HERO_COPY_EN.primaryCta.label,
+    href: HERO_COPY_EN.primaryCta.href,
     variant: 'primary',
   },
 
   secondaryCta: {
-    label: 'Explore our craft',
-    href: '#services',
+    label: HERO_COPY_EN.secondaryCta.label,
+    href: HERO_COPY_EN.secondaryCta.href,
     variant: 'ghost',
   },
 } as const;
@@ -207,6 +216,9 @@ export const HERO_IMAGE = {
  * From VISUAL_RULES AC15:
  * "One <h1> heading per page. Only one."
  * The hero brand name IS the h1 — it's the page's primary heading.
+ *
+ * Copy sourced from hero.copy.ts via HERO_COPY_EN.
+ * Accessibility strings are never hardcoded in components.
  */
 export const HERO_A11Y_CONFIG = {
   /** The hero section landmark */
@@ -216,12 +228,11 @@ export const HERO_A11Y_CONFIG = {
   headingLevel: 'h1' as const,
 
   /** ARIA label for the hero section */
-  ariaLabel: 'Welcome to The Sovereign Artisor',
+  ariaLabel: HERO_COPY_EN.a11y.sectionAriaLabel,
 
   /** Image alt text — descriptive, specific (AC11) */
-  imageAlt:
-    'The salon interior bathed in warm afternoon light — brass fixtures, soft linens, and the quiet luxury of a space designed for care',
+  imageAlt: HERO_COPY_EN.a11y.imageAlt,
 
   /** Live region for load state */
-  ariaLive: 'polite' as const,
+  ariaLive: HERO_COPY_EN.a11y.ariaLive,
 } as const;
