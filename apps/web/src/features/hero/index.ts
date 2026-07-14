@@ -44,6 +44,7 @@ export { useHeroState } from './hooks/use-hero-state';
 export { useHeroViewport } from './hooks/use-hero-viewport';
 export { useHeroAnimation } from './hooks/use-hero-animation';
 export { useHeroAssets } from './hooks/use-hero-assets';
+export { useHeroA11y } from './hooks/use-hero-a11y';
 export { useHeroInteraction } from './hooks/use-hero-interaction';
 export { useHoverIntent } from './hooks/use-hover-intent';
 
@@ -98,6 +99,8 @@ export type {
   UseHeroInteractionReturn,
   HeroInteractionContextValue,
 } from './hero-interaction.types';
+
+export type { HeroAnnouncement } from './hooks/use-hero-a11y';
 
 export { HERO_INTERACTION } from './hero-interaction.config';
 

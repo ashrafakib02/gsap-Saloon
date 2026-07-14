@@ -9,8 +9,8 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | Phase 4 — Experience Layer |
-| **Current Step** | 4.6 — Hero Accessibility |
-| **Overall Completion** | 14.6% (12 / 82 steps) |
+| **Current Step** | 4.7 — Hero Performance |
+| **Overall Completion** | 15.9% (13 / 82 steps) |
 | **Last Updated** | 2026-07-14 |
 
 ---
@@ -44,7 +44,7 @@
 | 4.3 Hero Layout | ✅ Completed |
 | 4.4 Hero Interactions | ✅ Completed |
 | 4.5 Hero Responsive Behavior | ✅ Completed |
-| 4.6 Hero Accessibility | ⬜ Not Started |
+| 4.6 Hero Accessibility | ✅ Completed |
 | 4.7 Hero Performance | ⬜ Not Started |
 
 ---
@@ -214,7 +214,7 @@
 | 4.3 | Hero Layout | ✅ Completed | Frontend Architect | P0 | 4.1 | Medium |
 | 4.4 | Hero Interactions | ✅ Completed | Frontend Architect | P1 | 4.1, 3.5 | Medium |
 | 4.5 | Hero Responsive Behavior | ✅ Completed | Frontend Architect | P0 | 4.1, 3.5 | Medium |
-| 4.6 | Hero Accessibility | ⬜ Not Started | Frontend Architect | P0 | 4.1 | Medium |
+| 4.6 | Hero Accessibility | ✅ Completed | Frontend Architect | P0 | 4.1 | Medium |
 | 4.7 | Hero Performance | ⬜ Not Started | Frontend Architect | P0 | 4.1 | High |
 | 5.1 | Narrative Structure | ⬜ Not Started | Frontend Architect | P0 | 4.1, 3.3 | Medium |
 | 5.2 | Section Transitions | ⬜ Not Started | Frontend Architect | P0 | 5.1, 3.5 | Medium |
@@ -290,6 +290,11 @@
 ## Changelog
 
 ### 2026-07-14
+
+**Phase 4.6 — Hero Accessibility**
+Status: Completed
+
+Built the accessibility architecture for the Hero section — ensuring WCAG 2.1 Level AA compliance (VISUAL_RULES AC1) across all hero states. 2 new files created, 4 existing files updated. **Accessibility CSS** (`hero-accessibility.css`): Focus indicator styles (2px accent outline, 2px offset, high-contrast colors), visible focus ring for keyboard-only navigation, reduced-motion media query respecting `prefers-reduced-motion: reduce`, skip-link styles, visually-hidden live region styles (`clip-rect` pattern), contrast ratio compliance for all text-on-background combinations. **Accessibility Hook** (`hooks/use-hero-a11y.ts`): `useHeroA11y({ announce })` manages live region announcements for dynamic state changes (loading/loaded/error/error-recovered). Clear-then-set microtask pattern ensures re-announcement of repeated states. `focusRetryButton()` with `requestAnimationFrame` timing for post-error focus management. `liveRegionRef` and `retryButtonRef` for DOM attachment. **Updated hero.tsx**: Consumes `useHeroA11y` hook, renders `<div aria-live="polite">` live region, announces hero state transitions. `role="banner"` section landmark (from Phase 4.4). **Updated hero-error-boundary.tsx**: Focus management — on error catch, focus moves to retry button so keyboard users can immediately retry without tabbing through the page. **Updated hero sub-components**: Focus indicators on interactive elements, keyboard operability verified. TypeScript strict mode clean — fixed `RefObject<T | null>` → `RefObject<T>` type mismatch for React 18 compatibility. Ready for Phase 4.7 (Hero Performance).
 
 **Phase 4.5 — Hero Responsive Behavior**
 Status: Completed

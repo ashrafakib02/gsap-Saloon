@@ -16,6 +16,7 @@ import { Route as ServicesHairRouteImport } from './services/hair'
 import { Route as ServicesColorRouteImport } from './services/color'
 import { Route as ServicesBridalRouteImport } from './services/bridal'
 import { Route as ServicesLayoutRouteImport } from './services/_layout'
+import { Route as DevFoundationRouteImport } from './dev/foundation'
 import { Route as BookingConfirmationRouteImport } from './booking/confirmation'
 
 const R404Route = R404RouteImport.update({
@@ -53,6 +54,11 @@ const ServicesLayoutRoute = ServicesLayoutRouteImport.update({
   path: '/services',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DevFoundationRoute = DevFoundationRouteImport.update({
+  id: '/dev/foundation',
+  path: '/dev/foundation',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BookingConfirmationRoute = BookingConfirmationRouteImport.update({
   id: '/booking/confirmation',
   path: '/booking/confirmation',
@@ -63,6 +69,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/404': typeof R404Route
   '/booking/confirmation': typeof BookingConfirmationRoute
+  '/dev/foundation': typeof DevFoundationRoute
   '/services': typeof ServicesLayoutRoute
   '/services/bridal': typeof ServicesBridalRoute
   '/services/color': typeof ServicesColorRoute
@@ -73,6 +80,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/404': typeof R404Route
   '/booking/confirmation': typeof BookingConfirmationRoute
+  '/dev/foundation': typeof DevFoundationRoute
   '/services': typeof ServicesLayoutRoute
   '/services/bridal': typeof ServicesBridalRoute
   '/services/color': typeof ServicesColorRoute
@@ -84,6 +92,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/404': typeof R404Route
   '/booking/confirmation': typeof BookingConfirmationRoute
+  '/dev/foundation': typeof DevFoundationRoute
   '/services/_layout': typeof ServicesLayoutRoute
   '/services/bridal': typeof ServicesBridalRoute
   '/services/color': typeof ServicesColorRoute
@@ -96,6 +105,7 @@ export interface FileRouteTypes {
     | '/'
     | '/404'
     | '/booking/confirmation'
+    | '/dev/foundation'
     | '/services'
     | '/services/bridal'
     | '/services/color'
@@ -106,6 +116,7 @@ export interface FileRouteTypes {
     | '/'
     | '/404'
     | '/booking/confirmation'
+    | '/dev/foundation'
     | '/services'
     | '/services/bridal'
     | '/services/color'
@@ -116,6 +127,7 @@ export interface FileRouteTypes {
     | '/'
     | '/404'
     | '/booking/confirmation'
+    | '/dev/foundation'
     | '/services/_layout'
     | '/services/bridal'
     | '/services/color'
@@ -127,6 +139,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   R404Route: typeof R404Route
   BookingConfirmationRoute: typeof BookingConfirmationRoute
+  DevFoundationRoute: typeof DevFoundationRoute
   ServicesLayoutRoute: typeof ServicesLayoutRoute
   ServicesBridalRoute: typeof ServicesBridalRoute
   ServicesColorRoute: typeof ServicesColorRoute
@@ -185,6 +198,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ServicesLayoutRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dev/foundation': {
+      id: '/dev/foundation'
+      path: '/dev/foundation'
+      fullPath: '/dev/foundation'
+      preLoaderRoute: typeof DevFoundationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/booking/confirmation': {
       id: '/booking/confirmation'
       path: '/booking/confirmation'
@@ -199,6 +219,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   R404Route: R404Route,
   BookingConfirmationRoute: BookingConfirmationRoute,
+  DevFoundationRoute: DevFoundationRoute,
   ServicesLayoutRoute: ServicesLayoutRoute,
   ServicesBridalRoute: ServicesBridalRoute,
   ServicesColorRoute: ServicesColorRoute,

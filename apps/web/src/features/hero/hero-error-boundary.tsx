@@ -22,7 +22,7 @@
  * - All copy from hero.copy.ts — zero hardcoded text
  */
 
-import { Component } from 'react';
+import { Component, createRef } from 'react';
 import type { ErrorInfo } from 'react';
 import { HERO_COPY_EN } from './hero.copy';
 import type { HeroErrorBoundaryProps } from './hero.types';
@@ -57,6 +57,36 @@ export class HeroErrorBoundary extends Component<
   constructor(props: HeroErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false, error: null };
+    /**
+     * Phase 4.6: Ref for the retry button to enable focus management.
+     * From TECHNICAL_ARCHITECTURE §16.4:
+     * "Focus management: After dynamic content changes, focus
+     *  moves to the new content."
+     */
+    this.retryButtonRef = createRef<HTMLButtonElement>();
+  }
+
+  retryButtonRef: React.RefObject<HTMLButtonElement>;
+
+  /**
+   * Phase 4.6: Focus the retry button when error state is entered.
+   * From VISUAL_RULES AC4:
+   * "Focus indicators are visible and high-contrast."
+   *
+   * When the error boundary catches an error, focus moves to the
+   * retry button so keyboard users can immediately retry without
+   * having to Tab through the page.
+   */
+  componentDidUpdate(
+    _prevProps: HeroErrorBoundaryProps,
+    prevState: HeroErrorState,
+  ): void {
+    if (this.state.hasError && !prevState.hasError) {
+      /* Error just occurred — focus the retry button after render */
+      requestAnimationFrame(() => {
+        this.retryButtonRef.current?.focus();
+      });
+    }
   }
 
   static getDerivedStateFromError(error: Error): HeroErrorState {
@@ -106,9 +136,9 @@ export class HeroErrorBoundary extends Component<
             {/* Brand name — still communicates identity in error state */}
             <h1
               style={{
-                fontFamily: 'var(--font-family-serif)',
-                fontSize: 'var(--type-size-heading)',
-                lineHeight: 'var(--type-leading-heading)',
+                fontFamily: 'var(--font-serif)',
+                fontSize: 'var(--text-display)',
+                lineHeight: 'var(--leading-display)',
                 fontWeight: 500,
                 color: 'var(--color-text)',
               }}
@@ -119,9 +149,9 @@ export class HeroErrorBoundary extends Component<
             {/* Warm, non-technical message */}
             <p
               style={{
-                fontFamily: 'var(--font-family-sans)',
-                fontSize: 'var(--type-size-body)',
-                lineHeight: 'var(--type-leading-body)',
+                fontFamily: 'var(--font-sans)',
+                fontSize: 'var(--text-body)',
+                lineHeight: 'var(--leading-body)',
                 color: 'var(--color-text-secondary)',
                 marginTop: 'var(--spacing-social)',
                 whiteSpace: 'pre-line',
@@ -130,10 +160,14 @@ export class HeroErrorBoundary extends Component<
               {copy.state.errorMessage}
             </p>
 
-            {/* Retry button — Primary CTA style */}
+            {/* Retry button — Primary CTA style
+             * Phase 4.6: Receives ref for focus management (AC4).
+             * Focus moves here when error boundary catches an error. */}
             <button
+              ref={this.retryButtonRef}
               onClick={this.handleRetry}
               type="button"
+              className="hero-cta hero-cta--primary"
               style={{
                 marginTop: 'var(--spacing-personal)',
                 display: 'inline-flex',
@@ -141,8 +175,8 @@ export class HeroErrorBoundary extends Component<
                 justifyContent: 'center',
                 minHeight: '48px',
                 padding: '14px 36px',
-                fontFamily: 'var(--font-family-sans)',
-                fontSize: 'var(--type-size-body)',
+                fontFamily: 'var(--font-sans)',
+                fontSize: 'var(--text-body)',
                 fontWeight: 500,
                 color: 'var(--color-surface)',
                 backgroundColor: 'var(--color-accent)',

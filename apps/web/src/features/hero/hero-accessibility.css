@@ -1,0 +1,356 @@
+/**
+ * Hero Accessibility — Centralized Accessibility Styles
+ *
+ * From VISUAL_RULES AC1-AC15 (Accessibility Rules):
+ * "WCAG 2.1 Level AA is the minimum standard."
+ * "Accessibility is not a constraint on design — it is a quality standard."
+ *
+ * From DESIGN_SYSTEM §15 (Accessibility Standards):
+ * "A design that works for everyone works better for everyone."
+ *
+ * This file handles accessibility concerns that require CSS:
+ *   - Focus-visible styles for all hero interactive elements
+ *   - High contrast mode (forced-colors) compatibility
+ *   - Reduced-motion refinements beyond the global layer
+ *   - Touch target minimums (44×44px)
+ *   - Screen reader utility styles
+ *   - Skip-link target styles
+ *
+ * Architecture:
+ *   hero-accessibility.css → a11y-specific CSS (this file)
+ *   hero-responsive.css    → responsive layout CSS
+ *   global.css             → global focus-visible (2px gold accent)
+ *
+ * Global focus styles (global.css) provide the foundation:
+ *   *:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+ *
+ * This file adds hero-SPECIFIC refinements that the global styles
+ * cannot express — element-specific focus treatments, forced-colors
+ * fallbacks, and touch-target enforcement.
+ *
+ * From VISUAL_RULES:
+ * - AC4: Focus indicators use gold accent (2px minimum), never removed
+ * - AC5: prefers-reduced-motion always respected
+ * - AC12: Touch targets meet or exceed 44×44px with 8px spacing
+ * - A6: Focus indicators always visible, never outline:none without alternative
+ * - A9: Touch targets minimum 44×44px
+ */
+
+/* ═══════════════════════════════════════════════════════════
+   1. FOCUS-VISIBLE STYLES (AC4, A6)
+   ═══════════════════════════════════════════════════════════
+   Hero-specific focus styles that complement the global
+   *:focus-visible rule. These handle element-specific
+   treatments that the generic rule cannot express.
+
+   From VISUAL_RULES AC4:
+   "Focus indicators are visible and high-contrast.
+    The focus ring uses our gold accent (2px minimum)."
+
+   From VISUAL_RULES A6:
+   "Focus indicators are always visible. Keyboard-navigated
+    elements show a clear focus ring." */
+
+/* CTA focus ring — uses accent gold, adapts to variant */
+.hero-cta:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+  /* Ensure focus ring is visible over hero overlays */
+  position: relative;
+  z-index: 11;
+}
+
+/* Ghost CTA needs stronger focus visibility against dark overlays */
+.hero-cta--ghost:focus-visible {
+  outline-color: var(--color-accent);
+  outline-width: 2px;
+  /* Subtle background for contrast against busy hero image */
+  background-color: color-mix(in srgb, var(--color-surface) 15%, transparent);
+}
+
+/* Scroll indicator focus ring */
+.scroll-indicator:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 4px;
+  /* Ensure focus ring is visible over hero overlays */
+  position: relative;
+  z-index: 11;
+}
+
+/* Error boundary retry button focus */
+.hero-error-fallback button:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   2. TOUCH TARGET VALIDATION (AC12, A9)
+   ═══════════════════════════════════════════════════════════
+   All interactive elements must meet 44×44px minimum.
+   8px spacing between adjacent targets.
+
+   From VISUAL_RULES AC12:
+   "Touch targets meet or exceed 44×44px with 8px spacing."
+
+   From VISUAL_RULES A9:
+   "Touch targets are minimum 44×44px. Spacing between
+    adjacent targets is minimum 8px."
+
+   Components set min-height/min-width via inline styles and
+   CSS classes. These CSS rules serve as the safety net —
+   enforcing the minimum even if a component misses it. */
+
+/* CTA touch target — minimum 48px height for comfortable reach */
+.hero-cta {
+  min-height: 48px;
+  min-width: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* Ensure adequate spacing between adjacent CTAs */
+  padding: 12px 32px;
+}
+
+/* Scroll indicator touch target */
+.scroll-indicator {
+  min-height: 48px;
+  min-width: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* Touch-aware padding for comfortable interaction */
+  padding: 12px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   3. HIGH CONTRAST MODE (Windows High Contrast Theme)
+   ═══════════════════════════════════════════════════════════
+   Windows High Contrast Mode (forced-colors) replaces all
+   colors with system colors. We must ensure:
+   - Interactive elements remain distinguishable
+   - Focus indicators remain visible
+   - Content remains readable
+   - Decorative elements don't create noise
+
+   From VISUAL_RULES AC1:
+   "WCAG 2.1 Level AA is the minimum standard."
+
+   WCAG 2.1 §1.4.11: Non-text contrast requires 3:1 against
+   adjacent colors for UI components. forced-colors mode
+   handles this automatically for most elements, but we
+   must ensure our custom elements adapt. */
+
+@media (forced-colors: active) {
+  /* CTA elements get a visible border in high contrast mode */
+  .hero-cta {
+    border: 1px solid ButtonText;
+    forced-color-adjust: none;
+  }
+
+  .hero-cta--primary {
+    background-color: Highlight;
+    color: HighlightText;
+    border-color: Highlight;
+  }
+
+  .hero-cta--ghost {
+    background-color: transparent;
+    color: ButtonText;
+    border-color: ButtonText;
+  }
+
+  /* Focus ring adapts to system focus color */
+  .hero-cta:focus-visible,
+  .scroll-indicator:focus-visible,
+  .hero-error-fallback button:focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: 3px;
+    forced-color-adjust: none;
+  }
+
+  /* Scroll indicator remains visible */
+  .scroll-indicator {
+    border: 1px solid ButtonText;
+    forced-color-adjust: none;
+  }
+
+  /* Loading indicator uses system colors */
+  .hero-loading {
+    forced-color-adjust: none;
+  }
+
+  /* Error boundary adapts */
+  .hero-error-fallback {
+    forced-color-adjust: none;
+  }
+
+  .hero-error-fallback button {
+    background-color: Highlight;
+    color: HighlightText;
+    border: 1px solid Highlight;
+    forced-color-adjust: none;
+  }
+
+  /* Hide decorative overlays in high contrast — they create noise */
+  .hero-overlay {
+    display: none;
+  }
+
+  /* Background gradient hidden — system provides contrast */
+  .hero-background {
+    background: Canvas !important;
+  }
+
+  /* Placeholder hidden — not meaningful in high contrast */
+  .hero-placeholder {
+    display: none;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   4. REDUCED MOTION — CSS LAYER (AC5)
+   ═══════════════════════════════════════════════════════════
+   Beyond the global reduced-motion handling, the hero
+   requires specific CSS refinements:
+
+   - Loading transition: instant (no 600ms fade)
+   - Content opacity transitions: instant
+   - Scroll indicator: no fade animation
+   - Background: no transition
+
+   From VISUAL_RULES AC5:
+   "prefers-reduced-motion is always respected.
+    When active: all scroll-linked reveals become instant,
+    all hover transitions become instant, all page
+    transitions become instant."
+
+   From VISUAL_RULES M11:
+   "When reduced motion is active: all scroll-linked
+    reveals become instant, all hover transitions become
+    instant. The experience is complete without animation." */
+
+@media (prefers-reduced-motion: reduce) {
+  /* Loading overlay: instant appearance/disappearance */
+  .hero-loading {
+    transition: none !important;
+    opacity: 1 !important;
+  }
+
+  /* All hero content elements: no opacity transitions */
+  .hero-brand-name,
+  .hero-tagline,
+  .hero-cta-group {
+    transition: none !important;
+    opacity: 1 !important;
+  }
+
+  /* Scroll indicator: no animation */
+  .scroll-indicator {
+    transition: none !important;
+    animation: none !important;
+  }
+
+  .scroll-indicator__chevron {
+    animation: none !important;
+  }
+
+  /* Background: no transition */
+  .hero-background {
+    transition: none !important;
+  }
+
+  /* CTA hover/press: no scale animation */
+  .hero-cta {
+    transition: none !important;
+  }
+
+  /* Media image: no transition */
+  .hero-image {
+    transition: none !important;
+  }
+
+  /* Error fallback: no transition */
+  .hero-error-fallback {
+    transition: none !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   5. SCREEN READER UTILITIES
+   ═══════════════════════════════════════════════════════════
+   Utility classes for screen reader text that provides
+   context without visual presence.
+
+   From DESIGN_SYSTEM §15:
+   "Page content is accessible via screen reader landmarks."
+
+   These complement the shared VisuallyHidden component
+   for CSS-only use cases within the hero. */
+
+/* Visually hidden but accessible to screen readers */
+.hero-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Live region — visually hidden, announced by screen readers */
+.hero-live-region {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   6. SKIP LINK TARGET
+   ═══════════════════════════════════════════════════════════
+   When the skip link focuses #hero, the section should
+   receive focus without visual clutter.
+
+   From TECHNICAL_ARCHITECTURE §16.4:
+   "Skip-to-content link is the first focusable element." */
+
+/* Skip link target — remove focus outline on the section itself */
+#hero:focus {
+  outline: none;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   7. PREFERS-CONTRAST ENHANCEMENT
+   ═══════════════════════════════════════════════════════════
+   When the user requests enhanced contrast, increase
+   text legibility and interactive element visibility.
+
+   From VISUAL_RULES AC2:
+   "Color contrast meets or exceeds WCAG requirements." */
+
+@media (prefers-contrast: more) {
+  /* Ensure CTA text is maximally legible */
+  .hero-cta--primary {
+    border: 2px solid currentColor;
+  }
+
+  /* Focus ring more prominent */
+  .hero-cta:focus-visible,
+  .scroll-indicator:focus-visible {
+    outline-width: 3px;
+    outline-offset: 4px;
+  }
+
+  /* Scroll indicator more visible */
+  .scroll-indicator {
+    border: 2px solid currentColor;
+  }
+}

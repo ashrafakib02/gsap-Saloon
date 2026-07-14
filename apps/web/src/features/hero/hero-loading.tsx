@@ -56,6 +56,7 @@ export function HeroLoading({ isVisible }: HeroLoadingProps) {
     <div
       className="hero-loading absolute inset-0 flex items-center justify-center"
       role="status"
+      aria-live="polite"
       aria-label={HERO_COPY_EN.state.loadingAriaLabel}
       style={{
         backgroundColor: 'var(--color-surface)',

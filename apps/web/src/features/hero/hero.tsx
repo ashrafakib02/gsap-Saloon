@@ -51,7 +51,7 @@
  * Components do NOT hardcode breakpoint logic.
  */
 
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { HeroErrorBoundary } from './hero-error-boundary';
 import { HeroBackground } from './hero-background';
 import { HeroMedia } from './hero-media';
@@ -65,9 +65,11 @@ import { useHeroState } from './hooks/use-hero-state';
 import { useHeroViewport } from './hooks/use-hero-viewport';
 import { useHeroAnimation } from './hooks/use-hero-animation';
 import { useHeroAssets } from './hooks/use-hero-assets';
+import { useHeroA11y } from './hooks/use-hero-a11y';
 import { HERO_DEFAULT_CONFIG, HERO_LAYOUT } from './hero.config';
 import { HERO_COPY_EN } from './hero.copy';
 import type { HeroSectionProps } from './hero.types';
+import type { HeroAnnouncement } from './hooks/use-hero-a11y';
 
 /* ── Responsive Styles (Phase 4.5) ─────────────────────────
  * Import the centralized responsive CSS.
@@ -86,6 +88,16 @@ import type { HeroSectionProps } from './hero.types';
  * - Reduced motion CSS layer (AC5)
  */
 import './hero-responsive.css';
+/* ── Accessibility Styles (Phase 4.6) ───────────────────────
+ * Centralized accessibility CSS for the hero:
+ * - Focus-visible styles (AC4, A6)
+ * - Touch target validation (AC12, A9)
+ * - High contrast mode (forced-colors)
+ * - Reduced-motion CSS refinements (AC5)
+ * - Screen reader utilities
+ * - Skip link target styles
+ * - Prefers-contrast enhancement (AC2) */
+import './hero-accessibility.css';
 
 // ── Component ─────────────────────────────────────────────
 
@@ -130,6 +142,18 @@ export function HeroSection({
   const viewport = useHeroViewport();
   const animation = useHeroAnimation(viewport.prefersReducedMotion);
   const assets = useHeroAssets();
+
+  /* ── Accessibility State (Phase 4.6) ────────────────────
+   * Maps hero state to screen reader announcements.
+   * Live region announces loading/loaded/error transitions. */
+  const announcement: HeroAnnouncement = useMemo(() => {
+    if (heroState.loadState === 'loading') return 'loading';
+    if (heroState.loadState === 'loaded' && heroState.isReady) return 'loaded';
+    if (heroState.loadState === 'error') return 'error';
+    return null;
+  }, [heroState.loadState, heroState.isReady]);
+
+  const { liveRegionRef } = useHeroA11y({ announce: announcement });
 
   /* ── Lifecycle ────────────────────────────────────────── */
 
@@ -253,6 +277,12 @@ export function HeroSection({
            * Communicates: "There is more to discover."
            * Hidden when hero is loading, visible when ready.
            *
+           * Phase 4.6 (AC5): The scroll indicator is visible even
+           * when prefers-reduced-motion is active. It communicates
+           * "there is more content below" — a navigational cue that
+           * must not be removed. Animation is suppressed by CSS
+           * (hero-accessibility.css), but the element remains visible.
+           *
            * From DESIGN_SYSTEM §14 Law 3:
            * "Most visitors should not consciously notice the motion."
            *
@@ -261,8 +291,22 @@ export function HeroSection({
           <HeroScrollIndicator
             label={HERO_COPY_EN.a11y.scrollIndicatorLabel}
             bottom={HERO_LAYOUT.scrollIndicator[viewport.variant].bottom}
-            isVisible={heroState.isReady && !viewport.prefersReducedMotion}
+            isVisible={heroState.isReady}
             targetId="services"
+          />
+
+          {/* ── Live Region (Phase 4.6) ─────────────────────
+           * Announces dynamic state changes to screen readers.
+           * From VISUAL_RULES AC1: "WCAG 2.1 Level AA minimum."
+           *
+           * This div is visually hidden (hero-live-region class)
+           * but announced by screen readers via aria-live="polite".
+           * Content is managed by useHeroA11y hook. */}
+          <div
+            ref={liveRegionRef}
+            className="hero-live-region"
+            aria-live="polite"
+            aria-atomic="true"
           />
         </section>
       </HeroInteractionProvider>
