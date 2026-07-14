@@ -9,8 +9,8 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | Phase 4 — Experience Layer |
-| **Current Step** | 4.3 — Hero Layout |
-| **Overall Completion** | 11.0% (9 / 82 steps) |
+| **Current Step** | 4.4 — Hero Interactions |
+| **Overall Completion** | 12.2% (10 / 82 steps) |
 | **Last Updated** | 2026-07-14 |
 
 ---
@@ -41,7 +41,7 @@
 |------|--------|
 | 4.1 Hero Experience | ✅ Completed |
 | 4.2 Hero Copy | ✅ Completed |
-| 4.3 Hero Layout | ⬜ Not Started |
+| 4.3 Hero Layout | ✅ Completed |
 | 4.4 Hero Interactions | ⬜ Not Started |
 | 4.5 Hero Responsive Behavior | ⬜ Not Started |
 | 4.6 Hero Accessibility | ⬜ Not Started |
@@ -211,7 +211,7 @@
 | 3.7 | Shared Infrastructure | ✅ Completed | Frontend Architect | P0 | 3.2, 3.3 | Medium |
 | 4.1 | Hero Experience | ✅ Completed | Frontend Architect | P0 | 3.3, 3.4, 3.5 | High |
 | 4.2 | Hero Copy | ✅ Completed | Content Lead | P0 | None | Low |
-| 4.3 | Hero Layout | ⬜ Not Started | Frontend Architect | P0 | 4.1 | Medium |
+| 4.3 | Hero Layout | ✅ Completed | Frontend Architect | P0 | 4.1 | Medium |
 | 4.4 | Hero Interactions | ⬜ Not Started | Frontend Architect | P1 | 4.1, 3.5 | Medium |
 | 4.5 | Hero Responsive Behavior | ⬜ Not Started | Frontend Architect | P0 | 4.1, 3.5 | Medium |
 | 4.6 | Hero Accessibility | ⬜ Not Started | Frontend Architect | P0 | 4.1 | Medium |
@@ -290,6 +290,11 @@
 ## Changelog
 
 ### 2026-07-14
+
+**Phase 4.3 — Hero Layout**
+Status: Completed
+
+Defined the complete responsive spatial composition for the Hero section — the cinematic architecture that makes it look like the opening scene of a premium interactive website, even without animation. All 20 layout items implemented across 4 files. **Responsive Layout Configuration** (`hero.config.ts`): Expanded HERO_LAYOUT with 10 new responsive constants keyed by HeroVariant — contentPaddingBottom (optical centering: 0 mobile/tablet, 16% desktop for golden-section composition), spacing.headlineToTagline (personal→social tier), spacing.taglineToCta (social→formal tier), ctaLayout (vertical mobile → horizontal tablet/desktop), ctaGap (personal→social), ctaMinWidth (100% mobile → auto desktop), scrollIndicator (personal→formal bottom spacing), safeArea (env() insets for notched devices). All values derive from existing design system spacing tokens — zero magic numbers. **Content Component** (`hero-content.tsx`): Accepts `variant` prop for viewport-aware layout. Responsive spacing between headline/tagline/CTA adapts per breakpoint. CTA group switches from vertical stack (full-width mobile buttons for thumb reach) to horizontal row (side-by-side on tablet/desktop). Fixed CSS variable names to match actual tokens (`--font-serif` not `--font-family-serif`, `--text-display` not `--type-size-display`). All typography scales via global CSS custom properties (3.5rem→4.5rem→5.5rem). **Composition** (`hero.tsx`): Desktop optical centering via asymmetric padding-bottom (16%) on the flex container — content sits at ~42% from top for cinematic composition. Responsive scroll indicator bottom spacing per breakpoint. Safe-area padding on the section element for iPhone notch/home indicator. **Types** (`hero.types.ts`): Added `variant: HeroVariant` to HeroContentProps. Layer stacking verified: Background(z:0) → Media(z:auto) → 3D(z:1) → Overlay(z:2) → Content(z:10) → Loading(z:100). TypeScript strict mode clean. Zero hero-related errors. Ready for Phase 4.4 (Hero Interactions).
 
 **Phase 4.2 — Hero Copy**
 Status: Completed

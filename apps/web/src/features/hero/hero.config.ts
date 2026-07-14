@@ -17,7 +17,7 @@
  * - Components receive config via props, never import copy or config directly
  */
 
-import type { HeroConfig } from './hero.types';
+import type { HeroConfig, HeroVariant } from './hero.types';
 import { HERO_COPY_EN } from './hero.copy';
 
 // ── Default Hero Configuration ────────────────────────────
@@ -132,41 +132,217 @@ export const HERO_ANIMATION = {
 // ── Layout Configuration ──────────────────────────────────
 
 /**
- * Hero layout parameters.
+ * Hero layout parameters — responsive spatial composition.
  *
  * From DESIGN_SYSTEM §6 (Grid System):
  * "Center alignment for hero moments, single-focus statements.
  *  Communicates formality, importance, and singular focus."
  *
- * From DESIGN_SYSTEM §7 (Breakpoints):
- * - Mobile: 0-767px, single column
- * - Tablet: 768-1023px, transitional
- * - Desktop: 1024-1439px, full editorial
- * - Wide: 1440px+, expanded desktop
+ * From DESIGN_SYSTEM §6 (Grid Exceptions):
+ * "The hero section (which may use a centered, non-columnar
+ *  composition for maximum impact)."
+ *
+ * From CREATIVE_DIRECTION §1.4 (Breathing Principle):
+ * "Between any two content elements, the space should be
+ *  proportionally larger than the internal spacing of those elements."
+ *
+ * From CREATIVE_DIRECTION §1.4 (Rhythm Principle):
+ * "Hero sections are almost entirely space with a single focal element."
+ *
+ * From EXPERIENCE_STORYBOARD SCENE 1:
+ * "One image. Full viewport. The composition is cinematic —
+ *  wide enough to show the space and the atmosphere, close
+ *  enough to feel intimate."
+ *
+ * Architecture:
+ * - Mobile-first responsive values keyed by HeroVariant
+ * - Vertical offset via asymmetric padding for optical centering
+ * - Spacing tokens map to the five-tier scale
+ * - CTA layout strategy changes per breakpoint (stacked → side-by-side)
+ * - Safe-area support for notched devices
+ *
+ * Responsive Typography (handled by global CSS in tailwind.css):
+ * - Mobile (0-767px):   --text-display: 3.5rem
+ * - Tablet (768-1023px): --text-display: 4.5rem
+ * - Desktop (1024px+):   --text-display: 5.5rem
+ * Typography scaling is CSS-driven, not JS-driven.
+ * This config handles SPATIAL composition only.
  */
 export const HERO_LAYOUT = {
-  /** Hero takes full viewport height */
+  /** Full viewport height — the hero IS the viewport.
+   *  Using svh (small viewport height) for mobile address bar compensation. */
   height: '100svh',
 
-  /** Content positioning within the hero */
+  /** Content alignment — centered per DESIGN_SYSTEM §6.
+   *  "Center alignment for hero moments, single-focus statements." */
   contentPosition: {
-    /** Horizontal alignment */
     align: 'center' as const,
-    /** Vertical alignment */
     justify: 'center' as const,
   },
 
-  /** Maximum content width for text legibility */
+  /**
+   * Content vertical offset — asymmetric padding for optical centering.
+   *
+   * From CREATIVE_DIRECTION §7 Law 1:
+   * "Each viewport delivers exactly one clear idea."
+   *
+   * Mobile/Tablet: '0' — content sits at mathematical center.
+   * Desktop: '16%' — extra bottom padding pushes the visual center
+   * upward to ~42% from top, creating a cinematic golden-section
+   * composition. The extra space below creates visual weight that
+   * draws the eye downward toward the scroll indicator.
+   *
+   * Implementation: applied as padding-bottom on the flex container.
+   * The flex justify-center then centers within the remaining space.
+   * Example: 16% bottom padding on 100vh = center at ~42vh.
+   */
+  contentPaddingBottom: {
+    mobile: '0',
+    tablet: '0',
+    desktop: '16%',
+  } as Record<HeroVariant, string>,
+
+  /** Maximum content width — 65ch for optimal readability (T7).
+   *  "Body copy maximum line length is 65-75 characters." */
   maxContentWidth: '65ch',
 
-  /** Horizontal padding — prevents content touching viewport edge (S5) */
+  /**
+   * Horizontal padding per breakpoint — prevents edge-touching (S5).
+   * "Content never touches the viewport edge."
+   *
+   * Mobile: social tier (1.5rem) — minimum breathing room,
+   *   maximum content width on narrow screens.
+   * Tablet: formal tier (3rem) — generous margins.
+   * Desktop: formal tier (3rem) — generous margins.
+   *   On wide screens (1440px+), the 65ch max-width naturally
+   *   creates even more generous margins.
+   */
   paddingX: {
-    mobile: 'var(--spacing-social)',
-    tablet: 'var(--spacing-formal)',
-    desktop: 'var(--spacing-formal)',
+    mobile: 'var(--spacing-social)',   /* 1.5rem — Tier 3 */
+    tablet: 'var(--spacing-formal)',   /* 3rem — Tier 4 */
+    desktop: 'var(--spacing-formal)',  /* 3rem — Tier 4 */
+  } as Record<HeroVariant, string>,
+
+  /**
+   * Spacing rhythm between content elements.
+   *
+   * From CREATIVE_DIRECTION §1.4 (Breathing Principle):
+   * "The space should be proportionally larger than the internal
+   *  spacing of those elements."
+   *
+   * From VISUAL_RULES S2:
+   * "The gap between two elements is always proportionally larger
+   *  than the internal spacing within those elements."
+   *
+   * Headline → Tagline: personal (1rem) mobile, social (1.5rem) desktop.
+   *   The headline and tagline are tightly coupled — one thought.
+   * Tagline → CTA: social (1.5rem) mobile, formal (3rem) desktop.
+   *   The CTA is a separate action — more breathing room.
+   *
+   * Creates the "breathing rhythm" from DESIGN_SYSTEM §14 Law 4:
+   * "Pacing as breathing."
+   */
+  spacing: {
+    headlineToTagline: {
+      mobile: 'var(--spacing-personal)',  /* 1rem — Tier 2 */
+      tablet: 'var(--spacing-social)',    /* 1.5rem — Tier 3 */
+      desktop: 'var(--spacing-social)',   /* 1.5rem — Tier 3 */
+    } as Record<HeroVariant, string>,
+    taglineToCta: {
+      mobile: 'var(--spacing-social)',    /* 1.5rem — Tier 3 */
+      tablet: 'var(--spacing-formal)',    /* 3rem — Tier 4 */
+      desktop: 'var(--spacing-formal)',   /* 3rem — Tier 4 */
+    } as Record<HeroVariant, string>,
   },
 
-  /** Content starts below the navigation height */
+  /**
+   * CTA group layout strategy.
+   *
+   * From DESIGN_SYSTEM §7 (Mobile-First):
+   * "Touch-first interaction (44×44px minimum targets)"
+   * "Thumb-zone optimization for critical interactive elements"
+   *
+   * Mobile: Vertical (stacked) — each CTA gets full width,
+   *   large touch targets, thumb-friendly placement.
+   * Tablet/Desktop: Horizontal (side by side) — primary and
+   *   secondary CTAs share a row, maintaining visual hierarchy.
+   */
+  ctaLayout: {
+    mobile: 'vertical' as const,
+    tablet: 'horizontal' as const,
+    desktop: 'horizontal' as const,
+  } as Record<HeroVariant, 'vertical' | 'horizontal'>,
+
+  /**
+   * CTA group gap — space between primary and secondary CTAs.
+   *
+   * Mobile vertical: personal (1rem) — stacked buttons need less gap.
+   * Tablet/Desktop horizontal: social (1.5rem) — side-by-side needs more.
+   */
+  ctaGap: {
+    mobile: 'var(--spacing-personal)',  /* 1rem — Tier 2 */
+    tablet: 'var(--spacing-social)',    /* 1.5rem — Tier 3 */
+    desktop: 'var(--spacing-social)',   /* 1.5rem — Tier 3 */
+  } as Record<HeroVariant, string>,
+
+  /**
+   * CTA minimum width — ensures touch targets meet accessibility.
+   *
+   * From VISUAL_RULES A9:
+   * "Touch targets are minimum 44×44px."
+   *
+   * Mobile: 100% width — full-width buttons for thumb reach.
+   * Tablet/Desktop: auto — natural width, no minimum enforced.
+   */
+  ctaMinWidth: {
+    mobile: '100%',
+    tablet: 'auto',
+    desktop: 'auto',
+  } as Record<HeroVariant, string>,
+
+  /**
+   * Scroll indicator positioning per breakpoint.
+   *
+   * From DESIGN_SYSTEM §14 Law 3:
+   * "Most visitors should not consciously notice the motion.
+   *  They should notice the feeling."
+   *
+   * The scroll indicator is a subtle static cue, not animation.
+   * Positioned from the bottom with safe-area awareness.
+   *
+   * Mobile: Compact — less room, indicator closer to edge.
+   * Desktop: Generous — more breathing room below.
+   */
+  scrollIndicator: {
+    mobile: {
+      bottom: 'var(--spacing-personal)',  /* 1rem — compact on mobile */
+    },
+    tablet: {
+      bottom: 'var(--spacing-social)',    /* 1.5rem */
+    },
+    desktop: {
+      bottom: 'var(--spacing-formal)',    /* 3rem — generous on desktop */
+    },
+  } as Record<HeroVariant, { bottom: string }>,
+
+  /**
+   * Safe-area insets — for notched/rounded-corner devices.
+   *
+   * From VISUAL_RULES A9:
+   * "Touch targets are minimum 44×44px."
+   *
+   * env(safe-area-inset-*) is zero when not applicable.
+   * These values ensure content doesn't overlap with:
+   * - Bottom home indicator (iPhone X+)
+   * - Side notches on landscape mobile
+   */
+  safeArea: {
+    bottom: 'env(safe-area-inset-bottom, 0px)',
+    left: 'env(safe-area-inset-left, 0px)',
+    right: 'env(safe-area-inset-right, 0px)',
+  },
+
+  /** Fixed navigation height compensation */
   navOffset: '72px',
 } as const;
 

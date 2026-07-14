@@ -1,5 +1,5 @@
 /**
- * HeroContent — Text and CTA region
+ * HeroContent — Text and CTA Region
  *
  * From EXPERIENCE_STORYBOARD SCENE 1:
  * "There is no text to read, no button to click, no navigation to parse.
@@ -16,6 +16,18 @@
  * - CTA in sentence case per VISUAL_RULES B2
  * - No exclamation marks per VISUAL_RULES B10 and L7
  *
+ * Responsive layout (Phase 4.3):
+ * - Uses HeroVariant to drive spacing, CTA layout, and padding
+ * - Mobile: stacked CTAs, compact spacing, full-width buttons
+ * - Tablet: horizontal CTAs, moderate spacing
+ * - Desktop: horizontal CTAs, generous spacing, 65ch max-width
+ *
+ * Typography scaling is handled by global CSS custom properties:
+ * - Mobile: --text-display: 3.5rem
+ * - Tablet: --text-display: 4.5rem
+ * - Desktop: --text-display: 5.5rem
+ * This component uses the tokens, not hardcoded sizes.
+ *
  * Phase 4.1 builds the ARCHITECTURE. The warm reveal animation
  * (word-by-word stagger, opacity transitions) is implemented in Phase 9.
  * Components receive `isReady` to know when content should be visible.
@@ -27,7 +39,7 @@ import { HERO_LAYOUT } from './hero.config';
 // ── Component ─────────────────────────────────────────────
 
 /**
- * The hero's text and CTA region.
+ * The hero's text and CTA region — responsive composition.
  *
  * Contains:
  * 1. Brand name (h1) — the page's single heading
@@ -39,6 +51,12 @@ import { HERO_LAYOUT } from './hero.config';
  * "Every element must earn its place."
  *
  * Each element is intentionally minimal. The whitespace does the work.
+ *
+ * Responsive behavior:
+ * - Headline typography scales via CSS custom properties (tailwind.css)
+ * - Spacing between elements increases with viewport width
+ * - CTA layout switches from vertical (mobile) to horizontal (tablet+)
+ * - Horizontal padding prevents edge-touching at all widths
  */
 export function HeroContent({
   brandName,
@@ -46,14 +64,25 @@ export function HeroContent({
   cta,
   secondaryCta,
   isReady,
+  variant,
 }: HeroContentProps) {
+  /* ── Responsive Values ──────────────────────────────── */
+  const padding = HERO_LAYOUT.paddingX[variant];
+  const headlineToTaglineGap = HERO_LAYOUT.spacing.headlineToTagline[variant];
+  const taglineToCtaGap = HERO_LAYOUT.spacing.taglineToCta[variant];
+  const ctaDirection = HERO_LAYOUT.ctaLayout[variant] === 'vertical'
+    ? 'column' as const
+    : 'row' as const;
+  const ctaGap = HERO_LAYOUT.ctaGap[variant];
+  const ctaMinWidth = HERO_LAYOUT.ctaMinWidth[variant];
+
   return (
     <div
       className="hero-content relative z-10 flex flex-col items-center text-center"
       style={{
         maxWidth: HERO_LAYOUT.maxContentWidth,
-        paddingLeft: HERO_LAYOUT.paddingX.mobile,
-        paddingRight: HERO_LAYOUT.paddingX.mobile,
+        paddingLeft: padding,
+        paddingRight: padding,
       }}
     >
       {/* ── Brand Name (h1) ──────────────────────────────
@@ -61,16 +90,18 @@ export function HeroContent({
        * Serif typeface — Cormorant Garamond (DESIGN_SYSTEM §4).
        * Title case per VISUAL_RULES T9.
        *
-       * TODO Phase 4.2: Final copy may refine this text.
+       * Typography scales via CSS custom properties:
+       * Mobile: 3.5rem, Tablet: 4.5rem, Desktop: 5.5rem
+       *
        * TODO Phase 9: Word-by-word stagger reveal animation.
        */}
       <h1
         className="hero-brand-name"
         style={{
-          fontFamily: "var(--font-family-serif)",
-          fontSize: 'var(--type-size-display)',
-          lineHeight: 'var(--type-leading-display)',
-          letterSpacing: 'var(--type-tracking-display)',
+          fontFamily: 'var(--font-serif)',
+          fontSize: 'var(--text-display)',
+          lineHeight: 'var(--leading-display)',
+          letterSpacing: 'var(--tracking-display)',
           fontWeight: brandName.weight,
           color: 'var(--color-text)',
           opacity: isReady ? 1 : 0,
@@ -85,19 +116,21 @@ export function HeroContent({
        * Sentence case per VISUAL_RULES T10.
        * Light weight to contrast with the heavier h1.
        *
-       * TODO Phase 4.2: Final copy.
+       * Spacing from headline adapts per breakpoint:
+       * Mobile: personal (1rem), Tablet/Desktop: social (1.5rem)
+       *
        * TODO Phase 9: Fade-in after brand name completes.
        */}
       <p
         className="hero-tagline"
         style={{
-          fontFamily: "var(--font-family-sans)",
-          fontSize: 'var(--type-size-subheading)',
-          lineHeight: 'var(--type-leading-subheading)',
-          letterSpacing: 'var(--type-tracking-subheading)',
+          fontFamily: 'var(--font-sans)',
+          fontSize: 'var(--text-subheading)',
+          lineHeight: 'var(--leading-subheading)',
+          letterSpacing: 'var(--tracking-subheading)',
           fontWeight: tagline.weight,
           color: 'var(--color-text-secondary)',
-          marginTop: 'var(--spacing-personal)',
+          marginTop: headlineToTaglineGap,
           opacity: isReady ? 1 : 0,
           transition: 'opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.3s',
         }}
@@ -110,17 +143,22 @@ export function HeroContent({
        * Ghost CTA: Secondary, less prominent.
        * Both meet 44×44px touch target minimum (VISUAL_RULES A9, AC12).
        *
+       * Responsive layout:
+       * Mobile: Vertical stack — full-width buttons, thumb-friendly.
+       * Tablet/Desktop: Horizontal row — side-by-side, visual hierarchy.
+       *
        * TODO Phase 4.4: Hero Interactions (hover states, focus management).
        * TODO Phase 9: CTA fade-in after tagline.
        */}
       <div
         className="hero-cta-group"
         style={{
-          marginTop: 'var(--spacing-social)',
+          marginTop: taglineToCtaGap,
           display: 'flex',
-          flexDirection: 'column',
+          flexDirection: ctaDirection,
           alignItems: 'center',
-          gap: 'var(--spacing-personal)',
+          justifyContent: 'center',
+          gap: ctaGap,
           opacity: isReady ? 1 : 0,
           transition: 'opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.5s',
         }}
@@ -134,9 +172,10 @@ export function HeroContent({
             alignItems: 'center',
             justifyContent: 'center',
             minHeight: '48px',
+            minWidth: ctaMinWidth,
             padding: '14px 36px',
-            fontFamily: 'var(--font-family-sans)',
-            fontSize: 'var(--type-size-body)',
+            fontFamily: 'var(--font-sans)',
+            fontSize: 'var(--text-body)',
             fontWeight: 500,
             letterSpacing: '0.01em',
             color: 'var(--color-surface)',
@@ -166,9 +205,10 @@ export function HeroContent({
             alignItems: 'center',
             justifyContent: 'center',
             minHeight: '44px',
+            minWidth: ctaMinWidth,
             padding: '10px 24px',
-            fontFamily: 'var(--font-family-sans)',
-            fontSize: 'var(--type-size-body)',
+            fontFamily: 'var(--font-sans)',
+            fontSize: 'var(--text-body)',
             fontWeight: 400,
             letterSpacing: '0.01em',
             color: 'var(--color-text-secondary)',

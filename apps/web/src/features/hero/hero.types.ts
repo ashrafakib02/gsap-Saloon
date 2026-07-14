@@ -123,6 +123,8 @@ export interface HeroContentProps {
   secondaryCta: HeroConfig['secondaryCta'];
   /** Whether the hero has finished its loading phase */
   isReady: boolean;
+  /** Current viewport variant — drives responsive layout decisions */
+  variant: HeroVariant;
 }
 
 /** Props for HeroMedia — the image/background region */

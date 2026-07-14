@@ -147,6 +147,11 @@ export function HeroSection({
           width: '100%',
           /* Ensure the hero sits above the page surface */
           backgroundColor: 'var(--color-surface)',
+          /* Safe-area support for notched/rounded-corner devices.
+           * env() returns 0px when not applicable — zero visual impact. */
+          paddingBottom: HERO_LAYOUT.safeArea.bottom,
+          paddingLeft: HERO_LAYOUT.safeArea.left,
+          paddingRight: HERO_LAYOUT.safeArea.right,
         }}
       >
         {/* ── Layer 0: Ambient Background ─────────────────
@@ -180,10 +185,18 @@ export function HeroSection({
 
         {/* ── Layer 10: Content ────────────────────────────
          * Brand name (h1), tagline, CTAs.
-         * Centered per DESIGN_SYSTEM §6. */}
+         * Centered per DESIGN_SYSTEM §6.
+         *
+         * Phase 4.3: Responsive vertical positioning.
+         * Desktop: Extra bottom padding pushes content above center
+         * to ~42% from top (golden-section composition).
+         * Mobile/Tablet: Content centers at mathematical 50%. */}
         <div
           className="absolute inset-0 flex items-center justify-center"
-          style={{ zIndex: 10 }}
+          style={{
+            zIndex: 10,
+            paddingBottom: HERO_LAYOUT.contentPaddingBottom[viewport.variant],
+          }}
         >
           <HeroContent
             brandName={config.brandName}
@@ -191,6 +204,7 @@ export function HeroSection({
             cta={config.cta}
             secondaryCta={config.secondaryCta}
             isReady={heroState.isReady}
+            variant={viewport.variant}
           />
         </div>
 
@@ -207,15 +221,18 @@ export function HeroSection({
          * From DESIGN_SYSTEM §14 Law 3:
          * "Most visitors should not consciously notice the motion."
          *
-         * This is a gentle static cue, not an animation.
+         * Phase 4.3: Responsive bottom positioning per breakpoint.
+         * Mobile: 1rem (compact), Tablet: 1.5rem, Desktop: 3rem.
+         *
          * Phase 9 may add a subtle bob animation. */}
         {heroState.isReady && !viewport.prefersReducedMotion && (
           <div
-            className="hero-scroll-indicator absolute bottom-8 left-1/2 -translate-x-1/2"
+            className="hero-scroll-indicator absolute left-1/2 -translate-x-1/2"
             style={{
               zIndex: 10,
               opacity: 0.5,
               transition: 'opacity 0.6s ease-out',
+              bottom: HERO_LAYOUT.scrollIndicator[viewport.variant].bottom,
             }}
             aria-hidden="true"
             title={HERO_COPY_EN.a11y.scrollIndicatorLabel}
