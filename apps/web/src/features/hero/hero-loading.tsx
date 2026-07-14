@@ -25,7 +25,6 @@
  */
 
 import { memo } from 'react';
-import { memo } from 'react';
 import { LoadingIndicator } from '@/shared/feedback/loading-indicator';
 import { HERO_COPY_EN } from './hero.copy';
 import type { HeroLoadingProps } from './hero.types';
