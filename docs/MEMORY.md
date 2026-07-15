@@ -644,4 +644,50 @@ The **progressive reveal system** is the global infrastructure that determines *
 
 ---
 
+## 21. Phase 6.1 — React Three Fiber Setup
+
+**System:** Complete React Three Fiber infrastructure in `features/three/`. Infrastructure only — no scenes, cameras, lighting, materials, or animations.
+
+**Provider Hierarchy:** `ReduxProvider → QueryProvider → ThemeProvider → ThreeProvider → AnimationProvider → PortalProvider → CursorContext.Provider`. ThreeProvider sits between ThemeProvider and AnimationProvider so that reduced motion state is available before GSAP/Lenis initialization.
+
+**ThreeProvider (`three-provider.tsx`):** Subscribes to `threePerformanceManager` via `useSyncExternalStore`. Probes capabilities on mount, derives quality preset, builds renderer config. Re-probes on breakpoint crossing (mobile↔tablet, tablet↔desktop). Reads `isReducedMotion` from Redux (via `useReducedMotion`). Persists quality override to localStorage. Memoized context value prevents downstream re-renders.
+
+**Renderer Architecture (`three-renderer.ts`):** Centralized WebGL config builder. `buildGlAttributes(config)` → typed GL attributes for R3F Canvas. `resolveCanvasSettings(renderer, quality, viewport)` → canvas settings (dpr, shadows, flat, onCreated). Adaptive DPR per quality preset: ultra(1–2), high(1–1.5), medium(1–1), low(0.75–1), minimal(0.5–0.75). `flat: true` prevents double tone-mapping. `resize: { scroll: false }` delegates scroll to Lenis.
+
+**Quality System (`three.types.ts` + `three.constants.ts` + `three.config.ts`):** Five presets: ultra, high, medium, low, minimal. Each has frozen budgets (frame, texture, geometry, shadow, post-processing). Auto-derived from: viewport size, touch capability, reduced motion (hard floor → minimal), hardware tier, device memory, connection speed. User can override via `setQualityPreset()` which persists to localStorage.
+
+**Performance Model (`three-performance.ts`):** Module-level singleton `threePerformanceManager`. Builds frozen `ThreePerformanceSnapshot` from capability probes: WebGL/WebGL2 support, GPU classification (discrete/integrated/mobile), device tier (high/medium/low/ultra-low), renderer name, max texture size. Subscriber pattern with `subscribe(callback)` and `getSnapshot()`.
+
+**Event Architecture (`three-events.ts`):** Typed pub/sub event hub with 9 categories: pointer, wheel, gesture, keyboard, touch, raycast, select, hover, focus. Factory + singleton pattern (`threeEventManager`). Architecture only — no handlers registered. Events flow through R3F Canvas event source.
+
+**Error Handling (`three-error-boundary.tsx`):** Class component error boundary wrapping the 3D layer. Catches renderer failure, context loss, WebGL unavailability. Falls back to provided content. Accessibility: `aria-hidden: true` + `pointer-events: none` on decorative 3D wrapper.
+
+**Canvas Wrapper (`three-canvas.tsx`):** Reusable R3F Canvas wrapper. Feature gates: `isEnabled && !isReducedMotion && !forceFallback`. When disabled: renders fallback or null (no Canvas mounted, saves GPU). When enabled: wraps `<Canvas>` in `<ThreeErrorBoundary>` + `<Suspense>`. Props override frameloop and dpr per instance. Memoized component.
+
+**Registry (`three-registry.ts`):** Generic Map-based registry for future scene/camera/light/asset registration. Follows same pattern as narrative and timeline registries.
+
+**Hooks (6):**
+- `useThree(selector?, equalityFn?)` — full context or derived slice. Selector memoized via ref-stored equality function.
+- `useThreePerformance(selector?, equalityFn?)` — performance snapshot via `useSyncExternalStore`. Direct subscription to singleton.
+- `useThreeRenderer()` — renderer config + derived canvas settings (gl, dpr, shadows, flat, onCreated). All memoized.
+- `useThreeQuality()` — quality settings + override API. Derives: canPostProcess, canShadow, recommendedFrameloop.
+- `useThreeViewport()` — live viewport detection using `useBreakpoint()` + `useWindowSize()`. Returns isMobileViewport, dimensions, aspectRatio, devicePixelRatio.
+- `useThreeDevice()` — device capability access. Reads from `ThreeContextValue.performance.capabilities`. Returns tier, gpu, hasWebGL, canRender3D, etc.
+
+**Feature Flag:** `hero_3d` (defaults to `false`). `THREE_FEATURE_FLAG` constant in `three.constants.ts`. Feature flag must be enabled for any 3D content to render.
+
+**SSR Safety:** All capability probes gated behind `typeof window !== 'undefined'`. Default snapshots used server-side. localStorage persistence wrapped in try/catch.
+
+**Dependencies:** `three` (v0.185.1), `@react-three/fiber` (v8, for React 18 compatibility).
+
+**Import Pattern:** `import { ThreeCanvas, ThreeProvider, useThree, useThreeQuality, QUALITY_PRESETS, type ThreeContextValue } from '@/features/three'`
+
+**Files Created:** hooks/use-three.ts, hooks/use-three-performance.ts, hooks/use-three-renderer.ts, hooks/use-three-quality.ts, hooks/use-three-viewport.ts, hooks/use-three-device.ts, three-canvas.tsx, index.ts
+
+**Files Modified:** root-provider.tsx (added ThreeProvider), three.config.ts (removed unused imports), hero-3d-mount.tsx (removed unused import)
+
+**Key Rule:** Internal singletons (`threePerformanceManager`, `threeEventManager`, `ThreeContext`) are NOT exported from barrel. Consumers access through hooks and provider only.
+
+---
+
 *This document is immutable project memory. It is updated only when permanent architectural or design decisions change. It does not track progress, implementation history, or temporary state.*

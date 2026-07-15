@@ -9,8 +9,8 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | Phase 6 — 3D Experience |
-| **Current Step** | 6.1 — React Three Fiber Setup |
-| **Overall Completion** | 24.39% (20 / 82 steps) |
+| **Current Step** | 6.2 — Scene Architecture |
+| **Overall Completion** | 25.61% (21 / 82 steps) |
 | **Last Updated** | 2026-07-15 |
 
 ---
@@ -66,11 +66,11 @@
 
 ### Phase 6 — 3D Experience
 
-**Status:** Not Started
+**Status:** In Progress
 
 | Step | Status |
 |------|--------|
-| 6.1 React Three Fiber Setup | ⬜ Not Started |
+| 6.1 React Three Fiber Setup | ✅ Completed |
 | 6.2 Scene Architecture | ⬜ Not Started |
 | 6.3 Camera System | ⬜ Not Started |
 | 6.4 Lighting | ⬜ Not Started |

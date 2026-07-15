@@ -31,7 +31,7 @@
  * Phase 4.1 creates the ARCHITECTURE ONLY — no canvas, no scene.
  */
 
-import { Suspense, memo } from 'react';
+import { memo } from 'react';
 import { useDeferredLoad } from './hooks/use-deferred-load';
 import type { Hero3DMountProps } from './hero.types';
 

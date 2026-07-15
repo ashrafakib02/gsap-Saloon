@@ -6,6 +6,11 @@
  * establishing R3F configuration, device capability checks, and
  * mount configurations.
  *
+ * @deprecated Superseded by `@/features/three` (Phase 6.1+).
+ * This module is retained for backward compatibility only.
+ * New code should import from `@/features/three` instead.
+ * This file will be removed in a future cleanup pass.
+ *
  * @module r3f-bootstrap
  */
 
