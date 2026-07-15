@@ -141,6 +141,19 @@ export type { UseScrollBreakpointReturn } from './hooks/use-scroll-breakpoint';
 export { useScrollPhase } from './hooks/use-scroll-phase';
 export type { UseScrollPhaseReturn } from './hooks/use-scroll-phase';
 
+// ── Progressive Reveal Hooks ──────────────────────────────
+
+export { useProgressiveReveal } from './hooks/use-progressive-reveal';
+export type { UseProgressiveRevealReturn } from './hooks/use-progressive-reveal';
+
+export { useRevealGroup } from './hooks/use-reveal-group';
+export { useRevealItem } from './hooks/use-reveal-item';
+export { useRevealSequence } from './hooks/use-reveal-sequence';
+export { useRevealVisibility } from './hooks/use-reveal-visibility';
+
+export { useRevealProgress } from './hooks/use-reveal-progress';
+export type { UseRevealProgressReturn } from './hooks/use-reveal-progress';
+
 // ── Registries ─────────────────────────────────────────────
 
 export { NARRATIVE_REGISTRY } from './narrative.config';
@@ -150,6 +163,13 @@ export { TIMELINE_REGISTRY } from './narrative-timeline.config';
 // ── Scroll State Manager ──────────────────────────────────
 
 export { scrollStateManager } from './scroll-state-manager';
+
+// ── Progressive Reveal Manager ────────────────────────────
+
+export {
+  progressiveRevealManager,
+  isDebugMode as isRevealDebugMode,
+} from './progressive-reveal-manager';
 
 // ── ScrollTrigger Manager ──────────────────────────────────
 
@@ -398,3 +418,53 @@ export type {
   BreakpointConfig,
   ScrollTriggerManagerConfig,
 } from './scrolltrigger.types';
+
+// ── Progressive Reveal Constants ──────────────────────────
+
+export {
+  REVEAL_STRATEGIES,
+  REVEAL_STATES,
+  REVEAL_VISIBILITY,
+  REVEAL_PRIORITIES,
+  REVEAL_TRIGGERS,
+  REVEAL_RESET_POLICIES,
+  REVEAL_STRATEGY_DESCRIPTIONS,
+  REVEAL_STATE_DESCRIPTIONS,
+  REVEAL_VISIBILITY_DESCRIPTIONS,
+  REVEAL_PRIORITY_DESCRIPTIONS,
+  REVEAL_TRIGGER_DESCRIPTIONS,
+  REVEAL_RESET_POLICY_DESCRIPTIONS,
+  REVEAL_PRIORITY_ORDER,
+  DEFAULT_REVEAL_CONFIG,
+  DEFAULT_REVEAL_SNAPSHOT,
+} from './progressive-reveal.constants';
+
+// ── Progressive Reveal Types ──────────────────────────────
+
+export type {
+  RevealStrategy,
+  RevealState,
+  RevealVisibility,
+  RevealPriority,
+  RevealTrigger,
+  RevealResetPolicy,
+  RevealItemOptions,
+  RevealItemDefinition,
+  RevealItemState,
+  RevealGroupOptions,
+  RevealGroupDefinition,
+  RevealGroupState,
+  RevealSequenceOptions,
+  RevealSequenceDefinition,
+  RevealSequenceState,
+  RevealDependencyNode,
+  RevealDependencyGraph,
+  ProgressiveRevealSnapshot,
+  ProgressiveRevealRegistry,
+  ProgressiveRevealManager,
+  ProgressiveRevealConfig,
+  RevealSelector,
+  RevealEquality,
+  RevealCallback,
+  RevealUnsubscribe,
+} from './progressive-reveal.types';

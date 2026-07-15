@@ -8,9 +8,9 @@
 
 | Field | Value |
 |-------|-------|
-| **Current Phase** | Phase 5 — Narrative Architecture |
-| **Current Step** | 5.5 — Scroll State |
-| **Overall Completion** | 23.17% (19 / 82 steps) |
+| **Current Phase** | Phase 6 — 3D Experience |
+| **Current Step** | 6.1 — React Three Fiber Setup |
+| **Overall Completion** | 24.39% (20 / 82 steps) |
 | **Last Updated** | 2026-07-15 |
 
 ---
@@ -51,7 +51,7 @@
 
 ### Phase 5 — Scroll Storytelling
 
-**Status:** In Progress
+**Status:** ✅ Completed
 
 | Step | Status |
 |------|--------|
@@ -60,7 +60,7 @@
 | 5.3 Scroll Timeline | ✅ Completed |
 | 5.4 Scroll Triggers | ✅ Completed |
 | 5.5 Scroll State | ✅ Completed |
-| 5.6 Progressive Reveal | ⬜ Not Started |
+| 5.6 Progressive Reveal | ✅ Completed |
 
 ---
 
@@ -346,6 +346,11 @@ Built the ScrollTrigger management infrastructure — connecting the narrative a
 Status: Completed
 
 Built the centralized scroll state infrastructure — the single source of truth for all runtime scroll state. Created 9 new files in `features/narrative/`. **Types** (`scroll-state.types.ts`): 3 union constants (SCROLL_DIRECTIONS: 3 values, SCROLL_BREAKPOINTS: 4 breakpoints, SCROLL_PHASES: 5 phases) + 12 interfaces (ScrollState with 30+ readonly fields, CurrentSectionInfo, ScrollProgressInfo, ScrollDirectionInfo, ScrollVelocityInfo, ScrollBreakpointInfo, ScrollPhaseInfo, ScrollStateSelector, ScrollStateEquality, ScrollStateManager, ScrollStateConfig). All readonly, no any. **Constants** (`scroll-state.constants.ts`): Re-exports unions + 3 description records + DEFAULT_SCROLL_STATE (initial snapshot) + DEFAULT_SCROLL_STATE_CONFIG (idle 2s, direction 10px, resize 150ms) + VELOCITY_THRESHOLDS (fast: 2000px/s, still: 5px/s) + STATE_DESCRIPTIONS (30 fields). **Manager** (`scroll-state-manager.ts`): Singleton with module-level mutable state, requestAnimationFrame batching, selector-based subscriptions. Owns ScrollState snapshot, notifies subscribers via RAF-coalesced updates. Integrates with NARRATIVE_REGISTRY (section lookup), TRANSITION_REGISTRY (transition state), ScrollTrigger Manager (active trigger count), prefersReducedMotion, BREAKPOINTS. Event model: scroll (passive), resize (debounced 150ms), orientationchange, visibilitychange, pointermove. Idle detection (2s timeout). Velocity smoothing (5-frame rolling average). O(1) section lookup via Map. Debug mode (auto-enabled in dev). **7 Hooks**: useScrollState (main hook with selector/equality pattern, stable function refs), useCurrentSection (enriched section navigation), useScrollProgress (page/section/timeline progress), useScrollDirection (direction + forward/backward), useScrollVelocity (velocity + fast-scroll detection), useScrollBreakpoint (viewport + responsive state), useScrollPhase (narrative context). All hooks use selector-based subscriptions — components re-render only when their selected slice changes. Updated barrel exports with aliased names to avoid collisions with timeline constants. Fixed 10 lint errors (unused imports, unused functions, unnecessary assertions, let→const). All verification passes: 0 narrative ESLint errors, 0 narrative TypeScript errors. Build fails only on pre-existing hero/dev phase errors.
+
+**Phase 5.6 — Progressive Reveal**
+Status: Completed
+
+Built the global progressive reveal architecture — the infrastructure that determines WHAT should become visible and WHEN. Metadata + state only; no animations, no GSAP timelines, no visual effects. Future GSAP, Framer Motion, R3F, Camera, Lighting, Audio, and UI systems consume this reveal state. Created 9 new files in `features/narrative/`. **Types** (`progressive-reveal.types.ts`): 6 union constants (REVEAL_STRATEGIES: 10 — instant/fade/cascade/stagger/sequence/manual/viewport/timeline/dependency/group, REVEAL_STATES: 5 — pending/revealing/revealed/hidden/reset, REVEAL_VISIBILITY: 4 — hidden/entering/visible/leaving, REVEAL_PRIORITIES: 4, REVEAL_TRIGGERS: 6, REVEAL_RESET_POLICIES: 5) + item/group/sequence Options·Definition·State interfaces + RevealDependencyNode/Graph + ProgressiveRevealSnapshot (immutable, revision-counted) + ProgressiveRevealRegistry (12 query methods) + ProgressiveRevealManager + ProgressiveRevealConfig + selector/equality/callback/unsubscribe types. All readonly, no any. **Constants** (`progressive-reveal.constants.ts`): Re-exports unions + 6 description records + REVEAL_PRIORITY_ORDER + DEFAULT_REVEAL_CONFIG (default reset policy 'none' per Law 5, stagger 80ms) + DEFAULT_REVEAL_SNAPSHOT (empty). **Manager** (`progressive-reveal-manager.ts`): Singleton with module-level Maps (item/group/sequence definitions, item states, sequence step index) and Sets (subscribers, selector subscribers). requestAnimationFrame batching (one snapshot rebuild per frame), selector-based subscriptions, immutable frozen snapshots, dependency resolution (prerequisites + parent/child graph), priority+ordinal reveal ordering, cleanup. No React. Integrates with the EXISTING scroll state manager for reduced-motion (single matchMedia owner — ThemeProvider → scrollStateManager → reveal manager; zero duplicate listeners/observers) and prefersReducedMotion for SSR-safe reads. Reveals are permanent by default (Law 5: previously-revealed content stays revealed). **6 Hooks**: useProgressiveReveal (base hook with selector/equality pattern, initializes manager on mount), useRevealGroup, useRevealItem, useRevealProgress, useRevealSequence, useRevealVisibility — all read-only, memoized selectors, stable references. Accessibility: respects prefers-reduced-motion, adds no hidden interactive elements, no focus traps, does not alter focus order. Updated barrel exports (hooks/index.ts + index.ts) with no collisions and no broken imports. Phase 5 (Scroll Storytelling) now complete. All verification passes: 0 narrative ESLint errors, 0 narrative TypeScript errors. Build fails only on pre-existing hero/dev phase errors.
 
 ---
 

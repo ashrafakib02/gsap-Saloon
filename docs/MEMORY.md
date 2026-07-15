@@ -593,4 +593,55 @@ const dir = useScrollState(directionSelector, directionEquality);
 
 ---
 
+## Progressive Reveal Architecture (Phase 5.6)
+
+The **progressive reveal system** is the global infrastructure that determines **what should become visible and when**. It stores reveal metadata and orchestrates reveal *state* only — it runs **no animations, no GSAP timelines, no visual effects**. Future systems (GSAP, Framer Motion, React Three Fiber, Camera, Lighting, Audio, UI) subscribe to this reveal state to drive their own visual effects. It lives in `features/narrative/` and extends the existing narrative architecture rather than duplicating it.
+
+**Reveal Model:**
+- **Reveal Item** — the atomic unit; has strategy, trigger, priority, reset policy, order, delay, prerequisites, parentId, groupId, sectionId.
+- **Reveal Group** — coordinates many items (cascade / stagger / synchronized group reveal). Completion is `requireAllChildren` (all) or any-child.
+- **Reveal Sequence** — ordered steps, each gated on completion of the previous; supports `loop`.
+- **Reveal Strategy** (metadata only, 10): `instant`, `fade`, `cascade`, `stagger`, `sequence`, `manual`, `viewport`, `timeline`, `dependency`, `group`.
+- **Reveal State** (5): `pending` → `revealing` → `revealed`, plus `hidden` / `reset`.
+- **Reveal Visibility** (4, viewport-relative, distinct from state): `hidden`, `entering`, `visible`, `leaving`.
+- **Reveal Priority** (4): `critical` / `high` / `normal` / `low` — weight via `REVEAL_PRIORITY_ORDER` (lower reveals first), then item `order`.
+- **Reveal Trigger** (6): `manual`, `viewport`, `scroll`, `timeline`, `dependency`, `immediate`.
+- **Reveal Reset Policy** (5): `none` (default — Law 5, reveals are permanent), `on-exit`, `on-leave`, `always`, `manual`.
+- **Reveal Dependencies** — `prerequisites` (must be revealed first) + `parentId`/`children` graph; `dependenciesMet` is derived per snapshot.
+
+**State Model (`ProgressiveRevealSnapshot`, immutable + revision-counted):** `items`/`groups`/`sequences` (ReadonlyMaps of runtime state), `visibleItemIds`, `revealedItemIds`, `pendingItemIds`, `activeSequenceId`, `completedSequenceIds`, `overallProgress` (revealed / total), `isReducedMotion` (mirrored from scroll state), `revision`, `timestamp`.
+
+**Manager (`progressive-reveal-manager.ts`, singleton, no React):**
+- Module-level Maps: `itemDefinitions`, `groupDefinitions`, `sequenceDefinitions`, `itemStates`, `sequenceStepIndex`. Sets: `subscribers`, `selectorSubscribers`.
+- Responsibilities: registration (idempotent by ID, preserves runtime state on re-register), visibility, dependency resolution, reveal ordering (priority + ordinal), rAF batching (one `rebuildSnapshot()` per frame), selector subscriptions, immutable `Object.freeze` snapshots, cleanup.
+- API: `getSnapshot`, `subscribe`, `subscribeSelector`, `isInitialized`, `init`, `destroy`, `registerItem`/`Group`/`Sequence` + `unregister*`, `reveal`, `beginReveal`, `reset` (honours reset policy), `resetAll` (explicit teardown, bypasses policy), `setVisibility`, `setProgress`, `advanceSequence`, `getRegistry`, `getDependencyGraph`, `setDebugMode`. Plus `isRevealDebugMode` (barrel-aliased from `isDebugMode`).
+
+**Lifecycle:** `init()` → ensures `scrollStateManager.init()` → seeds `reducedMotion` from `prefersReducedMotion()` → subscribes to the scroll state manager's `isReducedMotion` selector. Registration/mutation → `scheduleUpdate()` (rAF) → `rebuildSnapshot()` (recompute derived item/group/sequence aggregates + overall progress, bump `revision`, freeze) → `notifySubscribers()` (all-subscribers then selector-subscribers whose value changed). `destroy()` cancels rAF, runs cleanups, clears registries/subscribers, resets to `DEFAULT_REVEAL_SNAPSHOT`.
+
+**Integration points (no duplicated runtime state, zero duplicate listeners):**
+- **Scroll State Manager** — sole upstream for reduced-motion; reveal manager consumes its selector, never adds its own matchMedia listener. (Chain: ThemeProvider owns matchMedia → scrollStateManager mirrors it → reveal manager reads it.)
+- **Narrative Registry** — `sectionId` on items/groups/sequences ties reveals to sections.
+- **Reduced Motion utilities** — `prefersReducedMotion()` for the SSR-safe initial read.
+- **Timeline / Transition / ScrollTrigger registries + future GSAP loader** — designed as downstream consumers of reveal state; strategies (`timeline`, `viewport`, `scroll`) are metadata those systems act on.
+
+**Hooks (6, read-only, memoized selectors, stable refs):**
+- `useProgressiveReveal(selector?, equalityFn?)` — base hook; full snapshot or selected slice; initializes manager on mount.
+- `useRevealGroup(id)` — group runtime state (state, revealedCount, totalCount, progress).
+- `useRevealItem(id)` — single item runtime state.
+- `useRevealProgress()` — aggregates: overallProgress + revealed/pending/visible/total counts.
+- `useRevealSequence(id)` — sequence runtime state (activeStepIndex, completedCount, isComplete).
+- `useRevealVisibility(id)` — viewport-relative visibility (`'hidden'` fallback when unregistered).
+
+**Accessibility:** respects `prefers-reduced-motion`; adds no hidden interactive elements; no focus traps; never alters focus order or keyboard navigation (state metadata only).
+
+**Import Pattern:** `import { progressiveRevealManager, useProgressiveReveal, useRevealGroup, useRevealItem, useRevealProgress, useRevealSequence, useRevealVisibility, REVEAL_STRATEGIES, DEFAULT_REVEAL_CONFIG, type ProgressiveRevealSnapshot, type RevealItemOptions } from '@/features/narrative'`
+
+**Name Collisions:** all reveal exports are `REVEAL_`-prefixed (e.g. `REVEAL_STATE_DESCRIPTIONS`), so no collision with scroll-state / timeline `STATE_DESCRIPTIONS`. Manager `isDebugMode` re-exported as `isRevealDebugMode`.
+
+**Files Created:** progressive-reveal.types.ts, progressive-reveal.constants.ts, progressive-reveal-manager.ts, hooks/use-progressive-reveal.ts, hooks/use-reveal-group.ts, hooks/use-reveal-item.ts, hooks/use-reveal-progress.ts, hooks/use-reveal-sequence.ts, hooks/use-reveal-visibility.ts
+
+**Files Modified:** hooks/index.ts (added 6 hook exports + 2 type exports), index.ts (added Progressive Reveal hooks, manager, constants, types sections)
+
+---
+
 *This document is immutable project memory. It is updated only when permanent architectural or design decisions change. It does not track progress, implementation history, or temporary state.*

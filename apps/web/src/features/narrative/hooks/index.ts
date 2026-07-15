@@ -106,3 +106,19 @@ export type { UseScrollBreakpointReturn } from './use-scroll-breakpoint';
 
 export { useScrollPhase } from './use-scroll-phase';
 export type { UseScrollPhaseReturn } from './use-scroll-phase';
+
+// ── Progressive Reveal Hooks ──────────────────────────────
+
+export { useProgressiveReveal } from './use-progressive-reveal';
+export type { UseProgressiveRevealReturn } from './use-progressive-reveal';
+
+export { useRevealGroup } from './use-reveal-group';
+
+export { useRevealItem } from './use-reveal-item';
+
+export { useRevealProgress } from './use-reveal-progress';
+export type { UseRevealProgressReturn } from './use-reveal-progress';
+
+export { useRevealSequence } from './use-reveal-sequence';
+
+export { useRevealVisibility } from './use-reveal-visibility';
