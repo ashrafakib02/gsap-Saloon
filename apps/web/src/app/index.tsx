@@ -22,13 +22,13 @@ export const Route = createFileRoute('/')({
  */
 function HomePage() {
   return (
-    <main id="main-content">
+    <>
       {/* ── Scene 1: Threshold ────────────────────────────
        * The hero is the first and most important scene.
        * It occupies the full viewport.
        * From DESIGN_SYSTEM §1 (P2: One Idea Per Moment):
        * "One section, one idea. One scene, one emotion." */}
       <HeroSection />
-    </main>
+    </>
   );
 }
