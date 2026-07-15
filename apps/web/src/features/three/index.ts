@@ -178,3 +178,80 @@ export {
   DEFAULT_SCENE_GROUP,
   DEFAULT_SCENE_SNAPSHOT,
 } from './scene.constants';
+
+// ── Camera Components ────────────────────────────────────
+
+export { CameraRoot } from './camera-root';
+export { CameraContext, useCameraContext } from './camera-provider';
+
+// ── Camera Hooks ─────────────────────────────────────────
+
+export { useCamera } from './hooks/use-camera';
+export { useCameraManager } from './hooks/use-camera-manager';
+export { useCameraPreset } from './hooks/use-camera-preset';
+export { useCameraTarget } from './hooks/use-camera-target';
+export { useCameraState } from './hooks/use-camera-state';
+export { useCameraControls } from './hooks/use-camera-controls';
+
+// ── Camera Hook Return Types ─────────────────────────────
+
+export type { UseCameraManagerReturn } from './hooks/use-camera-manager';
+export type { UseCameraControlsReturn } from './hooks/use-camera-controls';
+export type { CameraStateReturn } from './hooks/use-camera-state';
+
+// ── Camera Types ─────────────────────────────────────────
+
+export type {
+  CameraMode,
+  CameraPreset,
+  CameraPresetId,
+  CameraTarget,
+  CameraViewport,
+  CameraQualityProfile,
+  CameraConstraints,
+  CameraMetadata,
+  CameraControllerConfig,
+  CameraTimelineConfig,
+  CameraPresetOptions,
+  CameraPresetDefinition,
+  CameraPresetState,
+  CameraTargetOptions,
+  CameraTargetDefinition,
+  CameraTargetState,
+  CameraSnapshot,
+  CameraRegistry,
+  CameraManager,
+  CameraSelector,
+  CameraEquality,
+  CameraCallback,
+  CameraUnsubscribe,
+} from './camera.types';
+
+export type { CameraContextValue } from './camera-provider';
+
+// ── Camera Constants ─────────────────────────────────────
+
+export {
+  CAMERA_MODES,
+  CAMERA_PRESETS,
+  CAMERA_TARGETS,
+  CAMERA_PRESET_DESCRIPTIONS,
+  CAMERA_MODE_DESCRIPTIONS,
+  CAMERA_TARGET_DESCRIPTIONS,
+  CAMERA_PRESET_ORDER,
+  CAMERA_MODE_ORDER,
+  CAMERA_TARGET_ORDER,
+  CAMERA_PRESET_FOV,
+  DEFAULT_CAMERA_FOV,
+  DEFAULT_CAMERA_NEAR,
+  DEFAULT_CAMERA_FAR,
+  DEFAULT_CAMERA_POSITION,
+  DEFAULT_CAMERA_LOOK_AT,
+  DEFAULT_CAMERA_MODE,
+  DEFAULT_ACTIVE_PRESET,
+  DEFAULT_ACTIVE_TARGET,
+  DEFAULT_CAMERA_VIEWPORT,
+  DEFAULT_QUALITY_PROFILE,
+  DEFAULT_CAMERA_CONSTRAINTS,
+  DEFAULT_CAMERA_SNAPSHOT,
+} from './camera.constants';

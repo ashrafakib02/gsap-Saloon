@@ -736,4 +736,58 @@ The **progressive reveal system** is the global infrastructure that determines *
 
 ---
 
+## 23. Phase 6.3 — Camera System
+
+**System:** Complete camera architecture in `features/three/`. Infrastructure only — no camera movement, no interpolation, no cinematic transitions, no orbit controls, no pointer controls, no scroll camera, no animation timelines, no GSAP implementation.
+
+**Camera Model:** The camera system manages state (position, lookAt, FOV, near/far clipping planes), presets (semantic configurations), targets (focal points), modes (how the camera is controlled), viewport adaptation, quality adaptation, and reduced-motion adaptation. It stores metadata and orchestrates camera STATE only — it never renders or moves the camera.
+
+**Camera Modes (7):** `static` (default, no movement), `narrative` (driven by section transitions), `scroll` (linked to scroll progress), `cinematic` (follows keyframe sequences), `interactive` (responds to pointer/touch), `manual` (set directly by consumer), `debug` (shows helpers/axes/frustum). Only one mode active at a time. Higher-priority modes take precedence when multiple systems attempt control.
+
+**Camera Presets (11):** `hero` (dramatic wide-angle), `intro` (welcoming perspective), `narrative` (documentary-style), `services` (product-focused), `gallery` (close-up detail), `transformation` (dramatic reveal), `booking` (stable accessible), `footer` (distant ambient), `mobile` (simplified settings), `reduced-motion` (no camera movement), `performance` (minimum GPU budget). Each bundles FOV, near/far planes, position, target, mode, orbit/procedural flags.
+
+**Camera Targets (7):** `hero`, `scene-center`, `character`, `product`, `booking`, `ui`, `debug`. Represent focal points in the 3D scene. Camera lookAt direction derived from active target's position + offset.
+
+**Camera Quality Profiles (5):** `ultra` (maxFov 80, shadow 100, effects+procedural+orbit all enabled), `high` (70/75), `medium` (70/50), `low` (60/25, no procedural), `minimal` (50/0, no effects, no procedural, no orbit). Derived from ThreePerformanceManager quality.
+
+**Camera Constraints:** Position bounds (±100 default, tightened for reduced-motion), FOV range (10–120°), distance limits (0.1–500). Quality and reduced-motion settings tighten constraints dynamically.
+
+**Viewport Adaptation:** 4 breakpoints (wide/desktop/tablet/mobile). FOV adjusted per breakpoint: wide +15%, tablet +10%, mobile +5%. Base FOV from active preset.
+
+**Manager (`camera-manager.ts`):** Singleton following exact scene-manager pattern — module-level Maps for preset/target definitions and states, Sets for subscribers/selector subscribers, RAF batching (one `rebuildSnapshot()` per frame), immutable frozen snapshots, selector-based subscriptions. Integrates with `threePerformanceManager` for quality changes and `prefersReducedMotion` for SSR-safe reads.
+
+**Manager Responsibilities:** Registration (idempotent by ID, preserves runtime state on re-register), active preset/target management (applies preset defaults on activation), mode management, position/lookAt/FOV/near/far mutation, viewport adaptation, quality adaptation, reduced-motion adaptation (locks to static mode), RAF batching, selector subscriptions, snapshots, cleanup for page transitions.
+
+**Registry API:** `getRegistry()` returns read-only queries: `getPreset`, `getTarget`, `getPresetIds`, `getTargetIds`, `hasPreset`, `hasTarget`, `presetCount`, `targetCount`, `getEnabledPresets`, `getEnabledTargets`. All O(1) via Map.
+
+**Snapshot Model (`CameraSnapshot`, immutable + revision-counted):** `presets`/`targets` (ReadonlyMaps of runtime state), `activePresetId`, `activeTargetId`, `mode`, `position`, `lookAt`, `fov`, `near`, `far`, `viewport`, `qualityProfile`, `constraints`, `isReducedMotion`, `qualityPreset`, `presetCount`, `targetCount`, `revision`, `timestamp`.
+
+**React Components (2):**
+- `CameraRoot` — lifecycle owner, reads ThreeContext via `useThree()`, initializes camera-manager on mount, destroys on unmount, forwards isReducedMotion and quality changes, subscribes via `useSyncExternalStore`, provides CameraContext. Renders INSIDE SceneRoot.
+- `CameraContext` — context creation (no JSX, Fast Refresh compliant). `useCameraContext()` accessor.
+
+**Hooks (6):**
+- `useCamera(selector?, equalityFn?)` — full snapshot or selected slice via `useSyncExternalStore`. Selector memoized via ref-stored equality function.
+- `useCameraManager()` — memoized bound manager methods (22 methods, stable references).
+- `useCameraPreset()` — active preset ID.
+- `useCameraTarget()` — active target ID.
+- `useCameraState()` — derived camera state (position, lookAt, fov, near, far, mode, viewport, qualityProfile, constraints, isReducedMotion).
+- `useCameraControls()` — memoized control methods (8 methods: setActivePreset, setActiveTarget, setMode, setPosition, setLookAt, setFov, setNear, setFar).
+
+**Config (`camera.config.ts`):** Pure derivation functions, no React, no state. Type guards (isCameraMode, isCameraPreset, isCameraTarget). Quality profile derivation. Viewport-aware FOV derivation. Constraint derivation with reduced-motion adaptation. FOV/position clamping. Per-preset defaults (position, lookAt, FOV, near/far planes).
+
+**Integration Points:**
+- ThreePerformanceManager → CameraManager (quality changes via subscription)
+- prefersReducedMotion → CameraManager (SSR-safe initial read)
+- CameraRoot reads ThreeContext (isEnabled, isReducedMotion, quality)
+- Downstream consumers: Cinematic transitions (Phase 6.8+), Scroll camera, Interactive controls
+
+**Import Pattern:** `import { CameraRoot, useCamera, useCameraManager, useCameraPreset, CAMERA_PRESETS, type CameraSnapshot } from '@/features/three'`
+
+**Files Created:** camera.types.ts, camera.constants.ts, camera.config.ts, camera-manager.ts, camera-provider.tsx, camera-root.tsx, hooks/use-camera.ts, hooks/use-camera-manager.ts, hooks/use-camera-preset.ts, hooks/use-camera-target.ts, hooks/use-camera-state.ts, hooks/use-camera-controls.ts
+
+**Files Modified:** index.ts (added Camera Components, Camera Hooks, Camera Hook Return Types, Camera Types, Camera Constants sections)
+
+---
+
 *This document is immutable project memory. It is updated only when permanent architectural or design decisions change. It does not track progress, implementation history, or temporary state.*
