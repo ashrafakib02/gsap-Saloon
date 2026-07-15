@@ -27,6 +27,7 @@
  * Phase 5.2: Section transitions and breathing spaces.
  * Phase 5.3: Scroll timeline architecture.
  * Phase 5.4: ScrollTrigger infrastructure.
+ * Phase 5.5: Centralized scroll state.
  */
 
 // ── Provider ───────────────────────────────────────────────
@@ -117,11 +118,38 @@ export type {
 export { useReducedMotionTrigger } from './hooks/use-reduced-motion-trigger';
 export type { UseReducedMotionTriggerReturn } from './hooks/use-reduced-motion-trigger';
 
+// ── Scroll State Hooks ────────────────────────────────────
+
+export { useScrollState } from './hooks/use-scroll-state';
+export type { UseScrollStateReturn } from './hooks/use-scroll-state';
+
+export { useCurrentSection } from './hooks/use-current-section';
+export type { UseCurrentSectionReturn } from './hooks/use-current-section';
+
+export { useScrollProgress } from './hooks/use-scroll-progress';
+export type { UseScrollProgressReturn } from './hooks/use-scroll-progress';
+
+export { useScrollDirection } from './hooks/use-scroll-direction';
+export type { UseScrollDirectionReturn } from './hooks/use-scroll-direction';
+
+export { useScrollVelocity } from './hooks/use-scroll-velocity';
+export type { UseScrollVelocityReturn } from './hooks/use-scroll-velocity';
+
+export { useScrollBreakpoint } from './hooks/use-scroll-breakpoint';
+export type { UseScrollBreakpointReturn } from './hooks/use-scroll-breakpoint';
+
+export { useScrollPhase } from './hooks/use-scroll-phase';
+export type { UseScrollPhaseReturn } from './hooks/use-scroll-phase';
+
 // ── Registries ─────────────────────────────────────────────
 
 export { NARRATIVE_REGISTRY } from './narrative.config';
 export { TRANSITION_REGISTRY } from './narrative-transitions.config';
 export { TIMELINE_REGISTRY } from './narrative-timeline.config';
+
+// ── Scroll State Manager ──────────────────────────────────
+
+export { scrollStateManager } from './scroll-state-manager';
 
 // ── ScrollTrigger Manager ──────────────────────────────────
 
@@ -301,6 +329,22 @@ export type {
   TimelineContextValue,
 } from './narrative-timeline.types';
 
+// ── Scroll State Constants ────────────────────────────────
+
+export {
+  SCROLL_DIRECTIONS,
+  SCROLL_BREAKPOINTS,
+  SCROLL_PHASES,
+  DIRECTION_DESCRIPTIONS as SCROLL_DIRECTION_DESCRIPTIONS,
+  BREAKPOINT_DESCRIPTIONS as SCROLL_BREAKPOINT_DESCRIPTIONS,
+  PHASE_DESCRIPTIONS,
+  DEFAULT_SECTION_ID,
+  DEFAULT_SCROLL_STATE_CONFIG,
+  DEFAULT_SCROLL_STATE,
+  VELOCITY_THRESHOLDS,
+  STATE_DESCRIPTIONS as SCROLL_STATE_DESCRIPTIONS,
+} from './scroll-state.constants';
+
 // ── ScrollTrigger Constants ────────────────────────────────
 
 export {
@@ -316,6 +360,25 @@ export {
   DEFAULT_BREAKPOINT_CONFIG,
   DEFAULT_MANAGER_CONFIG,
 } from './scrolltrigger.constants';
+
+// ── Scroll State Types ────────────────────────────────────
+
+export type {
+  ScrollDirection,
+  ScrollPhase,
+  ScrollBreakpoint,
+  ScrollState,
+  CurrentSectionInfo,
+  ScrollProgressInfo,
+  ScrollDirectionInfo,
+  ScrollVelocityInfo,
+  ScrollBreakpointInfo,
+  ScrollPhaseInfo,
+  ScrollStateSelector,
+  ScrollStateEquality,
+  ScrollStateManager,
+  ScrollStateConfig,
+} from './scroll-state.types';
 
 // ── ScrollTrigger Types ────────────────────────────────────
 

@@ -83,3 +83,26 @@ export type {
 
 export { useReducedMotionTrigger } from './use-reduced-motion-trigger';
 export type { UseReducedMotionTriggerReturn } from './use-reduced-motion-trigger';
+
+// ── Scroll State Hooks ────────────────────────────────────
+
+export { useScrollState } from './use-scroll-state';
+export type { UseScrollStateReturn } from './use-scroll-state';
+
+export { useCurrentSection } from './use-current-section';
+export type { UseCurrentSectionReturn } from './use-current-section';
+
+export { useScrollProgress } from './use-scroll-progress';
+export type { UseScrollProgressReturn } from './use-scroll-progress';
+
+export { useScrollDirection } from './use-scroll-direction';
+export type { UseScrollDirectionReturn } from './use-scroll-direction';
+
+export { useScrollVelocity } from './use-scroll-velocity';
+export type { UseScrollVelocityReturn } from './use-scroll-velocity';
+
+export { useScrollBreakpoint } from './use-scroll-breakpoint';
+export type { UseScrollBreakpointReturn } from './use-scroll-breakpoint';
+
+export { useScrollPhase } from './use-scroll-phase';
+export type { UseScrollPhaseReturn } from './use-scroll-phase';

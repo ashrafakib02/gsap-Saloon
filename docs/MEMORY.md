@@ -539,6 +539,58 @@ Before writing any code in this project, verify:
 
 **Files Modified:** hooks/index.ts (added 5 hook exports + 5 type exports), index.ts (added ScrollTrigger hooks, manager functions, constants, types sections)
 
+## 20. Phase 5.5 — Centralized Scroll State
+
+**Location:** `apps/web/src/features/narrative/scroll-state.*.ts` + `hooks/use-scroll-*.ts`
+
+**Architecture:** Singleton scroll state manager (`scrollStateManager`) owns all runtime scroll state. Module-level mutable state with immutable snapshots. React hooks subscribe via selector-based pattern — components re-render only when their selected slice changes.
+
+**State Model:** ScrollState interface with 30+ readonly fields covering position (scrollY, scrollX), progress (page, section, timeline), navigation (currentSectionId, previous, next), behavior (direction, isScrolling, isIdle), velocity (instantaneous, smoothed), narrative context (stage, phase, actProgress, narrativeProgress), viewport (width, height, breakpoint), input (isTouchDevice, pointerType), accessibility (isReducedMotion), transitions (isTransitioning), triggers (activeTriggerCount), debug (debugMode, timestamp, frameCount).
+
+**Manager Pattern:**
+- `requestAnimationFrame` batching — one update per frame, coalesces rapid events
+- Selector-based subscriptions — `subscribeSelector<T>(selector, callback, equalityFn?)` notifies only when selected value changes
+- Integrates with: NARRATIVE_REGISTRY (O(1) section lookup), TRANSITION_REGISTRY (transition state), ScrollTrigger Manager (active trigger count), prefersReducedMotion, BREAKPOINTS
+- Event model: scroll (passive, capture), resize (debounced 150ms), orientationchange, visibilitychange, pointermove
+- Idle detection (2s timeout from config.idleTimeout)
+- Velocity smoothing (5-frame rolling average from config.velocitySampleCount)
+
+**Event Flow:** User scroll → handleScroll() → compute velocity/direction → scheduleUpdate() → requestAnimationFrame → buildSnapshot() → notifySubscribers() → React re-renders
+
+**Section Resolution:** `findCurrentSectionId(scrollY)` uses DOM element positions when available (`section-{id}` IDs), falls back to order-based estimation. O(1) lookup via `sectionById` Map.
+
+**Hooks (7):**
+- `useScrollState(selector?, equalityFn?)` — main hook, full state or selected slice, initializes manager on mount
+- `useCurrentSection()` — enriched section navigation (current, previous, next, stage, phase, actProgress, isFirst, isLast, index)
+- `useScrollProgress()` — page, section, timeline, normalized progress + scrollY
+- `useScrollDirection()` — direction, isScrolling, isForward, isBackward
+- `useScrollVelocity()` — velocity, smoothedVelocity, speed, isFastScrolling
+- `useScrollBreakpoint()` — breakpoint, viewportWidth/Height, isDesktop/Tablet/Mobile/Wide, isTouchDevice, pointerType, isReducedMotion
+- `useScrollPhase()` — section, sectionId, stage, phase, actProgress, narrativeProgress, timelineNormalizedProgress, isTransitioning, isFirst, isLast
+
+**Selector Pattern (avoids unnecessary re-renders):**
+```ts
+// Custom selector — component only re-renders when pageProgress changes
+const progress = useScrollState((s) => s.pageProgress);
+// With equality function — fine-grained control
+const dir = useScrollState(directionSelector, directionEquality);
+```
+
+**Derived Helpers (computed in snapshot):**
+- `isEnteringSection` / `isLeavingSection` (from sectionProgress thresholds)
+- `isFirstSection` / `isLastSection` (from section index)
+- `isScrollingForward` / `isScrollingBackward` (from direction)
+- `isDesktop` / `isTablet` / `isMobile` / `isWide` (from breakpoint)
+- `currentActProgress` / `narrativeProgress` / `timelineNormalizedProgress`
+
+**Import Pattern:** `import { scrollStateManager, useScrollState, useCurrentSection, useScrollProgress, SCROLL_PHASES, type ScrollState, type ScrollBreakpoint } from '@/features/narrative'`
+
+**Name Collision Handling:** `DIRECTION_DESCRIPTIONS` and `STATE_DESCRIPTIONS` aliased as `SCROLL_DIRECTION_DESCRIPTIONS` and `SCROLL_STATE_DESCRIPTIONS` in barrel export to avoid collisions with timeline constant exports.
+
+**Files Created:** scroll-state.types.ts, scroll-state.constants.ts, scroll-state-manager.ts, hooks/use-scroll-state.ts, hooks/use-current-section.ts, hooks/use-scroll-progress.ts, hooks/use-scroll-direction.ts, hooks/use-scroll-velocity.ts, hooks/use-scroll-breakpoint.ts, hooks/use-scroll-phase.ts
+
+**Files Modified:** hooks/index.ts (added 7 hook exports + 7 type exports), index.ts (added ScrollState hooks, manager, constants, types sections with aliased names to avoid collisions)
+
 ---
 
 *This document is immutable project memory. It is updated only when permanent architectural or design decisions change. It does not track progress, implementation history, or temporary state.*
