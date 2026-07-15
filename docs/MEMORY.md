@@ -690,4 +690,50 @@ The **progressive reveal system** is the global infrastructure that determines *
 
 ---
 
+## 22. Phase 6.2 — Scene Architecture
+
+**System:** Scene lifecycle and composition architecture in `features/three/`. Infrastructure only — no 3D objects, no salon model, no camera, no lighting, no materials, no environment maps, no post-processing, no particles, no physics, no audio.
+
+**Scene Model:** Scenes are the atomic units of 3D content. Each scene has an ID, layer (z-order), lifecycle stage, priority, group, and enabled flag. Scene visibility is derived from stage + quality preset + reduced motion — it is never set directly (unless overridden via `setSceneVisibility`).
+
+**Scene Lifecycle (7 stages):** `boot` → `loading` → `ready` → `active` → `paused` → `hidden` → `disposed`. Transitions are validated (e.g., `disposed` is terminal). Stage determines visibility: boot/loading → hidden, ready/active → visible, paused → suspended, disposed → disabled.
+
+**Scene Layers (7):** `environment` (0) → `background` (1) → `world` (2) → `character` (3) → `effects` (4) → `ui` (5) → `debug` (6). Lower z-order renders behind higher. Layers are fixed architectural concepts — all registered eagerly on init.
+
+**Scene Slots (9):** `camera`, `lighting`, `environment`, `models`, `particles`, `postprocessing`, `helpers`, `audio`, `debug`. Fixed mounting positions for future 3D subsystems. All registered eagerly on init. All empty in Phase 6.2.
+
+**Scene Groups (4):** `hero` (persistent, high quality), `section` (tied to scroll sections), `ambient` (always present, low resource), `utility` (on-demand, debugging).
+
+**Scene Priorities (4):** `critical` → `high` → `normal` → `low`. Higher priority scenes receive resources first when budgets are tight.
+
+**Scene Visibility (5):** `visible`, `hidden`, `suspended`, `disabled`, `offscreen`. Derived from stage + quality preset + reduced motion. Quality gate: `minimal` preset disables most scenes. Reduced motion: suppresses `effects` layer scenes.
+
+**Manager (`scene-manager.ts`):** Singleton, module-level state, no React. Follows the exact progressive-reveal-manager pattern: Maps for definitions/states, Sets for subscribers/selector subscribers, RAF batching (one `rebuildSnapshot()` per frame), immutable frozen snapshots, selector-based subscriptions. Integrates with `threePerformanceManager` for quality changes and `prefersReducedMotion` for SSR-safe reads.
+
+**Registry API:** `getRegistry()` returns read-only queries: `getScene`, `getLayer`, `getSlot`, `getSceneIds`, `getScenesByStage`, `getScenesByLayer`, `getScenesByGroup`, `hasScene`, `sceneCount`. All O(n) via Map iteration (acceptable for <100 scenes).
+
+**React Components (5):**
+- `SceneRoot` — lifecycle owner, reads ThreeContext, initializes scene-manager, subscribes via `useSyncExternalStore`, provides SceneContext. Renders INSIDE ThreeCanvas.
+- `SceneContext` — context creation (no JSX, Fast Refresh compliant). `useSceneContext()` accessor.
+- `SceneStage` — registers scene on mount, gates children by visibility.
+- `SceneSlot` — registers slot, renders children when enabled.
+- `SceneBoundary` — error boundary for scene layers (class component).
+
+**Hooks (5):**
+- `useScene(selector?, equalityFn?)` — full snapshot or selected slice, via `useSyncExternalStore`.
+- `useSceneManager()` — memoized bound manager methods (stable references).
+- `useSceneStage(sceneId)` — stage for a scene.
+- `useSceneSlot(slotId)` — slot state.
+- `useSceneVisibility(sceneId)` — visibility for a scene.
+
+**Architecture Pattern:** `scene.types.ts` (6 unions, 13+ interfaces) → `scene.constants.ts` (re-exports + 6 description records + ordering + defaults + `DEFAULT_SCENE_SNAPSHOT`) → `scene.config.ts` (pure derivation: `deriveSceneVisibility`, `isValidStageTransition`, type guards, `resolveSceneLayers`, `resolveSceneSlots`) → `scene-manager.ts` (singleton, RAF batching, subscriptions) → `scene-provider.tsx` (context creation, no JSX) → `scene-root.tsx` (lifecycle owner) → 2 components (SceneStage, SceneSlot) + 1 error boundary + 5 hooks.
+
+**Import Pattern:** `import { SceneRoot, SceneStage, useScene, useSceneManager, useSceneStage, SCENE_STAGES, type SceneSnapshot } from '@/features/three'`
+
+**Files Created:** scene.types.ts, scene.constants.ts, scene.config.ts, scene-manager.ts, scene-provider.tsx, scene-root.tsx, scene-stage.tsx, scene-slot.tsx, scene-boundary.tsx, hooks/use-scene.ts, hooks/use-scene-manager.ts, hooks/use-scene-stage.ts, hooks/use-scene-slot.ts, hooks/use-scene-visibility.ts
+
+**Files Modified:** index.ts (added Scene Components, Scene Hooks, Scene Hook Return Types, Scene Types, Scene Constants sections)
+
+---
+
 *This document is immutable project memory. It is updated only when permanent architectural or design decisions change. It does not track progress, implementation history, or temporary state.*

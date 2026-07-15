@@ -13,6 +13,7 @@
  * them through hooks and the provider.
  *
  * Phase 6.1: React Three Fiber setup — infrastructure only.
+ * Phase 6.2: Scene architecture — scene components, hooks, types, constants.
  */
 
 // ── Canvas ──────────────────────────────────────────────
@@ -102,3 +103,78 @@ export {
   THREE_QUALITY_STORAGE_KEY,
   THREE_FEATURE_FLAG,
 } from './three.constants';
+
+// ── Scene Components ─────────────────────────────────────
+
+export { SceneRoot } from './scene-root';
+export { SceneContext, useSceneContext } from './scene-provider';
+export { SceneStage as SceneStageComponent } from './scene-stage';
+export { SceneSlot } from './scene-slot';
+export { SceneBoundary } from './scene-boundary';
+
+// ── Scene Hooks ──────────────────────────────────────────
+
+export { useScene } from './hooks/use-scene';
+export { useSceneManager } from './hooks/use-scene-manager';
+export { useSceneStage } from './hooks/use-scene-stage';
+export { useSceneSlot } from './hooks/use-scene-slot';
+export { useSceneVisibility } from './hooks/use-scene-visibility';
+
+// ── Scene Hook Return Types ──────────────────────────────
+
+export type { UseSceneManagerReturn } from './hooks/use-scene-manager';
+
+// ── Scene Types ──────────────────────────────────────────
+
+export type {
+  SceneLayerId,
+  SceneSlotId,
+  SceneStage,
+  SceneVisibility,
+  ScenePriority,
+  SceneGroup,
+  SceneOptions,
+  SceneDefinition,
+  SceneState,
+  SceneLayerOptions,
+  SceneLayerDefinition,
+  SceneLayerState,
+  SceneSlotOptions,
+  SceneSlotDefinition,
+  SceneSlotState,
+  SceneSnapshot,
+  SceneRegistry,
+  SceneManager,
+  SceneSelector,
+  SceneEquality,
+  SceneCallback,
+  SceneUnsubscribe,
+} from './scene.types';
+
+export type { SceneContextValue } from './scene-provider';
+
+// ── Scene Constants ──────────────────────────────────────
+
+export {
+  SCENE_LAYERS,
+  SCENE_SLOTS,
+  SCENE_STAGES,
+  SCENE_VISIBILITY_STATES,
+  SCENE_PRIORITIES,
+  SCENE_GROUPS,
+  SCENE_STAGE_DESCRIPTIONS,
+  SCENE_VISIBILITY_DESCRIPTIONS,
+  SCENE_PRIORITY_DESCRIPTIONS,
+  SCENE_LAYER_DESCRIPTIONS,
+  SCENE_SLOT_DESCRIPTIONS,
+  SCENE_GROUP_DESCRIPTIONS,
+  SCENE_STAGE_ORDER,
+  SCENE_LAYER_ORDER,
+  SCENE_PRIORITY_ORDER,
+  SCENE_SLOT_DEFAULTS,
+  DEFAULT_SCENE_STAGE,
+  DEFAULT_SCENE_VISIBILITY,
+  DEFAULT_SCENE_PRIORITY,
+  DEFAULT_SCENE_GROUP,
+  DEFAULT_SCENE_SNAPSHOT,
+} from './scene.constants';

@@ -9,8 +9,8 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | Phase 6 — 3D Experience |
-| **Current Step** | 6.2 — Scene Architecture |
-| **Overall Completion** | 25.61% (21 / 82 steps) |
+| **Current Step** | 6.3 — Camera System |
+| **Overall Completion** | 26.83% (22 / 82 steps) |
 | **Last Updated** | 2026-07-15 |
 
 ---
@@ -71,7 +71,7 @@
 | Step | Status |
 |------|--------|
 | 6.1 React Three Fiber Setup | ✅ Completed |
-| 6.2 Scene Architecture | ⬜ Not Started |
+| 6.2 Scene Architecture | ✅ Completed |
 | 6.3 Camera System | ⬜ Not Started |
 | 6.4 Lighting | ⬜ Not Started |
 | 6.5 Materials | ⬜ Not Started |
@@ -223,7 +223,7 @@
 | 5.5 | Scroll State | ✅ Completed | Frontend Architect | P1 | 5.3 | Low |
 | 5.6 | Progressive Reveal | ⬜ Not Started | Frontend Architect | P0 | 5.2, 5.4 | Medium |
 | 6.1 | React Three Fiber Setup | ⬜ Not Started | Frontend Architect | P2 | 3.2 | Medium |
-| 6.2 | Scene Architecture | ⬜ Not Started | Frontend Architect | P2 | 6.1 | High |
+| 6.2 | Scene Architecture | ✅ Completed | Frontend Architect | P2 | 6.1 | High |
 | 6.3 | Camera System | ⬜ Not Started | Frontend Architect | P2 | 6.2 | Medium |
 | 6.4 | Lighting | ⬜ Not Started | Frontend Architect | P2 | 6.2 | Medium |
 | 6.5 | Materials | ⬜ Not Started | Frontend Architect | P2 | 6.2 | Medium |
@@ -351,6 +351,16 @@ Built the centralized scroll state infrastructure — the single source of truth
 Status: Completed
 
 Built the global progressive reveal architecture — the infrastructure that determines WHAT should become visible and WHEN. Metadata + state only; no animations, no GSAP timelines, no visual effects. Future GSAP, Framer Motion, R3F, Camera, Lighting, Audio, and UI systems consume this reveal state. Created 9 new files in `features/narrative/`. **Types** (`progressive-reveal.types.ts`): 6 union constants (REVEAL_STRATEGIES: 10 — instant/fade/cascade/stagger/sequence/manual/viewport/timeline/dependency/group, REVEAL_STATES: 5 — pending/revealing/revealed/hidden/reset, REVEAL_VISIBILITY: 4 — hidden/entering/visible/leaving, REVEAL_PRIORITIES: 4, REVEAL_TRIGGERS: 6, REVEAL_RESET_POLICIES: 5) + item/group/sequence Options·Definition·State interfaces + RevealDependencyNode/Graph + ProgressiveRevealSnapshot (immutable, revision-counted) + ProgressiveRevealRegistry (12 query methods) + ProgressiveRevealManager + ProgressiveRevealConfig + selector/equality/callback/unsubscribe types. All readonly, no any. **Constants** (`progressive-reveal.constants.ts`): Re-exports unions + 6 description records + REVEAL_PRIORITY_ORDER + DEFAULT_REVEAL_CONFIG (default reset policy 'none' per Law 5, stagger 80ms) + DEFAULT_REVEAL_SNAPSHOT (empty). **Manager** (`progressive-reveal-manager.ts`): Singleton with module-level Maps (item/group/sequence definitions, item states, sequence step index) and Sets (subscribers, selector subscribers). requestAnimationFrame batching (one snapshot rebuild per frame), selector-based subscriptions, immutable frozen snapshots, dependency resolution (prerequisites + parent/child graph), priority+ordinal reveal ordering, cleanup. No React. Integrates with the EXISTING scroll state manager for reduced-motion (single matchMedia owner — ThemeProvider → scrollStateManager → reveal manager; zero duplicate listeners/observers) and prefersReducedMotion for SSR-safe reads. Reveals are permanent by default (Law 5: previously-revealed content stays revealed). **6 Hooks**: useProgressiveReveal (base hook with selector/equality pattern, initializes manager on mount), useRevealGroup, useRevealItem, useRevealProgress, useRevealSequence, useRevealVisibility — all read-only, memoized selectors, stable references. Accessibility: respects prefers-reduced-motion, adds no hidden interactive elements, no focus traps, does not alter focus order. Updated barrel exports (hooks/index.ts + index.ts) with no collisions and no broken imports. Phase 5 (Scroll Storytelling) now complete. All verification passes: 0 narrative ESLint errors, 0 narrative TypeScript errors. Build fails only on pre-existing hero/dev phase errors.
+
+**Phase 6.1 — React Three Fiber Setup**
+Status: Completed
+
+Built the complete React Three Fiber infrastructure in `features/three/`. Infrastructure only — no scenes, cameras, lighting, materials, or animations. **Provider**: ThreeProvider subscribes to threePerformanceManager, derives quality preset, builds renderer config, re-probes on breakpoint crossing. **Renderer Architecture**: Centralized WebGL config builder with adaptive DPR per quality preset. **Quality System**: Five presets (ultra/high/medium/low/minimal) with frozen budgets, auto-derived from capability probes. **Performance Model**: Module-level singleton threePerformanceManager with capability probes, subscriber pattern. **Event Architecture**: Typed pub/sub event hub with 9 categories. **Error Handling**: ThreeErrorBoundary class component wrapping 3D layer. **Canvas Wrapper**: Reusable R3F Canvas with feature gates, error boundary, Suspense. **Registry**: Generic Map-based registry for future subsystem registration. **6 Hooks**: useThree, useThreePerformance, useThreeRenderer, useThreeQuality, useThreeViewport, useThreeDevice. **Feature Flag**: `hero_3d` defaults to false. Dependencies: three v0.185.1, @react-three/fiber v8. Files created: 8. Files modified: 3 (root-provider.tsx, three.config.ts, hero-3d-mount.tsx).
+
+**Phase 6.2 — Scene Architecture**
+Status: Completed
+
+Built the scene lifecycle and composition architecture in `features/three/`. Infrastructure only — no 3D objects, no salon model, no camera, no lighting, no materials, no environment maps, no post-processing, no particles, no physics, no audio. **Scene Model**: Scenes are atomic units of 3D content with ID, layer (7 z-order layers), lifecycle stage (7 stages: boot→loading→ready→active→paused→hidden→disposed), priority (4 levels), group (4 groups), and enabled flag. **Scene Visibility (5 states)**: visible, hidden, suspended, disabled, offscreen — derived from stage + quality preset + reduced motion. Quality gate: minimal preset disables most scenes. Reduced motion: suppresses effects layer scenes. **Manager (`scene-manager.ts`)**: Singleton following exact progressive-reveal-manager pattern — module-level Maps for definitions/states, Sets for subscribers, RAF batching (one rebuildSnapshot per frame), immutable frozen snapshots, selector-based subscriptions. Integrates with threePerformanceManager for quality and prefersReducedMotion for SSR-safe reads. **React Components (5)**: SceneRoot (lifecycle owner, reads ThreeContext, initializes manager, provides SceneContext — renders INSIDE ThreeCanvas), SceneContext (context creation, no JSX, Fast Refresh compliant), SceneStage (registers scene, gates children by visibility), SceneSlot (renders children when slot enabled), SceneBoundary (error boundary for scene layers). **5 Hooks**: useScene (full snapshot or selector slice via useSyncExternalStore), useSceneManager (memoized bound methods), useSceneStage (stage for a scene), useSceneSlot (slot state), useSceneVisibility (visibility for a scene). **Files Created**: scene.types.ts, scene.constants.ts, scene.config.ts, scene-manager.ts, scene-provider.tsx, scene-root.tsx, scene-stage.tsx, scene-slot.tsx, scene-boundary.tsx, hooks/use-scene.ts, hooks/use-scene-manager.ts, hooks/use-scene-stage.ts, hooks/use-scene-slot.ts, hooks/use-scene-visibility.ts. **Files Modified**: index.ts (added Scene Components, Scene Hooks, Scene Hook Return Types, Scene Types, Scene Constants sections).
 
 ---
 
