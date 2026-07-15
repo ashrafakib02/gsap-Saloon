@@ -19,11 +19,14 @@
  *   - Transition hooks: useSectionTransition, useEntryTransition, etc.
  *   - TIMELINE_REGISTRY: singleton timeline registry
  *   - Timeline hooks: useTimeline, useTimelineTracks, etc.
+ *   - ScrollTrigger manager: registration, lifecycle, refresh, debug
+ *   - ScrollTrigger hooks: useScrollTriggers, useScrollTriggerRegistry, etc.
  *   - Section constants, transition constants, timeline constants, and types
  *
  * Phase 5.1: Structure and metadata.
  * Phase 5.2: Section transitions and breathing spaces.
  * Phase 5.3: Scroll timeline architecture.
+ * Phase 5.4: ScrollTrigger infrastructure.
  */
 
 // ── Provider ───────────────────────────────────────────────
@@ -91,11 +94,66 @@ export {
   useSectionProgress,
 } from './hooks/use-timeline-progress';
 
+// ── ScrollTrigger Hooks ────────────────────────────────────
+
+export { useScrollTriggers } from './hooks/use-scroll-triggers';
+export type { UseScrollTriggersReturn } from './hooks/use-scroll-triggers';
+
+export { useScrollTriggerRegistry } from './hooks/use-scroll-trigger-registry';
+export type { UseScrollTriggerRegistryReturn } from './hooks/use-scroll-trigger-registry';
+
+export { useScrollTriggerLifecycle } from './hooks/use-scroll-trigger-lifecycle';
+export type {
+  ScrollTriggerLifecycleOptions,
+  UseScrollTriggerLifecycleReturn,
+} from './hooks/use-scroll-trigger-lifecycle';
+
+export { useScrollTriggerRefresh } from './hooks/use-scroll-trigger-refresh';
+export type {
+  ScrollTriggerRefreshOptions,
+  UseScrollTriggerRefreshReturn,
+} from './hooks/use-scroll-trigger-refresh';
+
+export { useReducedMotionTrigger } from './hooks/use-reduced-motion-trigger';
+export type { UseReducedMotionTriggerReturn } from './hooks/use-reduced-motion-trigger';
+
 // ── Registries ─────────────────────────────────────────────
 
 export { NARRATIVE_REGISTRY } from './narrative.config';
 export { TRANSITION_REGISTRY } from './narrative-transitions.config';
 export { TIMELINE_REGISTRY } from './narrative-timeline.config';
+
+// ── ScrollTrigger Manager ──────────────────────────────────
+
+export {
+  initScrollTriggerManager,
+  registerScrollTrigger,
+  killTrigger,
+  killAll,
+  disableTrigger,
+  enableTrigger,
+  pauseTrigger,
+  resumeTrigger,
+  refresh,
+  refreshBatched,
+  updateBreakpoint,
+  getCurrentBreakpoint,
+  handleReducedMotionChange,
+  isReducedMotionActive,
+  getRegistry,
+  getDebugInfo,
+  setDebugMode,
+  logDebugInfo,
+  isInitialized,
+  getConfig,
+  getAllTriggerIds,
+  getActiveTriggerIds,
+  getTriggerCount,
+  getActiveCount,
+  isTriggerActive,
+  getRefreshCount,
+  getLastRefreshAt,
+} from './scrolltrigger-manager';
 
 // ── Section Constants ──────────────────────────────────────
 
@@ -242,3 +300,38 @@ export type {
   TimelineRegistry,
   TimelineContextValue,
 } from './narrative-timeline.types';
+
+// ── ScrollTrigger Constants ────────────────────────────────
+
+export {
+  TRIGGER_GROUPS,
+  TRIGGER_PRIORITIES,
+  TRIGGER_LIFECYCLE_STATES,
+  TRIGGER_BREAKPOINTS,
+  GROUP_DESCRIPTIONS,
+  TRIGGER_PRIORITY_DESCRIPTIONS,
+  BREAKPOINT_DESCRIPTIONS,
+  LIFECYCLE_DESCRIPTIONS,
+  DEFAULT_TRIGGER_DEFINITIONS,
+  DEFAULT_BREAKPOINT_CONFIG,
+  DEFAULT_MANAGER_CONFIG,
+} from './scrolltrigger.constants';
+
+// ── ScrollTrigger Types ────────────────────────────────────
+
+export type {
+  TriggerGroup,
+  TriggerPriority,
+  TriggerLifecycleState,
+  TriggerBreakpoint,
+  TriggerOptions,
+  TriggerDefinition,
+  TriggerState,
+  ManagedTrigger,
+  ScrollTriggerInstance,
+  ScrollTriggerRegistry,
+  ScrollTriggerDebugInfo,
+  ScrollTriggerContextValue,
+  BreakpointConfig,
+  ScrollTriggerManagerConfig,
+} from './scrolltrigger.types';

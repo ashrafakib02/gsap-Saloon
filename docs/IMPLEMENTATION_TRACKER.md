@@ -9,9 +9,9 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | Phase 5 — Narrative Architecture |
-| **Current Step** | 5.3 — Scroll Timeline |
-| **Overall Completion** | 20.7% (17 / 82 steps) |
-| **Last Updated** | 2026-07-14 |
+| **Current Step** | 5.4 — Scroll Triggers |
+| **Overall Completion** | 21.95% (18 / 82 steps) |
+| **Last Updated** | 2026-07-15 |
 
 ---
 
@@ -58,7 +58,7 @@
 | 5.1 Narrative Structure | ✅ Completed |
 | 5.2 Section Transitions | ✅ Completed |
 | 5.3 Scroll Timeline | ✅ Completed |
-| 5.4 Scroll Triggers | ⬜ Not Started |
+| 5.4 Scroll Triggers | ✅ Completed |
 | 5.5 Scroll State | ⬜ Not Started |
 | 5.6 Progressive Reveal | ⬜ Not Started |
 
@@ -219,7 +219,7 @@
 | 5.1 | Narrative Structure | ✅ Completed | Frontend Architect | P0 | 4.1, 3.3 | Medium |
 | 5.2 | Section Transitions | ✅ Completed | Frontend Architect | P0 | 5.1, 3.5 | Medium |
 | 5.3 | Scroll Timeline | ⬜ Not Started | Frontend Architect | P0 | 5.1 | Medium |
-| 5.4 | Scroll Triggers | ⬜ Not Started | Frontend Architect | P0 | 5.3 | Medium |
+| 5.4 | Scroll Triggers | ✅ Completed | Frontend Architect | P0 | 5.3 | Medium |
 | 5.5 | Scroll State | ⬜ Not Started | Frontend Architect | P1 | 5.3 | Low |
 | 5.6 | Progressive Reveal | ⬜ Not Started | Frontend Architect | P0 | 5.2, 5.4 | Medium |
 | 6.1 | React Three Fiber Setup | ⬜ Not Started | Frontend Architect | P2 | 3.2 | Medium |
@@ -336,6 +336,11 @@ Built the Section Transitions system — the cinematic cut/fade/dissolve archite
 Status: Completed
 
 Built the Scroll Timeline architecture — a cinematic editing timeline model that future animation engines (GSAP, ScrollTrigger, React Three Fiber, Lenis) will consume. Created 1 new config file and 5 new hook files in `features/narrative/`. **Types** (`narrative-timeline.types.ts`): 10 union constants (TIMELINE_TRACK_TYPES, TIMELINE_STATES, TIMELINE_PRIORITIES, TIMELINE_PLAYBACK_MODES, TIMELINE_DIRECTIONS, TIMELINE_DURATION_CATEGORIES, TIMELINE_MARKER_TYPES, TIMELINE_OFFSET_UNITS, TIMELINE_SYNC_MODES, KEYFRAME_INTERPOLATIONS) + 13 interfaces (TimelineRange, TimelineOffset, TimelineLabel, TimelineKeyframe, TimelineCue, TimelineSegment, TimelineMarker, TimelineTrack, TimelineGroup, TimelineProgress, TimelineMetadata, TimelineDefinition, TimelineRegistry with 20+ methods, TimelineContextValue). **Constants** (`narrative-timeline.constants.ts`): Re-exports all unions + 12 description records + default track/group IDs. **Config** (`narrative-timeline.config.ts`): 11 parallel tracks (narrative, UI, camera, lighting, environment, 3D, particle, audio, analytics, accessibility, preload), 16 narrative segments auto-generated from section metadata, 60+ semantic markers (section-start/center/end, act-start/end, breathing-point, preload-point, camera-cue, analytics-cue), keyframes with interpolation modes per section, discrete event cues for analytics/preload/accessibility, 3 groups (visual, 3D, infrastructure). Factory pattern `createTimelineRegistry()` with singleton frozen `TIMELINE_REGISTRY`. O(1) Map-indexed lookups. **Hooks**: useTimeline (main timeline definition access), useTimelineRegistry (raw registry), 6 track hooks (useAllTimelineTracks, useEnabledTimelineTracks, useTimelineTrack, useTimelineTracksByPriority, useTimelineSegments, useTimelineSegmentsForSection), 4 marker hooks (useAllTimelineMarkers, useTimelineMarkersByType, useTimelineMarkersForSection, useTimelineMarker), 3 progress hooks (useTimelineProgress returns static initial state for Phase 9, useActiveSegments, useSectionProgress). All hooks are pure data-access — zero effects, zero listeners, zero side effects. Updated all barrel exports. Fixed 6 ESLint/config errors (unused imports, unused function, unused params). All verification passes: 0 narrative ESLint errors, 0 narrative TypeScript errors, 0 build errors.
+
+**Phase 5.4 — Scroll Triggers**
+Status: Completed
+
+Built the ScrollTrigger management infrastructure — connecting the narrative architecture to GSAP ScrollTrigger with full lifecycle control. Created 7 new files in `features/narrative/`. **Types** (`scrolltrigger.types.ts`): 4 union constants (TRIGGER_GROUPS: 9 groups, TRIGGER_PRIORITIES: 4 levels, TRIGGER_LIFECYCLE_STATES: 4 states, TRIGGER_BREAKPOINTS: 5 breakpoints) + 10 interfaces (TriggerOptions, TriggerDefinition, TriggerState, ManagedTrigger, ScrollTriggerInstance, ScrollTriggerRegistry with 14 query methods, ScrollTriggerDebugInfo, ScrollTriggerContextValue, BreakpointConfig, ScrollTriggerManagerConfig). All readonly, no any. **Constants** (`scrolltrigger.constants.ts`): Re-exports unions + 4 description records + 8 DEFAULT_TRIGGER_DEFINITIONS (sectionReveal, parallax, textReveal, imageReveal, heroSection, breathingSpace, closingSection, analyticsEntry) + per-breakpoint config + DEFAULT_MANAGER_CONFIG. **Manager** (`scrolltrigger-manager.ts`): Singleton with module-level state (definitions Map, states Map, instances Map). Core functions: initScrollTriggerManager, registerScrollTrigger, killTrigger, killAll, disableTrigger, enableTrigger, pauseTrigger, resumeTrigger, refresh, refreshBatched, updateBreakpoint, getCurrentBreakpoint, handleReducedMotionChange, getRegistry, getDebugInfo. Integrates with existing getScrollTrigger() from gsap-registration.ts — zero GSAP duplication. Breakpoint-aware creation, reduced-motion handling (skip/instant/simplify), debounced refresh batching, throttled debug logging. **5 Hooks**: useScrollTriggers (full management API, 25+ stabilized properties), useScrollTriggerRegistry (read-only queries), useScrollTriggerLifecycle (component-level register/cleanup), useScrollTriggerRefresh (debounced/batched refresh), useReducedMotionTrigger (prefers-reduced-motion listener). Updated barrel exports. Fixed 9 lint/type errors (name collisions, unused imports, dead code, unreachable operators). All verification passes: 0 narrative ESLint errors, 0 narrative TypeScript errors. Build fails only on pre-existing hero/dev phase errors.
 
 ---
 

@@ -60,3 +60,26 @@ export {
   useActiveSegments,
   useSectionProgress,
 } from './use-timeline-progress';
+
+// ── ScrollTrigger Hooks ──────────────────────────────────
+
+export { useScrollTriggers } from './use-scroll-triggers';
+export type { UseScrollTriggersReturn } from './use-scroll-triggers';
+
+export { useScrollTriggerRegistry } from './use-scroll-trigger-registry';
+export type { UseScrollTriggerRegistryReturn } from './use-scroll-trigger-registry';
+
+export { useScrollTriggerLifecycle } from './use-scroll-trigger-lifecycle';
+export type {
+  ScrollTriggerLifecycleOptions,
+  UseScrollTriggerLifecycleReturn,
+} from './use-scroll-trigger-lifecycle';
+
+export { useScrollTriggerRefresh } from './use-scroll-trigger-refresh';
+export type {
+  ScrollTriggerRefreshOptions,
+  UseScrollTriggerRefreshReturn,
+} from './use-scroll-trigger-refresh';
+
+export { useReducedMotionTrigger } from './use-reduced-motion-trigger';
+export type { UseReducedMotionTriggerReturn } from './use-reduced-motion-trigger';

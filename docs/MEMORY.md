@@ -506,6 +506,39 @@ Before writing any code in this project, verify:
 
 **Files Modified:** hooks/index.ts (added 15 timeline hook exports), index.ts (added timeline hooks, TIMELINE_REGISTRY, timeline constants, timeline types exports)
 
+## 19. Phase 5.4 — ScrollTrigger Management Infrastructure
+
+**Location:** `apps/web/src/features/narrative/scrolltrigger.*.ts` + `hooks/use-scroll-trigger*.ts`
+
+**Architecture:** Singleton ScrollTrigger manager with module-level state (definitions Map, states Map, instances Map). Integrates with existing GSAP layer via `getScrollTrigger()` from `@/shared/animation/gsap-registration` — zero GSAP duplication, no direct gsap/ScrollTrigger imports in manager.
+
+**Lifecycle:** `registered` → `active` → `disabled` → `destroyed`. All transitions tracked in states Map. killAll() destroys all instances and clears all maps.
+
+**Breakpoint System:** 5 breakpoints (all/mobile/tablet/desktop/wide). Auto-detected from window.matchMedia on init. Per-breakpoint configs: enabled, markers, maxActiveTriggers, reducedMotionBehavior. updateBreakpoint() re-evaluates all registered triggers.
+
+**Reduced Motion:** Three behaviors — `skip` (don't create), `instant` (create with no animation), `simplify` (create with reduced complexity). handleReducedMotionChange() bulk-disables/enables all triggers.
+
+**Refresh Batching:** Debounced refresh (200ms default from timing.ts DEBOUNCE.resize). refreshBatched() queues refreshes and executes after debounce. refreshCount/lastRefreshAt tracked.
+
+**Debug Mode:** Optional, off by default, auto-enabled in dev (import.meta.env.DEV). Exposes getDebugInfo() with full registry snapshot. logDebugInfo() throttled at 100ms to console.
+
+**Registry:** getRegistry() returns 14 query methods — get, all, active, destroyed, byGroup, byPriority, byState, byBreakpoint, countByState, count, has, hasActive, getByGroup, getByPriority.
+
+**Hooks (5):**
+- `useScrollTriggers()` — full management API, 25+ stabilized properties (register, kill, killAll, disable, enable, pause, resume, refresh, registry, debug, state queries)
+- `useScrollTriggerRegistry()` — read-only queries (get, all, active, byGroup, byPriority, count)
+- `useScrollTriggerLifecycle(opts)` — component-level: registers on mount, kills on unmount, tracks state, accepts `skip` option
+- `useScrollTriggerRefresh(opts)` — debounced/batched refresh with configurable debounceMs, cleanup on unmount
+- `useReducedMotionTrigger()` — matchMedia listener, SSR-safe, notifies manager on change
+
+**Default Trigger Definitions (8):** sectionReveal (top 80%), parallax (scrubbed, low priority), textReveal (top 80%), imageReveal (top 85%), heroSection (top top, critical), breathingSpace (top center, low), closingSection (top 70%, critical), analyticsEntry (top 75%, low). All have `reducedMotionBehavior: 'skip'` except hero/closing (`'instant'`).
+
+**Import Pattern:** `import { registerScrollTrigger, useScrollTriggerLifecycle, useScrollTriggers, TRIGGER_GROUPS, type TriggerDefinition } from '@/features/narrative'`
+
+**Files Created:** scrolltrigger.types.ts, scrolltrigger.constants.ts, scrolltrigger-manager.ts, hooks/use-scroll-triggers.ts, hooks/use-scroll-trigger-registry.ts, hooks/use-scroll-trigger-lifecycle.ts, hooks/use-scroll-trigger-refresh.ts, hooks/use-reduced-motion-trigger.ts
+
+**Files Modified:** hooks/index.ts (added 5 hook exports + 5 type exports), index.ts (added ScrollTrigger hooks, manager functions, constants, types sections)
+
 ---
 
 *This document is immutable project memory. It is updated only when permanent architectural or design decisions change. It does not track progress, implementation history, or temporary state.*
