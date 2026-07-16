@@ -788,6 +788,104 @@ The **progressive reveal system** is the global infrastructure that determines *
 
 **Files Modified:** index.ts (added Camera Components, Camera Hooks, Camera Hook Return Types, Camera Types, Camera Constants sections)
 
+## 24. Phase 6.4 — Lighting System Architecture
+
+**Status**: ✅ Complete (2026-07-16)
+
+### Lighting Manager
+
+- **Module-level singleton** following exact scene-manager and camera-manager pattern
+- Module-level mutable state: preset/layer Maps, snapshot, subscribers Set, selector subscribers Set, cleanups array
+- **RAF batching**: All mutations schedule a single rAF callback → rebuildSnapshot → notifySubscribers (SSR fallback uses setTimeout(0))
+- **Immutable snapshots**: `Object.freeze()`, new object per change, `Object.is` reference checks for selector equality
+- **Selector subscriptions**: `subscribeSelector<T>(selector, callback, equalityFn)` — fine-grained updates, only fires when selected slice changes
+- **Integration subscription teardown**: `cleanups` array populated during `init()`, drained in `destroy()`
+
+### Lighting Presets
+
+- **12 presets**: hero, intro, narrative, services, gallery, transformation, booking, footer, night, mobile, reduced-motion, performance
+- **Options→Definition→State→Snapshot pipeline**: Consumer input → resolved definition → runtime state → immutable snapshot
+- **Idempotent registration**: Re-registering same ID preserves existing runtime state (does not overwrite)
+- Per-preset defaults: intensity, color temperature, ambient intensity, directional intensity, environment, shadows
+
+### Lighting Environments
+
+- **8 environments**: studio, golden-hour, interior, gallery, spa, night, neutral, debug
+- Stored as `LightingEnvironment | null` in snapshot, not as a separate registry
+- Environment derives from active preset via `resolvePresetEnvironment()` in config
+
+### Light Layers (Infrastructure)
+
+- **11 layers**: ambient, directional, hemisphere, spot, point, rect-area, environment, rim, fill, key, back
+- Registered as definitions during `init()`, stored in `layerStates` Map
+- **Infrastructure only** — no actual Three.js lights, no shadow rendering, no volumetrics
+
+### Snapshot Model
+
+```
+LightingSnapshot {
+  presets: ReadonlyMap<LightingPresetId, LightingPresetState>
+  layers: ReadonlyMap<LightingLayerId, LightingLayerState>
+  activePresetId: LightingPresetId | null
+  activeEnvironment: LightingEnvironment | null
+  intensity: number
+  colorTemperature: number
+  ambientIntensity: number
+  directionalIntensity: number
+  shadowsEnabled: boolean
+  qualityProfile: LightingQualityProfile
+  constraints: LightingConstraints
+  isReducedMotion: boolean
+  qualityPreset: QualityPreset
+  presetCount: number
+  layerCount: number
+  revision: number
+  timestamp: number
+}
+```
+
+### Provider Pattern
+
+- **Fast Refresh compliant**: `lighting-provider.tsx` contains context creation (no JSX), `lighting-root.tsx` contains the provider component (JSX)
+- **LightingRoot** mounts inside SceneRoot, reads ThreeContext for isEnabled/qualityPreset/isReducedMotion
+- Provider hierarchy: ThreeProvider → ThreeCanvas → SceneRoot → CameraRoot → **LightingRoot**
+
+### Hook Responsibilities
+
+| Hook | Responsibility |
+|------|---------------|
+| `useLighting` | Full snapshot or selector slice (overloaded) |
+| `useLightingManager` | 15 memoized bound methods for mutations |
+| `useLightingPreset` | Active preset ID (`LightingPresetId \| null`) |
+| `useLightingState` | Derived state (intensity, color temp, ambient, directional, shadows, environment, quality, constraints) |
+| `useLightingQuality` | Quality profile with convenience booleans |
+| `useLightingEnvironment` | Active environment (`LightingEnvironment \| null`) |
+
+All hooks use `useSyncExternalStore` + `useRef` + equality check + `useMemo` pattern.
+
+### Integration Points
+
+- **threePerformanceManager**: Read `qualityPreset` via `getSnapshot().qualityPreset`; subscribe for changes
+- **prefersReducedMotion**: SSR-safe read from `@/shared/animation/reduced-motion`; updated via `setReducedMotion()`
+- **Reduced motion adaptation**: When reducedMotion=true → disables shadows, reduces intensity by 50%
+- **Quality system**: 5 presets (ultra/high/medium/low/minimal) → per-preset budgets (light count, shadow resolution, env/dynamic/effects flags)
+
+### Performance Decisions
+
+- O(1) Map/Set lookups for all registry queries
+- `useMemo`/`useRef` for stable hook return values
+- Selector equality via `Object.is` reference checks
+- Frozen snapshots prevent accidental mutation
+- SSR-safe: `typeof window !== 'undefined'` guards, setTimeout fallback for rAF
+
+### Future Extension Points
+
+- Actual light creation happens in Phase 6.5+ (lighting-root renders nothing — consumers call useLightingManager to configure, then create lights elsewhere)
+- HDRI/environment map loading will use `activeEnvironment` from snapshot
+- Shadow rendering will use `shadowsEnabled` + `qualityProfile.shadowMapSize` from snapshot
+- Post-processing/bloom will check `qualityProfile.effectsEnabled`
+- Cinematic lighting transitions will use the preset system's state management
+
 ---
 
 *This document is immutable project memory. It is updated only when permanent architectural or design decisions change. It does not track progress, implementation history, or temporary state.*

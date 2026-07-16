@@ -14,6 +14,8 @@
  *
  * Phase 6.1: React Three Fiber setup — infrastructure only.
  * Phase 6.2: Scene architecture — scene components, hooks, types, constants.
+ * Phase 6.3: Camera system — camera components, hooks, types, constants.
+ * Phase 6.4: Lighting system — lighting components, hooks, types, constants.
  */
 
 // ── Canvas ──────────────────────────────────────────────
@@ -255,3 +257,81 @@ export {
   DEFAULT_CAMERA_CONSTRAINTS,
   DEFAULT_CAMERA_SNAPSHOT,
 } from './camera.constants';
+
+// ── Lighting Components ──────────────────────────────────
+
+export { LightingRoot } from './lighting-root';
+export { LightingContext, useLightingContext } from './lighting-provider';
+
+// ── Lighting Hooks ───────────────────────────────────────
+
+export { useLighting } from './hooks/use-lighting';
+export { useLightingManager } from './hooks/use-lighting-manager';
+export { useLightingPreset } from './hooks/use-lighting-preset';
+export { useLightingState } from './hooks/use-lighting-state';
+export { useLightingQuality } from './hooks/use-lighting-quality';
+export { useLightingEnvironment } from './hooks/use-lighting-environment';
+
+// ── Lighting Hook Return Types ───────────────────────────
+
+export type { UseLightingManagerReturn } from './hooks/use-lighting-manager';
+export type { LightingStateReturn } from './hooks/use-lighting-state';
+export type { UseLightingQualityReturn } from './hooks/use-lighting-quality';
+
+// ── Lighting Types ───────────────────────────────────────
+
+export type {
+  LightingPreset,
+  LightingPresetId,
+  LightingLayer,
+  LightingLayerId,
+  LightingEnvironment,
+  LightingQualityProfile,
+  LightingConstraints,
+  LightingMetadata,
+  LightingControllerConfig,
+  LightingTimelineConfig,
+  LightingPresetOptions,
+  LightingPresetDefinition,
+  LightingPresetState,
+  LightingLayerState,
+  LightingSnapshot,
+  LightingRegistry,
+  LightingManager,
+  LightingSelector,
+  LightingEquality,
+  LightingCallback,
+  LightingUnsubscribe,
+} from './lighting.types';
+
+export type { LightingContextValue } from './lighting-provider';
+
+// ── Lighting Constants ───────────────────────────────────
+
+export {
+  LIGHTING_PRESETS,
+  LIGHTING_LAYERS,
+  LIGHTING_ENVIRONMENTS,
+  LIGHTING_PRESET_DESCRIPTIONS,
+  LIGHTING_LAYER_DESCRIPTIONS,
+  LIGHTING_ENVIRONMENT_DESCRIPTIONS,
+  LIGHTING_PRESET_ORDER,
+  LIGHTING_LAYER_ORDER,
+  LIGHTING_ENVIRONMENT_ORDER,
+  LIGHTING_PRESET_INTENSITY,
+  LIGHTING_PRESET_COLOR_TEMPERATURE,
+  LIGHTING_PRESET_AMBIENT_INTENSITY,
+  LIGHTING_PRESET_DIRECTIONAL_INTENSITY,
+  LIGHTING_PRESET_ENVIRONMENT,
+  LIGHTING_PRESET_SHADOWS,
+  DEFAULT_LIGHTING_INTENSITY,
+  DEFAULT_LIGHTING_COLOR_TEMPERATURE,
+  DEFAULT_LIGHTING_AMBIENT_INTENSITY,
+  DEFAULT_LIGHTING_DIRECTIONAL_INTENSITY,
+  DEFAULT_LIGHTING_SHADOWS_ENABLED,
+  DEFAULT_ACTIVE_LIGHTING_PRESET,
+  DEFAULT_ACTIVE_LIGHTING_ENVIRONMENT,
+  DEFAULT_LIGHTING_QUALITY_PROFILE,
+  DEFAULT_LIGHTING_CONSTRAINTS,
+  DEFAULT_LIGHTING_SNAPSHOT,
+} from './lighting.constants';

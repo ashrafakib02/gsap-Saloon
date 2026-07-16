@@ -9,9 +9,9 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | Phase 6 — 3D Experience |
-| **Current Step** | 6.4 — Lighting |
-| **Overall Completion** | 28.05% (23 / 82 steps) |
-| **Last Updated** | 2026-07-15 |
+| **Current Step** | 6.5 — Materials |
+| **Overall Completion** | 29.27% (24 / 82 steps) |
+| **Last Updated** | 2026-07-16 |
 
 ---
 
@@ -73,7 +73,7 @@
 | 6.1 React Three Fiber Setup | ✅ Completed |
 | 6.2 Scene Architecture | ✅ Completed |
 | 6.3 Camera System | ✅ Completed |
-| 6.4 Lighting | ⬜ Not Started |
+| 6.4 Lighting | ✅ Completed |
 | 6.5 Materials | ⬜ Not Started |
 | 6.6 Environment | ⬜ Not Started |
 | 6.7 Asset Loading | ⬜ Not Started |
@@ -225,7 +225,7 @@
 | 6.1 | React Three Fiber Setup | ⬜ Not Started | Frontend Architect | P2 | 3.2 | Medium |
 | 6.2 | Scene Architecture | ✅ Completed | Frontend Architect | P2 | 6.1 | High |
 | 6.3 | Camera System | ✅ Completed | Frontend Architect | P2 | 6.2 | Medium |
-| 6.4 | Lighting | ⬜ Not Started | Frontend Architect | P2 | 6.2 | Medium |
+| 6.4 | Lighting | ✅ Completed | Frontend Architect | P2 | 6.2 | Medium |
 | 6.5 | Materials | ⬜ Not Started | Frontend Architect | P2 | 6.2 | Medium |
 | 6.6 | Environment | ⬜ Not Started | Frontend Architect | P2 | 6.2 | Medium |
 | 6.7 | Asset Loading | ⬜ Not Started | Frontend Architect | P2 | 6.1 | Medium |
@@ -366,6 +366,11 @@ Built the scene lifecycle and composition architecture in `features/three/`. Inf
 Status: Completed
 
 Built the complete camera architecture in `features/three/`. Infrastructure only — no camera movement, no interpolation, no cinematic transitions, no orbit controls, no pointer controls, no scroll camera, no animation timelines, no GSAP implementation. **Camera Model**: 7 modes (static, narrative, scroll, cinematic, interactive, manual, debug), 11 presets (hero, intro, narrative, services, gallery, transformation, booking, footer, mobile, reduced-motion, performance), 7 targets (hero, scene-center, character, product, booking, ui, debug), camera constraints (position bounds, FOV range, distance limits), viewport adaptation (4 breakpoints), quality profiles (5 presets with FOV/shadow/effects settings). **Manager (`camera-manager.ts`)**: Singleton following exact scene-manager pattern — module-level Maps for preset/target definitions and states, Sets for subscribers/selector subscribers, RAF batching (one rebuildSnapshot per frame), immutable frozen snapshots, selector-based subscriptions. Integrates with threePerformanceManager for quality and prefersReducedMotion for SSR-safe reads. Manages active preset, active target, camera mode, position, lookAt, FOV, near/far clipping planes. **Config (`camera.config.ts`)**: Pure derivation functions — type guards for CameraMode/CameraPreset/CameraTarget, quality profile derivation (5 quality presets → camera settings), viewport-aware FOV/position derivation, constraint derivation with reduced-motion adaptation, FOV/position clamping, per-preset defaults (position, lookAt, FOV, near/far planes). **Constants (`camera.constants.ts`)**: 3 description records, 3 ordering records, preset FOV defaults, default viewport (1920×1080), default quality profile (medium), default constraints (±100 position bounds, 10–120° FOV), default snapshot. **React Components (2)**: CameraRoot (lifecycle owner, reads ThreeContext, initializes camera-manager, provides CameraContext — renders INSIDE SceneRoot), CameraContext (context creation, no JSX, Fast Refresh compliant). **6 Hooks**: useCamera (full snapshot or selector slice via useSyncExternalStore), useCameraManager (memoized bound methods — 22 methods), useCameraPreset (active preset ID), useCameraTarget (active target ID), useCameraState (derived camera state — position, lookAt, FOV, mode, viewport, qualityProfile, constraints), useCameraControls (memoized control methods — 8 methods). **Files Created**: camera.types.ts, camera.constants.ts, camera.config.ts, camera-manager.ts, camera-provider.tsx, camera-root.tsx, hooks/use-camera.ts, hooks/use-camera-manager.ts, hooks/use-camera-preset.ts, hooks/use-camera-target.ts, hooks/use-camera-state.ts, hooks/use-camera-controls.ts. **Files Modified**: index.ts (added Camera Components, Camera Hooks, Camera Hook Return Types, Camera Types, Camera Constants sections). **Verification**: TypeScript strict mode clean (zero camera errors), ESLint clean (zero warnings), all pre-existing errors only in hero/dev files.
+
+**Phase 6.4 — Lighting System**
+Status: Completed
+
+Built the complete lighting architecture in `features/three/`. Infrastructure only — no Three.js lights, no lighting animation, no shadow rendering, no HDRI, no environment maps, no volumetrics, no bloom, no post-processing, no cinematic effects. **Lighting Model**: 12 presets (hero, intro, narrative, services, gallery, transformation, booking, footer, night, mobile, reduced-motion, performance), 11 light layers (ambient, directional, hemisphere, spot, point, rect-area, environment, rim, fill, key, back), 8 environments (studio, golden-hour, interior, gallery, spa, night, neutral, debug), lighting constraints (intensity bounds, color temperature range), quality profiles (5 presets with light count/shadow/environment settings). **Manager (`lighting-manager.ts`)**: Singleton following exact camera-manager pattern — module-level Maps for preset definitions and states, Set for layer states, Sets for subscribers/selector subscribers, RAF batching (one rebuildSnapshot per frame), immutable frozen snapshots, selector-based subscriptions. Integrates with threePerformanceManager for quality and prefersReducedMotion for SSR-safe reads. Manages active preset, active environment, global intensity, color temperature, ambient/directional intensities, shadow state. **Config (`lighting.config.ts`)**: Pure derivation functions — type guards for LightingPreset/LightingLayer/LightingEnvironment, quality profile derivation (5 quality presets → lighting settings), constraint derivation with reduced-motion adaptation, intensity/temperature clamping, per-preset defaults (intensity, color temperature, ambient, directional, environment, shadows). **Constants (`lighting.constants.ts`)**: 3 description records, 3 ordering records, 6 preset default records (intensity, color temperature, ambient, directional, environment, shadows), default constraints (0–2 intensity, 2000–10000K temperature), default quality profile (medium, 8 max lights, shadows enabled), default snapshot. **React Components (2)**: LightingRoot (lifecycle owner, reads ThreeContext, initializes lighting-manager, provides LightingContext — renders INSIDE SceneRoot), LightingContext (context creation, no JSX, Fast Refresh compliant). **6 Hooks**: useLighting (full snapshot or selector slice via useSyncExternalStore), useLightingManager (memoized bound methods — 15 methods), useLightingPreset (active preset ID), useLightingState (derived lighting state — intensity, color temperature, ambient, directional, shadows, environment, quality profile, constraints), useLightingQuality (quality profile with convenience booleans), useLightingEnvironment (active environment ID). **Files Created**: lighting.types.ts, lighting.constants.ts, lighting.config.ts, lighting-manager.ts, lighting-provider.tsx, lighting-root.tsx, hooks/use-lighting.ts, hooks/use-lighting-manager.ts, hooks/use-lighting-preset.ts, hooks/use-lighting-state.ts, hooks/use-lighting-quality.ts, hooks/use-lighting-environment.ts. **Files Modified**: index.ts (added Lighting Components, Lighting Hooks, Lighting Hook Return Types, Lighting Types, Lighting Constants sections). **Verification**: TypeScript strict mode clean (zero lighting errors), ESLint clean (zero warnings), all pre-existing errors only in hero/dev files.
 
 ---
 
