@@ -335,3 +335,92 @@ export {
   DEFAULT_LIGHTING_CONSTRAINTS,
   DEFAULT_LIGHTING_SNAPSHOT,
 } from './lighting.constants';
+
+// ── Materials Components ──────────────────────────────────
+
+export { MaterialsRoot } from './materials-root';
+export { MaterialsContext, useMaterialsContext } from './materials-provider';
+
+// ── Materials Hooks ───────────────────────────────────────
+
+export { useMaterials } from './hooks/use-materials';
+export { useMaterialsManager } from './hooks/use-materials-manager';
+export { useMaterialPreset } from './hooks/use-material-preset';
+export { useMaterialState } from './hooks/use-material-state';
+export { useMaterialQuality } from './hooks/use-material-quality';
+export { useMaterialRegistry } from './hooks/use-material-registry';
+
+// ── Materials Hook Return Types ───────────────────────────
+
+export type { UseMaterialsManagerReturn } from './hooks/use-materials-manager';
+export type { MaterialStateReturn } from './hooks/use-material-state';
+export type { UseMaterialQualityReturn } from './hooks/use-material-quality';
+export type { UseMaterialRegistryReturn } from './hooks/use-material-registry';
+
+// ── Materials Types ───────────────────────────────────────
+
+export type {
+  MaterialPreset,
+  MaterialPresetId,
+  MaterialCategory,
+  MaterialCategoryId,
+  MaterialGroup,
+  MaterialGroupId,
+  MaterialLayer,
+  MaterialLayerId,
+  MaterialSurface,
+  MaterialSurfaceId,
+  MaterialVariant,
+  MaterialLifecycleState,
+  MaterialPriority,
+  MaterialQualityProfile,
+  MaterialConstraints,
+  MaterialMetadata,
+  MaterialShaderModuleConfig,
+  MaterialPresetOptions,
+  MaterialPresetDefinition,
+  MaterialPresetState,
+  MaterialCategoryState,
+  MaterialGroupState,
+  MaterialSnapshot,
+  MaterialRegistry,
+  MaterialsManager,
+  MaterialSelector,
+  MaterialEquality,
+  MaterialCallback,
+  MaterialUnsubscribe,
+} from './materials.types';
+
+export type { MaterialsContextValue } from './materials-provider';
+
+// ── Materials Constants ───────────────────────────────────
+
+export {
+  MATERIAL_PRESETS,
+  MATERIAL_CATEGORIES,
+  MATERIAL_GROUPS,
+  MATERIAL_LAYERS,
+  MATERIAL_SURFACES,
+  MATERIAL_PRIORITIES,
+  MATERIAL_LIFECYCLE_STATES,
+  MATERIAL_PRESET_DESCRIPTIONS,
+  MATERIAL_CATEGORY_DESCRIPTIONS,
+  MATERIAL_GROUP_DESCRIPTIONS,
+  MATERIAL_LAYER_DESCRIPTIONS,
+  MATERIAL_SURFACE_DESCRIPTIONS,
+  MATERIAL_PRIORITY_DESCRIPTIONS,
+  MATERIAL_PRESET_ORDER,
+  MATERIAL_CATEGORY_ORDER,
+  MATERIAL_GROUP_ORDER,
+  MATERIAL_LAYER_ORDER,
+  MATERIAL_SURFACE_ORDER,
+  MATERIAL_PRESET_CATEGORY,
+  MATERIAL_PRESET_SURFACE,
+  MATERIAL_PRESET_PRIORITY,
+  MATERIAL_PRESET_GROUP,
+  MATERIAL_CATEGORY_TO_GROUP,
+  DEFAULT_ACTIVE_MATERIAL_PRESET,
+  DEFAULT_MATERIAL_QUALITY_PROFILE,
+  DEFAULT_MATERIAL_CONSTRAINTS,
+  DEFAULT_MATERIAL_SNAPSHOT,
+} from './materials.constants';

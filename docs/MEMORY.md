@@ -888,4 +888,107 @@ All hooks use `useSyncExternalStore` + `useRef` + equality check + `useMemo` pat
 
 ---
 
+## 25. Phase 6.5 — Materials System Architecture
+
+**Status**: ✅ Complete (2026-07-16)
+
+### Materials Manager
+
+- **Module-level singleton** following exact scene-manager, camera-manager, and lighting-manager pattern
+- Module-level mutable state: preset/category/group Maps, snapshot, subscribers Set, selector subscribers Set, cleanups array
+- **RAF batching**: All mutations schedule a single rAF callback → rebuildSnapshot → notifySubscribers (SSR fallback uses setTimeout(0))
+- **Immutable snapshots**: `Object.freeze()`, new object per change, `Object.is` reference checks for selector equality
+- **Selector subscriptions**: `subscribeSelector<T>(selector, callback, equalityFn)` — fine-grained updates, only fires when selected slice changes
+- **Integration subscription teardown**: `cleanups` array populated during `init()`, drained in `destroy()`
+
+### Material Presets
+
+- **11 presets**: hero, narrative, services, gallery, transformation, booking, footer, mobile, performance, reduced-motion, debug
+- **Options→Definition→State→Snapshot pipeline**: Consumer input → resolved definition → runtime state → immutable snapshot
+- **Idempotent registration**: Re-registering same ID preserves existing runtime state (does not overwrite)
+- Per-preset defaults: category, surface finish, priority, group
+- **Lifecycle states**: registered → loading → ready → active → idle → disposing → disposed
+
+### Material Categories
+
+- **14 categories**: fabric, wood, stone, marble, metal, glass, ceramic, leather, skin, hair, liquid, procedural, ui, debug
+- **5 groups**: architectural, surface, reflective, organic, technical
+- Category-to-group mapping for quality budget allocation
+- Stored as `MaterialCategoryState` / `MaterialGroupState` in snapshot Maps
+
+### Material Layers
+
+- **11 layers**: base-color, normal, roughness, metallic, ambient-occlusion, emissive, displacement, clearcoat, transmission, subsurface, anisotropy
+- **Infrastructure only** — no actual texture loading, no uniform data, no shader modules
+
+### Snapshot Model
+
+```
+MaterialSnapshot {
+  presets: ReadonlyMap<MaterialPresetId, MaterialPresetState>
+  categories: ReadonlyMap<MaterialCategoryId, MaterialCategoryState>
+  groups: ReadonlyMap<MaterialGroupId, MaterialGroupState>
+  activePresetId: MaterialPresetId | null
+  qualityProfile: MaterialQualityProfile
+  constraints: MaterialConstraints
+  isReducedMotion: boolean
+  qualityPreset: QualityPreset
+  presetCount: number
+  categoryCount: number
+  groupCount: number
+  revision: number
+  timestamp: number
+}
+```
+
+### Provider Pattern
+
+- **Fast Refresh compliant**: `materials-provider.tsx` contains context creation (no JSX), `materials-root.tsx` contains the provider component (JSX)
+- **MaterialsRoot** mounts inside SceneRoot, reads ThreeContext for isEnabled/qualityPreset/isReducedMotion
+- Provider hierarchy: ThreeProvider → ThreeCanvas → SceneRoot → CameraRoot → LightingRoot → MaterialsRoot
+
+### Hook Responsibilities
+
+| Hook | Responsibility |
+|------|---------------|
+| `useMaterials` | Full snapshot or selector slice (overloaded) |
+| `useMaterialsManager` | 16 memoized bound methods for mutations |
+| `useMaterialPreset` | Active preset ID (`MaterialPresetId \| null`) |
+| `useMaterialState` | Derived state (active preset, quality, constraints, reduced-motion, counts) |
+| `useMaterialQuality` | Quality profile with 10 convenience booleans |
+| `useMaterialRegistry` | 16 read-only registry query methods |
+
+All hooks use `useSyncExternalStore` + `useRef` + equality check + `useMemo` pattern.
+
+### Quality Adaptation
+
+- **5 quality profiles** (ultra/high/medium/low/minimal) derived from ThreePerformanceManager
+- Per-profile budgets: texture size (256→4096), normal maps, PBR, clearcoat, transmission, subsurface, anisotropy, shader complexity, swaps per frame, compression
+- Reduced-motion: tightens max active materials to 16, max shader complexity to 40
+
+### Integration Points
+
+- **threePerformanceManager**: Read `qualityPreset` via `getSnapshot().estimatedQuality`; subscribe for changes
+- **prefersReducedMotion**: SSR-safe read from `@/shared/animation/reduced-motion`; updated via `setReducedMotion()`
+- **Reduced motion adaptation**: Tightens material budgets for accessibility
+- **Quality system**: 5 presets → per-preset texture/feature budgets
+
+### Performance Decisions
+
+- O(1) Map/Set lookups for all registry queries
+- `useMemo`/`useRef` for stable hook return values
+- Selector equality via `Object.is` reference checks
+- Frozen snapshots prevent accidental mutation
+- SSR-safe: `typeof window !== 'undefined'` guards, setTimeout fallback for rAF
+
+### Future Extension Points
+
+- Actual material instantiation happens in Phase 6.7+ (MaterialsRoot renders nothing — consumers call useMaterialsManager to configure, then create materials elsewhere)
+- Texture loading will use `qualityProfile.maxTextureSize` and `compressionEnabled` from snapshot
+- Shader complexity will use `qualityProfile` features and `constraints.maxShaderComplexity`
+- Material animations will use the preset system's state management
+- Category/group budgets enable per-type resource allocation
+
+---
+
 *This document is immutable project memory. It is updated only when permanent architectural or design decisions change. It does not track progress, implementation history, or temporary state.*
