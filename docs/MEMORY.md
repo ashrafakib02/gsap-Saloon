@@ -991,4 +991,81 @@ All hooks use `useSyncExternalStore` + `useRef` + equality check + `useMemo` pat
 
 ---
 
+## 26. Phase 6.6 — Environment System Architecture
+
+**Manager Pattern:** Singleton `environmentManager` — module-level state, no React dependency, RAF batching. Follows exact pattern of `materialsManager`. Registered as frozen object.
+
+**Presets:** 13 semantic presets — hero, golden-hour, interior, gallery, spa, services, booking, night, neutral, performance, mobile, reduced-motion, debug. Each bundles environment complexity, resolution budgets, and quality adaptation. Immutable configuration.
+
+**Categories:** 9 environment categories — interior, studio, architectural, natural, procedural, cinematic, minimal, debug, future-custom. Represent the broad class of 3D environment. Metadata only.
+
+**Groups:** 5 environment groups — spatial, lighting, atmospheric, procedural, utility. Cluster categories for quality budgeting.
+
+**Layers:** 11 environment layers — sky, reflections, fog, background, ambient-light, directional-light, ibl, atmosphere, ground, procedural-noise, post-processing. Future components of a complete environment. Metadata only.
+
+**Snapshot Model:**
+
+```
+EnvironmentSnapshot {
+  presets: ReadonlyMap<EnvironmentPresetId, EnvironmentPresetState>
+  categories: ReadonlyMap<EnvironmentCategoryId, EnvironmentCategoryState>
+  groups: ReadonlyMap<EnvironmentGroupId, EnvironmentGroupState>
+  activePresetId: EnvironmentPresetId | null
+  qualityProfile: EnvironmentQualityProfile
+  constraints: EnvironmentConstraints
+  isReducedMotion: boolean
+  qualityPreset: QualityPreset
+  presetCount: number
+  categoryCount: number
+  groupCount: number
+  revision: number
+  timestamp: number
+}
+```
+
+**Provider Pattern:**
+- **Fast Refresh compliant**: `environment-provider.tsx` contains context creation (no JSX), `environment-root.tsx` contains the provider component (JSX)
+- **EnvironmentRoot** mounts inside SceneRoot, reads ThreeContext for isEnabled/qualityPreset/isReducedMotion
+- Provider hierarchy: ThreeProvider → ThreeCanvas → SceneRoot → CameraRoot → LightingRoot → MaterialsRoot → EnvironmentRoot
+
+**Hook Responsibilities:**
+
+| Hook | Responsibility |
+|------|---------------|
+| `useEnvironment` | Full snapshot or selector slice (overloaded) |
+| `useEnvironmentManager` | 15 memoized bound methods for mutations |
+| `useEnvironmentPreset` | Active preset ID (`EnvironmentPresetId \| null`) |
+| `useEnvironmentState` | Derived state (active preset, quality, constraints, reduced-motion, counts) |
+| `useEnvironmentQuality` | Quality profile with 11 convenience booleans |
+| `useEnvironmentRegistry` | 16 read-only registry query methods |
+
+All hooks use `useSyncExternalStore` + `useRef` + equality check + `useMemo` pattern.
+
+**Quality Adaptation:**
+- **5 quality profiles** (ultra/high/medium/low/minimal) derived from ThreePerformanceManager
+- Per-profile budgets: HDR resolution (256→4096), reflection resolution (0→1024), fog precision (0→64), sky/IBL/atmosphere toggles, procedural complexity (0→100), transitions per frame (0→4)
+- Reduced-motion: tightens max active environments to 2, max fog distance to 100
+
+**Integration Points:**
+- **threePerformanceManager**: Read `qualityPreset` via `getSnapshot().estimatedQuality`; subscribe for changes
+- **prefersReducedMotion**: SSR-safe read from `@/shared/animation/reduced-motion`; updated via `setReducedMotion()`
+- **Reduced motion adaptation**: Tightens environment budgets for accessibility
+- **Quality system**: 5 presets → per-preset resolution/feature budgets
+
+**Performance Decisions:**
+- O(1) Map/Set lookups for all registry queries
+- `useMemo`/`useRef` for stable hook return values
+- Selector equality via `Object.is` reference checks
+- Frozen snapshots prevent accidental mutation
+- SSR-safe: `typeof window !== 'undefined'` guards, setTimeout fallback for rAF
+
+**Future Extension Points:**
+- Actual HDRI/EXR loading happens in later phases (EnvironmentRoot renders nothing — consumers call useEnvironmentManager to configure, then load environments elsewhere)
+- HDR resolution will use `qualityProfile.maxHDRResolution` and `maxReflectionResolution`
+- Fog precision will use `qualityProfile.fogPrecision` and `constraints.maxFogDistance`
+- Environment animations will use the preset system's state management
+- Category/group budgets enable per-type resource allocation
+
+---
+
 *This document is immutable project memory. It is updated only when permanent architectural or design decisions change. It does not track progress, implementation history, or temporary state.*

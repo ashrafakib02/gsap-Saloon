@@ -16,6 +16,8 @@
  * Phase 6.2: Scene architecture — scene components, hooks, types, constants.
  * Phase 6.3: Camera system — camera components, hooks, types, constants.
  * Phase 6.4: Lighting system — lighting components, hooks, types, constants.
+ * Phase 6.5: Materials system — materials components, hooks, types, constants.
+ * Phase 6.6: Environment system — environment components, hooks, types, constants.
  */
 
 // ── Canvas ──────────────────────────────────────────────
@@ -424,3 +426,83 @@ export {
   DEFAULT_MATERIAL_CONSTRAINTS,
   DEFAULT_MATERIAL_SNAPSHOT,
 } from './materials.constants';
+
+// ── Environment Components ──────────────────────────────────
+
+export { EnvironmentRoot } from './environment-root';
+export { EnvironmentContext, useEnvironmentContext } from './environment-provider';
+
+// ── Environment Hooks ───────────────────────────────────────
+
+export { useEnvironment } from './hooks/use-environment';
+export { useEnvironmentManager } from './hooks/use-environment-manager';
+export { useEnvironmentPreset } from './hooks/use-environment-preset';
+export { useEnvironmentState } from './hooks/use-environment-state';
+export { useEnvironmentQuality } from './hooks/use-environment-quality';
+export { useEnvironmentRegistry } from './hooks/use-environment-registry';
+
+// ── Environment Hook Return Types ───────────────────────────
+
+export type { UseEnvironmentManagerReturn } from './hooks/use-environment-manager';
+export type { EnvironmentStateReturn } from './hooks/use-environment-state';
+export type { UseEnvironmentQualityReturn } from './hooks/use-environment-quality';
+
+// ── Environment Types ───────────────────────────────────────
+
+export type {
+  EnvironmentPreset,
+  EnvironmentPresetId,
+  EnvironmentCategory,
+  EnvironmentCategoryId,
+  EnvironmentGroup,
+  EnvironmentGroupId,
+  EnvironmentLayer,
+  EnvironmentLayerId,
+  EnvironmentQualityProfile,
+  EnvironmentConstraints,
+  EnvironmentMetadata,
+  EnvironmentPresetOptions,
+  EnvironmentPresetDefinition,
+  EnvironmentPresetState,
+  EnvironmentCategoryState,
+  EnvironmentGroupState,
+  EnvironmentLifecycleState,
+  EnvironmentPriority,
+  EnvironmentSnapshot,
+  EnvironmentRegistry,
+  EnvironmentManager,
+  EnvironmentSelector,
+  EnvironmentEquality,
+  EnvironmentCallback,
+  EnvironmentUnsubscribe,
+} from './environment.types';
+
+export type { EnvironmentContextValue } from './environment-provider';
+
+// ── Environment Constants ───────────────────────────────────
+
+export {
+  ENVIRONMENT_PRESETS,
+  ENVIRONMENT_CATEGORIES,
+  ENVIRONMENT_GROUPS,
+  ENVIRONMENT_LAYERS,
+  ENVIRONMENT_PRIORITIES,
+  ENVIRONMENT_LIFECYCLE_STATES,
+  ENVIRONMENT_PRESET_DESCRIPTIONS,
+  ENVIRONMENT_CATEGORY_DESCRIPTIONS,
+  ENVIRONMENT_GROUP_DESCRIPTIONS,
+  ENVIRONMENT_LAYER_DESCRIPTIONS,
+  ENVIRONMENT_PRIORITY_DESCRIPTIONS,
+  ENVIRONMENT_PRESET_ORDER,
+  ENVIRONMENT_CATEGORY_ORDER,
+  ENVIRONMENT_GROUP_ORDER,
+  ENVIRONMENT_LAYER_ORDER,
+  ENVIRONMENT_PRESET_CATEGORY,
+  ENVIRONMENT_PRESET_PRIORITY,
+  ENVIRONMENT_PRESET_GROUP,
+  ENVIRONMENT_CATEGORY_TO_GROUP,
+  DEFAULT_ACTIVE_ENVIRONMENT_PRESET,
+  DEFAULT_ENVIRONMENT_QUALITY_PROFILE,
+  DEFAULT_ENVIRONMENT_CONSTRAINTS,
+  DEFAULT_ENVIRONMENT_SNAPSHOT,
+} from './environment.constants';
