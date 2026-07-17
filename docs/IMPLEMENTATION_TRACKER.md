@@ -9,8 +9,8 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | Phase 6 — 3D Experience |
-| **Current Step** | 6.8 — Performance Budget |
-| **Overall Completion** | 32.93% (27 / 82 steps) |
+| **Current Step** | 6.9 — Mobile Fallback |
+| **Overall Completion** | 34.15% (28 / 82 steps) |
 | **Last Updated** | 2026-07-17 |
 
 ---
@@ -77,7 +77,7 @@
 | 6.5 Materials | ✅ Completed |
 | 6.6 Environment | ✅ Completed |
 | 6.7 Asset Pipeline | ✅ Completed |
-| 6.8 Performance Budget | ⬜ Not Started |
+| 6.8 Performance Budget | ✅ Completed |
 | 6.9 Mobile Fallback | ⬜ Not Started |
 | 6.10 Accessibility Fallback | ⬜ Not Started |
 

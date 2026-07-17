@@ -1120,4 +1120,56 @@ All hooks use `useSyncExternalStore` + `useRef` + equality check + `useMemo` pat
 
 ---
 
+## 28. Phase 6.8 — Performance Budget Architecture
+
+**Date:** 2026-07-17
+**Status:** Completed
+
+**What Was Built:**
+12 new files implementing the performance budget infrastructure — metadata-only budget management, no actual measurement, no FPS monitoring, no dynamic quality switching.
+
+**Files Created:**
+1. `performance-budget.types.ts` — Complete type system: BudgetCategory (18), BudgetPriority (5), BudgetLifecycle (5), BudgetMetricId (13), BudgetThresholdOperator (5), BudgetOptions/MetricOptions/BudgetProfileOptions, BudgetDefinition/MetricDefinition/BudgetProfileDefinition, BudgetRuntimeState/MetricRuntimeState/BudgetProfileRuntimeState, BudgetRecommendation, PerformanceBudgetQualityProfile, BudgetConstraints, BudgetSnapshot, BudgetRegistry, BudgetManager, subscription types
+2. `performance-budget.constants.ts` — Description records, ordering records, 5 quality profiles (per QualityPreset), default constraints, default categories (18), default metrics (13), default snapshot
+3. `performance-budget.config.ts` — Type guards (isBudgetCategory, isBudgetPriority, isBudgetLifecycle, isBudgetThresholdOperator), quality profile derivation, constraint derivation, threshold evaluation, utilization calculation, lifecycle transition validation, priority clamping
+4. `performance-budget-manager.ts` — Singleton manager: module-level Maps for budgets/metrics/profiles, RAF batching, selector subscriptions, budget/metric/profile CRUD, metric recording with linked budget updates, threshold evaluation, recommendation generation, quality/reduced-motion adaptation
+5. `performance-budget-provider.tsx` — Fast Refresh compliant context creation: PerformanceBudgetContext, PerformanceBudgetContextValue, usePerformanceBudgetContext accessor
+6. `performance-budget-root.tsx` — Lifecycle owner: reads ThreeContext, initializes performanceBudgetManager, subscribes via useSyncExternalStore, forwards quality/reduced-motion, provides PerformanceBudgetContext
+7. `hooks/use-performance-budget.ts` — Full snapshot or selector slice via useSyncExternalStore (dual overload)
+8. `hooks/use-performance-budget-manager.ts` — Memoized bound manager methods (16 methods)
+9. `hooks/use-performance-budget-state.ts` — Derived aggregate state (budgetCount, exceededCount, isHealthy, healthRatio)
+10. `hooks/use-performance-budget-metrics.ts` — Metric queries (allMetrics, metricsByCategory, getLatestValue)
+11. `hooks/use-performance-budget-quality.ts` — Quality profile info (maxFrameTime, maxDrawCalls, maxTriangles, etc.)
+12. `hooks/use-performance-budget-registry.ts` — Read-only registry queries
+
+**Architecture Decisions:**
+- **18 budget categories**: geometry, materials, textures, environment, lighting, shadows, particles, postprocessing, animation, physics, audio, network, memory, gpu, cpu, draw-calls, triangles, shader-complexity
+- **13 default metrics**: frameTime, fps, drawCalls, triangleCount, textureMemory, geometryMemory, shaderCount, materialCount, lightCount, particleCount, gpuTime, cpuTime, assetMemory
+- **5 quality profiles**: ultra/high/medium/low/minimal with per-preset target budgets (maxFrameTime, maxDrawCalls, maxTriangles, etc.)
+- **Threshold evaluation**: configurable operators (lt, lte, eq, gte, gt) for each budget
+- **Recommendation generation**: when budgets are exceeded, the manager generates recommendations with severity and suggested action categories
+- **Metric→Budget linking**: `recordMetric()` automatically updates any budgets linked to that metric via `metricId`
+- **No measurement implementation**: all values are metadata-only; future phases populate actual measurements
+
+**Integration Points:**
+- **ThreePerformanceManager**: Reads `qualityPreset` via `getSnapshot().estimatedQuality`; subscribes for changes
+- **prefersReducedMotion**: SSR-safe read from `@/shared/animation/reduced-motion`; updated via `setReducedMotion()`
+- **Provider hierarchy**: ThreeProvider → ... → AssetRoot → PerformanceBudgetRoot
+
+**Performance Decisions:**
+- O(1) Map/Set lookups for all registry queries
+- `useMemo`/`useRef` for stable hook return values
+- Selector equality via `Object.is` reference checks
+- Frozen snapshots prevent accidental mutation
+- RAF batching — one rebuild per frame across all mutations
+
+**Future Extension Points:**
+- Actual performance measurement (FPS, draw calls, etc.) happens in later phases
+- Budget profiles define per-preset limits for future dynamic quality switching
+- Recommendations can be consumed by future UI overlays or quality controllers
+- Metric recording via `recordMetric()` will be called by future measurement systems
+- Budget evaluation via `evaluate()` will be called after metrics are recorded
+
+---
+
 *This document is immutable project memory. It is updated only when permanent architectural or design decisions change. It does not track progress, implementation history, or temporary state.*

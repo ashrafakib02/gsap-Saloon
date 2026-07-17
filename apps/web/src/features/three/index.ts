@@ -589,3 +589,88 @@ export {
   DEFAULT_DEPENDENCY_GRAPH,
   DEFAULT_ASSET_SNAPSHOT,
 } from './asset.constants';
+
+// ── Performance Budget Components ──────────────────────────
+
+export { PerformanceBudgetRoot } from './performance-budget-root';
+export {
+  PerformanceBudgetContext,
+  usePerformanceBudgetContext,
+} from './performance-budget-provider';
+
+// ── Performance Budget Hooks ───────────────────────────────
+
+export { usePerformanceBudget } from './hooks/use-performance-budget';
+export { usePerformanceBudgetManager } from './hooks/use-performance-budget-manager';
+export { usePerformanceBudgetState } from './hooks/use-performance-budget-state';
+export { usePerformanceBudgetMetrics } from './hooks/use-performance-budget-metrics';
+export { usePerformanceBudgetQuality } from './hooks/use-performance-budget-quality';
+export { usePerformanceBudgetRegistry } from './hooks/use-performance-budget-registry';
+
+// ── Performance Budget Hook Return Types ───────────────────
+
+export type { UsePerformanceBudgetManagerReturn } from './hooks/use-performance-budget-manager';
+export type { BudgetStateInfo } from './hooks/use-performance-budget-state';
+export type { BudgetMetricsInfo } from './hooks/use-performance-budget-metrics';
+export type { BudgetQualityInfo } from './hooks/use-performance-budget-quality';
+
+// ── Performance Budget Types ───────────────────────────────
+
+export type {
+  BudgetCategory,
+  BudgetCategoryId,
+  BudgetPriority,
+  BudgetLifecycle,
+  BudgetMetricId,
+  BudgetThresholdOperator,
+  BudgetId,
+  MetricId,
+  BudgetProfileId,
+  BudgetOptions,
+  MetricOptions,
+  BudgetProfileOptions,
+  BudgetDefinition,
+  MetricDefinition,
+  BudgetProfileDefinition,
+  BudgetRuntimeState,
+  MetricRuntimeState,
+  BudgetProfileRuntimeState,
+  BudgetRecommendation,
+  PerformanceBudgetQualityProfile,
+  BudgetConstraints,
+  BudgetSnapshot,
+  BudgetRegistry,
+  BudgetManager,
+  BudgetSelector,
+  BudgetEquality,
+  BudgetCallback,
+  BudgetUnsubscribe,
+} from './performance-budget.types';
+
+export type { PerformanceBudgetContextValue } from './performance-budget-provider';
+
+// ── Performance Budget Constants ───────────────────────────
+
+export {
+  BUDGET_CATEGORIES,
+  BUDGET_PRIORITIES,
+  BUDGET_LIFECYCLE_STATES,
+  BUDGET_METRICS,
+  BUDGET_THRESHOLD_OPERATORS,
+} from './performance-budget.types';
+
+export {
+  BUDGET_CATEGORY_DESCRIPTIONS,
+  BUDGET_PRIORITY_DESCRIPTIONS,
+  BUDGET_LIFECYCLE_DESCRIPTIONS,
+  BUDGET_METRIC_DESCRIPTIONS,
+  BUDGET_CATEGORY_ORDER,
+  BUDGET_PRIORITY_ORDER,
+  BUDGET_LIFECYCLE_ORDER,
+  PERFORMANCE_BUDGET_QUALITY_PROFILES,
+  DEFAULT_BUDGET_CONSTRAINTS,
+  BUDGET_DEFAULT_CATEGORIES,
+  BUDGET_DEFAULT_METRICS,
+  DEFAULT_BUDGET_QUALITY_PROFILE,
+  DEFAULT_BUDGET_SNAPSHOT,
+} from './performance-budget.constants';
