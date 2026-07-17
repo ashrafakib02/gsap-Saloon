@@ -18,6 +18,7 @@
  * Phase 6.4: Lighting system — lighting components, hooks, types, constants.
  * Phase 6.5: Materials system — materials components, hooks, types, constants.
  * Phase 6.6: Environment system — environment components, hooks, types, constants.
+ * Phase 6.7: Asset Pipeline — asset components, hooks, types, constants.
  */
 
 // ── Canvas ──────────────────────────────────────────────
@@ -506,3 +507,85 @@ export {
   DEFAULT_ENVIRONMENT_CONSTRAINTS,
   DEFAULT_ENVIRONMENT_SNAPSHOT,
 } from './environment.constants';
+
+// ── Asset Components ───────────────────────────────────────
+
+export { AssetRoot } from './asset-root';
+export { AssetContext, useAssetContext } from './asset-provider';
+
+// ── Asset Hooks ────────────────────────────────────────────
+
+export { useAssets } from './hooks/use-assets';
+export { useAssetManager } from './hooks/use-asset-manager';
+export { useAssetRegistry } from './hooks/use-asset-registry';
+export { useAssetState } from './hooks/use-asset-state';
+export { useAssetProgress } from './hooks/use-asset-progress';
+export { useAssetPriority } from './hooks/use-asset-priority';
+
+// ── Asset Hook Return Types ────────────────────────────────
+
+export type { UseAssetManagerReturn } from './hooks/use-asset-manager';
+export type { AssetStateInfo } from './hooks/use-asset-state';
+export type { AssetProgressInfo } from './hooks/use-asset-progress';
+export type { AssetPriorityInfo } from './hooks/use-asset-priority';
+
+// ── Asset Types ────────────────────────────────────────────
+
+export type {
+  AssetId,
+  AssetState,
+  AssetCategory,
+  AssetCategoryId,
+  AssetPriority,
+  AssetGroupId,
+  AssetFormat,
+  AssetOptions,
+  AssetDefinition,
+  AssetBundleOptions,
+  AssetBundleDefinition,
+  AssetRuntimeState,
+  AssetBundleState,
+  AssetCategoryState,
+  AssetCacheEntry,
+  AssetDependencyNode,
+  AssetDependencyGraph,
+  AssetQualityProfile,
+  AssetConstraints,
+  AssetSnapshot,
+  AssetRegistry,
+  AssetManager,
+  AssetSelector,
+  AssetEquality,
+  AssetCallback,
+  AssetUnsubscribe,
+} from './asset.types';
+
+export type { AssetContextValue } from './asset-provider';
+
+// ── Asset Constants ────────────────────────────────────────
+
+export {
+  ASSET_STATES,
+  ASSET_CATEGORIES,
+  ASSET_PRIORITIES,
+  ASSET_GROUP_IDS,
+  COMPRESSION_TYPES,
+} from './asset.types';
+
+export {
+  ASSET_STATE_DESCRIPTIONS,
+  ASSET_CATEGORY_DESCRIPTIONS,
+  ASSET_PRIORITY_DESCRIPTIONS,
+  ASSET_GROUP_DESCRIPTIONS,
+  ASSET_STATE_ORDER,
+  ASSET_CATEGORY_ORDER,
+  ASSET_PRIORITY_ORDER,
+  ASSET_QUALITY_PROFILES,
+  DEFAULT_ASSET_CONSTRAINTS,
+  REDUCED_MOTION_ASSET_CONSTRAINTS,
+  ASSET_DEFAULT_CATEGORIES,
+  ASSET_DEFAULT_BUNDLES,
+  DEFAULT_ASSET_QUALITY_PROFILE,
+  DEFAULT_DEPENDENCY_GRAPH,
+  DEFAULT_ASSET_SNAPSHOT,
+} from './asset.constants';

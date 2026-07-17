@@ -9,9 +9,9 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | Phase 6 — 3D Experience |
-| **Current Step** | 6.7 — Asset Pipeline |
-| **Overall Completion** | 31.71% (26 / 82 steps) |
-| **Last Updated** | 2026-07-16 |
+| **Current Step** | 6.8 — Performance Budget |
+| **Overall Completion** | 32.93% (27 / 82 steps) |
+| **Last Updated** | 2026-07-17 |
 
 ---
 
@@ -76,7 +76,7 @@
 | 6.4 Lighting | ✅ Completed |
 | 6.5 Materials | ✅ Completed |
 | 6.6 Environment | ✅ Completed |
-| 6.7 Asset Loading | ⬜ Not Started |
+| 6.7 Asset Pipeline | ✅ Completed |
 | 6.8 Performance Budget | ⬜ Not Started |
 | 6.9 Mobile Fallback | ⬜ Not Started |
 | 6.10 Accessibility Fallback | ⬜ Not Started |

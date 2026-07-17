@@ -1068,4 +1068,56 @@ All hooks use `useSyncExternalStore` + `useRef` + equality check + `useMemo` pat
 
 ---
 
+## 27. Phase 6.7 — Asset Pipeline Architecture
+
+**Date:** 2026-07-17
+**Status:** Completed
+
+**What Was Built:**
+12 new files implementing the asset pipeline infrastructure — metadata-only asset management, no loading, no decoding, no network requests.
+
+**Files Created:**
+1. `asset.types.ts` — Complete type system: AssetState (7 states), AssetCategory (12), AssetPriority (6), AssetGroupId (8), AssetFormat, AssetOptions, AssetDefinition, AssetBundleOptions/Definition/RuntimeState, AssetRuntimeState, AssetDependencyNode/Graph, AssetCacheEntry, AssetQualityProfile, AssetConstraints, AssetSnapshot, AssetCategoryState, AssetRegistry, AssetManager, subscription types
+2. `asset.constants.ts` — Description records, ordering records, 5 quality profiles (per QualityPreset), default/reduced-motion constraints, default categories (12), default bundles (8), default dependency graph, default snapshot
+3. `asset.config.ts` — Type guards (isAssetState, isAssetCategory, isAssetPriority), quality profile derivation, constraint derivation, dependency validation (DFS cycle detection), topological sort, priority clamping
+4. `asset-manager.ts` — Singleton manager: module-level Maps for definitions/states/bundles/categories/cache, RAF batching, selector subscriptions, asset CRUD, bundle CRUD, dependency graph computation, cache management, quality/reduced-motion adaptation, 20+ registry query methods
+5. `asset-provider.tsx` — Fast Refresh compliant context creation (no JSX): AssetContext, AssetContextValue interface, useAssetContext accessor
+6. `asset-root.tsx` — Lifecycle owner: reads ThreeContext, initializes assetManager, subscribes via useSyncExternalStore, forwards quality/reduced-motion, provides AssetContext
+7. `hooks/use-assets.ts` — Full snapshot or selector slice via useSyncExternalStore (dual overload)
+8. `hooks/use-asset-manager.ts` — Memoized bound manager methods (22 methods)
+9. `hooks/use-asset-registry.ts` — Read-only registry queries
+10. `hooks/use-asset-state.ts` — Derived aggregate state (counts, memory, isComplete, hasFailures)
+11. `hooks/use-asset-progress.ts` — Progress tracking (overall, per-bundle, per-category)
+12. `hooks/use-asset-priority.ts` — Priority-based queries (criticalLoaded, criticalAndHighLoaded, pending counts)
+
+**Architecture Decisions:**
+- **No active preset** — Assets have no single active preset; quality flows through `qualityProfile` in the snapshot
+- **Dependency graph** — Unique to assets: DFS cycle detection, topological sort, `dependenciesMet` per asset
+- **Cache entries** — Metadata-only cache model (cache key, version, hash, memory estimate, compression type, resident flag, last access, reference count)
+- **Bundle system** — Groups assets by scene section; bundles compute their own progress from child asset states
+- **Asset state machine** — registered → queued → loading → loaded → ready → disposed (with failed as error state)
+- **Priority system** — 6 levels (critical through idle); `useAssetPriority` hook derives criticalLoaded/criticalAndHighLoaded
+
+**Integration Points:**
+- **ThreePerformanceManager**: Reads `qualityPreset` via `getSnapshot().estimatedQuality`; subscribes for changes
+- **prefersReducedMotion**: SSR-safe read from `@/shared/animation/reduced-motion`; updated via `setReducedMotion()`
+- **Provider hierarchy**: ThreeProvider → ThreeCanvas → SceneRoot → CameraRoot → LightingRoot → MaterialsRoot → EnvironmentRoot → AssetRoot
+
+**Performance Decisions:**
+- O(1) Map/Set lookups for all registry queries
+- `useMemo`/`useRef` for stable hook return values
+- Selector equality via `Object.is` reference checks
+- Frozen snapshots prevent accidental mutation
+- RAF batching — one rebuild per frame across all mutations
+- Dependency graph rebuilt on each snapshot (efficient for moderate asset counts)
+
+**Future Extension Points:**
+- Actual asset loading (GLTF, textures, audio) happens in later phases
+- Loader hints in `AssetDefinition.loaderHint` guide future loader selection
+- `AssetFormat` type supports any format string (gltf, glb, png, jpg, etc.)
+- Bundle `maxConcurrent` controls parallel loading when loading is implemented
+- Cache entries store metadata for future browser cache integration
+
+---
+
 *This document is immutable project memory. It is updated only when permanent architectural or design decisions change. It does not track progress, implementation history, or temporary state.*
