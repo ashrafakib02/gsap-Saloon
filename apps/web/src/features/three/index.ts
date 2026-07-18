@@ -21,6 +21,7 @@
  * Phase 6.7: Asset Pipeline — asset components, hooks, types, constants.
  * Phase 6.8: Performance Budget — budget components, hooks, types, constants.
  * Phase 6.9: Mobile Fallback — fallback components, hooks, types, constants.
+ * Phase 6.10: Accessibility Fallback — accessibility components, hooks, types, constants.
  */
 
 // ── Canvas ──────────────────────────────────────────────
@@ -752,3 +753,83 @@ export {
   DEFAULT_COMPATIBILITY_MATRIX,
   DEFAULT_MOBILE_FALLBACK_SNAPSHOT,
 } from './mobile-fallback.constants';
+
+// ── Accessibility Fallback Components ─────────────────────────
+
+export { AccessibilityFallbackRoot } from './accessibility-fallback-root';
+export {
+  AccessibilityFallbackContext,
+  useAccessibilityFallbackContext,
+} from './accessibility-fallback-provider';
+
+// ── Accessibility Fallback Hooks ──────────────────────────────
+
+export { useAccessibilityFallback } from './hooks/use-accessibility-fallback';
+export { useAccessibilityFallbackManager } from './hooks/use-accessibility-fallback-manager';
+export { useAccessibilityProfile } from './hooks/use-accessibility-profile';
+export { useAccessibilityCapabilities } from './hooks/use-accessibility-capabilities';
+export { useAccessibilityPreferences } from './hooks/use-accessibility-preferences';
+export { useAccessibilityRegistry } from './hooks/use-accessibility-registry';
+
+// ── Accessibility Fallback Hook Return Types ──────────────────
+
+export type { UseAccessibilityFallbackManagerReturn } from './hooks/use-accessibility-fallback-manager';
+export type { AccessibilityProfileInfo } from './hooks/use-accessibility-profile';
+export type { AccessibilityCapabilitiesInfo } from './hooks/use-accessibility-capabilities';
+export type { AccessibilityPreferencesInfo } from './hooks/use-accessibility-preferences';
+export type { AccessibilityRegistryInfo } from './hooks/use-accessibility-registry';
+
+// ── Accessibility Fallback Types ──────────────────────────────
+
+export type {
+  AccessibilityProfile,
+  AccessibilityCategory,
+  AccessibilityStrategy,
+  AccessibilityLifecycle,
+  AccessibilityCapabilityProfile,
+  AccessibilityPreference,
+  AccessibilityRule,
+  AccessibilityCompatibilityEntry,
+  AccessibilityCapabilityEntry,
+  AccessibilityRecommendation,
+  AccessibilitySnapshot,
+  AccessibilityRegistry,
+  AccessibilityFallbackManager,
+  AccessibilitySelector,
+  AccessibilityEquality,
+  AccessibilityCallback,
+  AccessibilityUnsubscribe,
+} from './accessibility-fallback.types';
+
+export type { AccessibilityFallbackContextValue } from './accessibility-fallback-provider';
+
+// ── Accessibility Fallback Constants ──────────────────────────
+
+export {
+  ACCESSIBILITY_PROFILES,
+  ACCESSIBILITY_CATEGORIES,
+  ACCESSIBILITY_STRATEGIES,
+  ACCESSIBILITY_LIFECYCLE_STATES,
+} from './accessibility-fallback.types';
+
+export {
+  ACCESSIBILITY_PROFILE_DESCRIPTIONS,
+  ACCESSIBILITY_CATEGORY_DESCRIPTIONS,
+  ACCESSIBILITY_STRATEGY_DESCRIPTIONS,
+  ACCESSIBILITY_LIFECYCLE_DESCRIPTIONS,
+  ACCESSIBILITY_PROFILE_ORDER,
+  ACCESSIBILITY_CATEGORY_ORDER,
+  ACCESSIBILITY_STRATEGY_ORDER,
+  DEFAULT_ACCESSIBILITY_PROFILE,
+  REDUCED_MOTION_ACCESSIBILITY_PROFILE,
+  HIGH_CONTRAST_ACCESSIBILITY_PROFILE,
+  KEYBOARD_ACCESSIBILITY_PROFILE,
+  SCREEN_READER_ACCESSIBILITY_PROFILE,
+  LOW_VISION_ACCESSIBILITY_PROFILE,
+  CUSTOM_ACCESSIBILITY_PROFILE,
+  ACCESSIBILITY_PROFILES_MAP,
+  DEFAULT_ACCESSIBILITY_RULES,
+  DEFAULT_ACCESSIBILITY_PREFERENCES,
+  DEFAULT_ACCESSIBILITY_COMPATIBILITY,
+  DEFAULT_ACCESSIBILITY_SNAPSHOT,
+} from './accessibility-fallback.constants';

@@ -1223,4 +1223,59 @@ All hooks use `useSyncExternalStore` + `useRef` + equality check + `useMemo` pat
 
 ---
 
+## 30. Phase 6.10 — Accessibility Fallback Architecture
+
+**Date:** 2026-07-18
+**Status:** Completed
+
+**What Was Built:**
+12 new files implementing the accessibility fallback infrastructure — metadata-only accessibility profiling, capability management, preference resolution, WCAG-aligned rule evaluation, and recommendation generation. No runtime accessibility behavior.
+
+**Files Created:**
+1. `accessibility-fallback.types.ts` — Complete type system: AccessibilityProfile (7 profiles), AccessibilityCategory (22), AccessibilityStrategy (7), AccessibilityLifecycle (5), AccessibilityCapabilityProfile, AccessibilityPreference, AccessibilityRule, AccessibilityCompatibilityEntry, AccessibilityCapabilityEntry, AccessibilityRecommendation, AccessibilitySnapshot (immutable, revision-counted), AccessibilityRegistry (20+ query methods), AccessibilityFallbackManager, subscription types (Selector/Equality/Callback/Unsubscribe)
+2. `accessibility-fallback.constants.ts` — 4 description records (profiles, categories, strategies, lifecycles), 3 ordering records, 7 accessibility profiles with per-category strategy mappings and WCAG budgets, 18 default rules with WCAG references, 7 default preferences, 6 compatibility entries, default snapshot
+3. `accessibility-fallback.config.ts` — Type guards, profile lookup, capability derivation, strategy derivation with high-contrast/reduced-motion overrides, rule evaluation, recommendation generation (severity: info/warning/critical), compatibility evaluation, preference resolution, capability counts
+4. `accessibility-fallback-manager.ts` — Singleton manager: module-level Maps for profiles/rules/preferences/compatibilityEntries, RAF batching, selector subscriptions, integrates with ThreePerformanceManager, MobileFallbackManager, prefersReducedMotion, and high-contrast media query
+5. `accessibility-fallback-provider.tsx` — Fast Refresh compliant context creation: AccessibilityFallbackContext, AccessibilityFallbackContextValue, useAccessibilityFallbackContext accessor
+6. `accessibility-fallback-root.tsx` — Lifecycle owner: reads ThreeContext, initializes accessibilityFallbackManager, subscribes via useSyncExternalStore, forwards isReducedMotion/isHighContrast, provides AccessibilityFallbackContext
+7. `hooks/use-accessibility-fallback.ts` — Full snapshot or selector slice via useSyncExternalStore (dual overload)
+8. `hooks/use-accessibility-fallback-manager.ts` — Memoized bound manager methods (12 methods)
+9. `hooks/use-accessibility-profile.ts` — Active profile info with 7 per-profile booleans and WCAG requirements
+10. `hooks/use-accessibility-capabilities.ts` — Derived capability state with convenience booleans
+11. `hooks/use-accessibility-preferences.ts` — Resolved preference information with 7 per-preference booleans
+12. `hooks/use-accessibility-registry.ts` — Read-only registry queries (20 methods)
+
+**Architecture Decisions:**
+- **7 accessibility profiles**: default, reduced-motion, high-contrast, keyboard, screen-reader, low-vision, custom — each maps all 22 categories to strategies
+- **22 accessibility categories**: motion, animation, camera, lighting, materials, environment, particles, audio, captions, transcripts, keyboard, focus, navigation, screen-reader, contrast, text, touch, gesture, pointer, timing, feedback, debug
+- **7 accessibility strategies** (metadata only): enabled, disabled, simplified, alternative, reduced, substituted, enhanced — these are recommendations, not runtime decisions
+- **WCAG-aligned rules**: 18 default rules with explicit WCAG success criterion references (2.3.3, 1.4.6, 2.4.7, 2.4.1, 2.1.1, 1.1.1, 1.2.2, 1.2.1, 1.4.4, 2.5.5, 4.1.3, 2.2.1)
+- **WCAG budgets per profile**: minContrastRatio (AA=4.5, AAA=7), minTouchTargetSize (WCAG 2.5.5=44px), maxAnimationDuration (0=no animation), maxConcurrentAnimations
+- **High-contrast overrides**: when `prefers-contrast: more` is active, visual categories (contrast, text, focus) are enhanced; materials/environment are simplified
+- **Reduced-motion overrides**: when `prefers-reduced-motion: reduce` is active, animation categories are disabled, camera is simplified
+- **Recommendation severity**: critical (disabled on screen-reader/keyboard), warning (disabled or substituted), info (everything else)
+- **Integration**: ThreePerformanceManager (quality), MobileFallbackManager (mobile compatibility), prefersReducedMotion (SSR-safe), high-contrast media query (real-time)
+
+**Integration Points:**
+- **ThreePerformanceManager**: Reads quality preset; subscribes for changes
+- **MobileFallbackManager**: Reads mobile profile; subscribes for mobile-specific adaptations
+- **prefersReducedMotion**: SSR-safe read from `@/shared/animation/reduced-motion`; updated via `setReducedMotion()`
+- **High-contrast media query**: Real-time `(prefers-contrast: more)` listener; updated via `setHighContrast()`
+- **Provider hierarchy**: ThreeProvider → ... → AssetRoot → PerformanceBudgetRoot → MobileFallbackRoot → AccessibilityFallbackRoot
+
+**Performance Decisions:**
+- O(1) Map/Set lookups for all registry queries
+- `useMemo`/`useRef` for stable hook return values
+- Selector equality via `Object.is` reference checks
+- Frozen snapshots prevent accidental mutation
+- RAF batching — one rebuild per frame across all mutations
+
+**Future Extension Points:**
+- Actual runtime accessibility behavior (focus management, keyboard handlers, ARIA) will be implemented in later phases consuming the metadata
+- Custom profiles, rules, preferences, and compatibility entries can be registered/unregistered at runtime
+- The registry supports dynamic extension beyond the 22 built-in categories
+- WCAG references in rules provide documentation anchors for future audit systems
+
+---
+
 *This document is immutable project memory. It is updated only when permanent architectural or design decisions change. It does not track progress, implementation history, or temporary state.*
