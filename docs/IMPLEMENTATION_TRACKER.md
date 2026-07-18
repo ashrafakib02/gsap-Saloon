@@ -9,8 +9,8 @@
 | Field | Value |
 |-------|-------|
 | **Current Phase** | Phase 6 — 3D Experience |
-| **Current Step** | 6.9 — Mobile Fallback |
-| **Overall Completion** | 34.15% (28 / 82 steps) |
+| **Current Step** | 6.10 — Accessibility Fallback |
+| **Overall Completion** | 35.37% (29 / 82 steps) |
 | **Last Updated** | 2026-07-17 |
 
 ---
@@ -78,7 +78,7 @@
 | 6.6 Environment | ✅ Completed |
 | 6.7 Asset Pipeline | ✅ Completed |
 | 6.8 Performance Budget | ✅ Completed |
-| 6.9 Mobile Fallback | ⬜ Not Started |
+| 6.9 Mobile Fallback | ✅ Completed |
 | 6.10 Accessibility Fallback | ⬜ Not Started |
 
 ---
@@ -230,7 +230,7 @@
 | 6.6 | Environment | ✅ Completed | Frontend Architect | P2 | 6.2 | Medium |
 | 6.7 | Asset Loading | ⬜ Not Started | Frontend Architect | P2 | 6.1 | Medium |
 | 6.8 | Performance Budget | ⬜ Not Started | Frontend Architect | P2 | 6.1 | High |
-| 6.9 | Mobile Fallback | ⬜ Not Started | Frontend Architect | P2 | 6.1 | Medium |
+| 6.9 | Mobile Fallback | ✅ Completed | Frontend Architect | P2 | 6.1 | Medium |
 | 6.10 | Accessibility Fallback | ⬜ Not Started | Frontend Architect | P2 | 6.1 | Low |
 | 7.1 | Services | ⬜ Not Started | Frontend Architect | P0 | 3.3, 3.7 | High |
 | 7.2 | Gallery | ⬜ Not Started | Frontend Architect | P1 | 3.3 | Medium |
@@ -384,7 +384,10 @@ Built the complete environment architecture in `features/three/`. Infrastructure
 
 ---
 
-### 2026-07-13
+**Phase 6.9 — Mobile Fallback**
+Status: Completed
+
+Built the complete mobile fallback architecture in `features/three/`. Metadata only — no runtime switching, no actual rendering changes. Models device tiers, capability categories, fallback strategies, feature flags, compatibility rules, and recommendation generation. Created 12 new files in `features/three/` + 6 hooks. **Types** (`mobile-fallback.types.ts`): Complete type system — 6 mobile profiles (ultra/high/medium/low/minimal/unknown), 19 capability categories (camera/lighting/materials/environment/assets/particles/animations/postprocessing/shadows/audio/physics/interactions/helpers/debug/memory/gpu/cpu/network/battery), 7 fallback strategies (enabled/disabled/simplified/reduced/deferred/placeholder/minimal), plus MobileCapabilityProfile, MobileFallbackRule, MobileFeatureFlag, MobileCompatibilityEntry, MobileCapabilityEntry, MobileFallbackRecommendation, MobileFallbackSnapshot (immutable, revision-counted), MobileFallbackRegistry (20+ query methods), MobileFallbackManager, selector/equality/callback/unsubscribe types. All readonly, no any. **Constants** (`mobile-fallback.constants.ts`): 3 description records (profiles, categories, strategies), 3 ordering records, 6 tier profiles with per-category strategy mappings and hardware budgets (maxParticles, maxLights, maxTextureResolution, maxPolygons, maxDrawCalls, maxAnimations), 15 default fallback rules, 7 default feature flags with per-tier Maps, 5 default compatibility matrix entries, default snapshot. **Config** (`mobile-fallback.config.ts`): Pure derivation functions — type guards (isMobileProfile/isMobileCapabilityCategory/isMobileFallbackStrategy), profile derivation (DeviceTier+QualityPreset → MobileProfile, taking more conservative), tier profile lookup, capability derivation, strategy derivation with reduced-motion overrides, rule evaluation and recommendation generation (severity: info/warning/critical), compatibility evaluation, feature flag resolution, capability counts by strategy. **Manager (`mobile-fallback-manager.ts`)**: Singleton following exact progressive-reveal-manager pattern — module-level Maps for profiles/rules/featureFlags/compatibilityEntries, Sets for subscribers/selector subscribers, RAF batching (one rebuildSnapshot per frame), immutable frozen snapshots, selector-based subscriptions. Integrates with threePerformanceManager for quality/tier changes and prefersReducedMotion for SSR-safe reads. **React Components (2)**: MobileFallbackRoot (lifecycle owner, reads ThreeContext, initializes mobileFallbackManager, provides MobileFallbackContext — renders INSIDE PerformanceBudgetRoot), MobileFallbackContext (context creation, no JSX, Fast Refresh compliant). **6 Hooks**: useMobileFallback (full snapshot or selector slice via useSyncExternalStore with useRef equality), useMobileFallbackManager (memoized bound methods — 12 methods), useMobileCapabilities (derived capability state with convenience booleans), useMobileProfile (active profile info with per-tier booleans), useMobileQuality (quality-derived info with feature flags, compatibility, recommendations), useMobileRegistry (read-only registry queries — 20 methods). **Files Created**: mobile-fallback.types.ts, mobile-fallback.constants.ts, mobile-fallback.config.ts, mobile-fallback-manager.ts, mobile-fallback-provider.tsx, mobile-fallback-root.tsx, hooks/use-mobile-fallback.ts, hooks/use-mobile-fallback-manager.ts, hooks/use-mobile-capabilities.ts, hooks/use-mobile-profile.ts, hooks/use-mobile-quality.ts, hooks/use-mobile-registry.ts. **Files Modified**: index.ts (added Mobile Fallback Components, Mobile Fallback Hooks, Mobile Fallback Hook Return Types, Mobile Fallback Types, Mobile Fallback Constants sections). **Verification**: TypeScript strict mode clean (zero mobile-fallback errors), ESLint clean (zero warnings), all pre-existing errors only in hero/dev files.
 
 **Phase 3.1 — Project Scaffold**
 Status: Completed

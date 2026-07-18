@@ -1172,4 +1172,55 @@ All hooks use `useSyncExternalStore` + `useRef` + equality check + `useMemo` pat
 
 ---
 
+## 29. Phase 6.9 — Mobile Fallback Architecture
+
+**Date:** 2026-07-18
+**Status:** Completed
+
+**What Was Built:**
+12 new files implementing the mobile fallback infrastructure — metadata-only device tier profiling, capability management, fallback strategy modeling, and recommendation generation. No runtime switching, no actual rendering adaptation.
+
+**Files Created:**
+1. `mobile-fallback.types.ts` — Complete type system: MobileProfile (6 tiers), MobileCapabilityCategory (19), MobileFallbackStrategy (7), MobileCapabilityProfile, MobileFallbackRule, MobileFeatureFlag, MobileCompatibilityEntry, MobileCapabilityEntry, MobileFallbackRecommendation, MobileFallbackSnapshot (immutable, revision-counted), MobileFallbackRegistry (20+ query methods), MobileFallbackManager, subscription types (Selector/Equality/Callback/Unsubscribe)
+2. `mobile-fallback.constants.ts` — 3 description records (profiles, categories, strategies), 3 ordering records, 6 tier profiles with per-category strategy mappings and hardware budgets, 15 default fallback rules, 7 default feature flags with per-tier Maps, 5 default compatibility matrix entries, default snapshot
+3. `mobile-fallback.config.ts` — Type guards (isMobileProfile/isMobileCapabilityCategory/isMobileFallbackStrategy), profile derivation (DeviceTier+QualityPreset → MobileProfile, taking more conservative), tier profile lookup, capability derivation, strategy derivation with reduced-motion overrides, rule evaluation, recommendation generation (severity: info/warning/critical), compatibility evaluation, feature flag resolution, capability counts by strategy
+4. `mobile-fallback-manager.ts` — Singleton manager: module-level Maps for profiles/rules/featureFlags/compatibilityEntries, Sets for subscribers/selector subscribers, RAF batching, immutable frozen snapshots, selector-based subscriptions, integrates with ThreePerformanceManager and prefersReducedMotion
+5. `mobile-fallback-provider.tsx` — Fast Refresh compliant context creation: MobileFallbackContext, MobileFallbackContextValue, useMobileFallbackContext accessor
+6. `mobile-fallback-root.tsx` — Lifecycle owner: reads ThreeContext, initializes mobileFallbackManager, subscribes via useSyncExternalStore, forwards isReducedMotion, provides MobileFallbackContext
+7. `hooks/use-mobile-fallback.ts` — Full snapshot or selector slice via useSyncExternalStore (dual overload)
+8. `hooks/use-mobile-fallback-manager.ts` — Memoized bound manager methods (12 methods)
+9. `hooks/use-mobile-capabilities.ts` — Derived capability state with convenience booleans (enables3D/PostProcessing/Shadows)
+10. `hooks/use-mobile-profile.ts` — Active profile info with per-tier booleans and hardware budgets
+11. `hooks/use-mobile-quality.ts` — Quality-derived info: feature flags, compatibility, recommendations, severity checks
+12. `hooks/use-mobile-registry.ts` — Read-only registry queries (20 methods)
+
+**Architecture Decisions:**
+- **6 device tiers** (MobileProfile): ultra, high, medium, low, minimal, unknown — distinct from the existing `DeviceTier` (desktop-high, desktop-standard, tablet, mobile, low-end, unknown). MobileProfile is derived FROM DeviceTier+QualityPreset but represents a different axis (architectural tier vs device classification)
+- **19 capability categories**: camera, lighting, materials, environment, assets, particles, animations, postprocessing, shadows, audio, physics, interactions, helpers, debug, memory, gpu, cpu, network, battery
+- **7 fallback strategies** (metadata only): enabled, disabled, simplified, reduced, deferred, placeholder, minimal — these are recommendations, not runtime decisions
+- **Conservative derivation**: `deriveMobileProfile(deviceTier, qualityPreset)` takes the more constrained of the two — if the device is capable but quality is low, use low; if quality is high but device is constrained, use constrained
+- **Reduced motion overrides**: when `isReducedMotion` is true, strategies tighten one step (enabled→simplified→reduced→minimal)
+- **Recommendation severity**: critical (disabled on minimal/unknown), warning (disabled or placeholder), info (everything else)
+- **Registry model**: `getRegistry()` returns a frozen facade over the current snapshot, supporting 20+ query methods for categories, strategies, features, rules, and compatibility
+
+**Integration Points:**
+- **ThreePerformanceManager**: Reads `deviceTier` and `estimatedQuality` from performance snapshot; subscribes for changes
+- **prefersReducedMotion**: SSR-safe read from `@/shared/animation/reduced-motion`; updated via `setReducedMotion()`
+- **Provider hierarchy**: ThreeProvider → ... → AssetRoot → PerformanceBudgetRoot → MobileFallbackRoot
+
+**Performance Decisions:**
+- O(1) Map/Set lookups for all registry queries
+- `useMemo`/`useRef` for stable hook return values
+- Selector equality via `Object.is` reference checks
+- Frozen snapshots prevent accidental mutation
+- RAF batching — one rebuild per frame across all mutations
+
+**Future Extension Points:**
+- Actual runtime switching (if ever needed) would be implemented in a later phase consuming the metadata
+- Custom rules, feature flags, and compatibility entries can be registered/unregistered at runtime
+- The registry supports dynamic extension beyond the 19 built-in categories
+- Future phases (6.10 Accessibility Fallback) will interoperate via the compatibility matrix
+
+---
+
 *This document is immutable project memory. It is updated only when permanent architectural or design decisions change. It does not track progress, implementation history, or temporary state.*

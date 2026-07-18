@@ -19,6 +19,8 @@
  * Phase 6.5: Materials system — materials components, hooks, types, constants.
  * Phase 6.6: Environment system — environment components, hooks, types, constants.
  * Phase 6.7: Asset Pipeline — asset components, hooks, types, constants.
+ * Phase 6.8: Performance Budget — budget components, hooks, types, constants.
+ * Phase 6.9: Mobile Fallback — fallback components, hooks, types, constants.
  */
 
 // ── Canvas ──────────────────────────────────────────────
@@ -674,3 +676,79 @@ export {
   DEFAULT_BUDGET_QUALITY_PROFILE,
   DEFAULT_BUDGET_SNAPSHOT,
 } from './performance-budget.constants';
+
+// ── Mobile Fallback Components ────────────────────────────────
+
+export { MobileFallbackRoot } from './mobile-fallback-root';
+export {
+  MobileFallbackContext,
+  useMobileFallbackContext,
+} from './mobile-fallback-provider';
+
+// ── Mobile Fallback Hooks ─────────────────────────────────────
+
+export { useMobileFallback } from './hooks/use-mobile-fallback';
+export { useMobileFallbackManager } from './hooks/use-mobile-fallback-manager';
+export { useMobileCapabilities } from './hooks/use-mobile-capabilities';
+export { useMobileProfile } from './hooks/use-mobile-profile';
+export { useMobileQuality } from './hooks/use-mobile-quality';
+export { useMobileRegistry } from './hooks/use-mobile-registry';
+
+// ── Mobile Fallback Hook Return Types ─────────────────────────
+
+export type { UseMobileFallbackManagerReturn } from './hooks/use-mobile-fallback-manager';
+export type { MobileCapabilitiesInfo } from './hooks/use-mobile-capabilities';
+export type { MobileProfileInfo } from './hooks/use-mobile-profile';
+export type { MobileQualityInfo } from './hooks/use-mobile-quality';
+export type { MobileRegistryInfo } from './hooks/use-mobile-registry';
+
+// ── Mobile Fallback Types ─────────────────────────────────────
+
+export type {
+  MobileProfile,
+  MobileCapabilityCategory,
+  MobileFallbackStrategy,
+  MobileCapabilityProfile,
+  MobileFallbackRule,
+  MobileFeatureFlag,
+  MobileCompatibilityEntry,
+  MobileCapabilityEntry,
+  MobileFallbackRecommendation,
+  MobileFallbackSnapshot,
+  MobileFallbackRegistry,
+  MobileFallbackManager,
+  MobileFallbackSelector,
+  MobileFallbackEquality,
+  MobileFallbackCallback,
+  MobileFallbackUnsubscribe,
+} from './mobile-fallback.types';
+
+export type { MobileFallbackContextValue } from './mobile-fallback-provider';
+
+// ── Mobile Fallback Constants ─────────────────────────────────
+
+export {
+  MOBILE_PROFILES,
+  MOBILE_CAPABILITY_CATEGORIES,
+  MOBILE_FALLBACK_STRATEGIES,
+} from './mobile-fallback.types';
+
+export {
+  MOBILE_PROFILE_DESCRIPTIONS,
+  MOBILE_CAPABILITY_CATEGORY_DESCRIPTIONS,
+  MOBILE_FALLBACK_STRATEGY_DESCRIPTIONS,
+  MOBILE_PROFILE_ORDER,
+  MOBILE_CAPABILITY_CATEGORY_ORDER,
+  MOBILE_FALLBACK_STRATEGY_ORDER,
+  ULTRA_TIER_PROFILE,
+  HIGH_TIER_PROFILE,
+  MEDIUM_TIER_PROFILE,
+  LOW_TIER_PROFILE,
+  MINIMAL_TIER_PROFILE,
+  UNKNOWN_TIER_PROFILE,
+  MOBILE_TIER_PROFILES,
+  DEFAULT_FALLBACK_RULES,
+  DEFAULT_FEATURE_FLAGS,
+  DEFAULT_COMPATIBILITY_MATRIX,
+  DEFAULT_MOBILE_FALLBACK_SNAPSHOT,
+} from './mobile-fallback.constants';
