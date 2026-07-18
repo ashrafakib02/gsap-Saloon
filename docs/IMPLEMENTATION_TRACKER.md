@@ -8,10 +8,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Current Phase** | Phase 6 — 3D Experience |
-| **Current Step** | 7.1 — Core Asset Loading |
+| **Current Phase** | Phase 7 — Content Sections |
+| **Current Step** | 7.1 — Services |
 | **Overall Completion** | 36.59% (30 / 82 steps) |
-| **Last Updated** | 2026-07-17 |
+| **Last Updated** | 2026-07-18 |
 
 ---
 
@@ -66,7 +66,7 @@
 
 ### Phase 6 — 3D Experience
 
-**Status:** In Progress
+**Status:** ✅ Completed
 
 | Step | Status |
 |------|--------|
@@ -80,6 +80,8 @@
 | 6.8 Performance Budget | ✅ Completed |
 | 6.9 Mobile Fallback | ✅ Completed |
 | 6.10 Accessibility Fallback | ✅ Completed |
+
+**Scope note:** Per VISUAL_RULES.md D1/D4, this phase's 3D infrastructure (camera, lighting, materials, environment) is atmospheric-only — volumetric light, haze, depth layering. It does not and should not render literal 3D objects (furniture, product models). All salon imagery (chairs, mirrors, shelves, bottles, plants, etc.) is real photography per MOODBOARD.md, produced through the Content Sections phase below, not modeled as 3D geometry.
 
 ---
 
@@ -218,18 +220,18 @@
 | 4.7 | Hero Performance | ✅ Completed | Frontend Architect | P0 | 4.1 | High |
 | 5.1 | Narrative Structure | ✅ Completed | Frontend Architect | P0 | 4.1, 3.3 | Medium |
 | 5.2 | Section Transitions | ✅ Completed | Frontend Architect | P0 | 5.1, 3.5 | Medium |
-| 5.3 | Scroll Timeline | ⬜ Not Started | Frontend Architect | P0 | 5.1 | Medium |
+| 5.3 | Scroll Timeline | ✅ Completed | Frontend Architect | P0 | 5.1 | Medium |
 | 5.4 | Scroll Triggers | ✅ Completed | Frontend Architect | P0 | 5.3 | Medium |
 | 5.5 | Scroll State | ✅ Completed | Frontend Architect | P1 | 5.3 | Low |
-| 5.6 | Progressive Reveal | ⬜ Not Started | Frontend Architect | P0 | 5.2, 5.4 | Medium |
-| 6.1 | React Three Fiber Setup | ⬜ Not Started | Frontend Architect | P2 | 3.2 | Medium |
+| 5.6 | Progressive Reveal | ✅ Completed | Frontend Architect | P0 | 5.2, 5.4 | Medium |
+| 6.1 | React Three Fiber Setup | ✅ Completed | Frontend Architect | P2 | 3.2 | Medium |
 | 6.2 | Scene Architecture | ✅ Completed | Frontend Architect | P2 | 6.1 | High |
 | 6.3 | Camera System | ✅ Completed | Frontend Architect | P2 | 6.2 | Medium |
 | 6.4 | Lighting | ✅ Completed | Frontend Architect | P2 | 6.2 | Medium |
 | 6.5 | Materials | ✅ Completed | Frontend Architect | P2 | 6.2 | Medium |
 | 6.6 | Environment | ✅ Completed | Frontend Architect | P2 | 6.2 | Medium |
-| 6.7 | Asset Loading | ⬜ Not Started | Frontend Architect | P2 | 6.1 | Medium |
-| 6.8 | Performance Budget | ⬜ Not Started | Frontend Architect | P2 | 6.1 | High |
+| 6.7 | Asset Pipeline | ✅ Completed | Frontend Architect | P2 | 6.1 | Medium |
+| 6.8 | Performance Budget | ✅ Completed | Frontend Architect | P2 | 6.1 | High |
 | 6.9 | Mobile Fallback | ✅ Completed | Frontend Architect | P2 | 6.1 | Medium |
 | 6.10 | Accessibility Fallback | ✅ Completed | Frontend Architect | P2 | 6.1 | Low |
 | 7.1 | Services | ⬜ Not Started | Frontend Architect | P0 | 3.3, 3.7 | High |
@@ -288,6 +290,18 @@
 ---
 
 ## Changelog
+
+### 2026-07-18
+
+**Phase 6.7 — Asset Pipeline**
+Status: Completed
+
+Built the complete asset pipeline architecture in `features/three/`. Infrastructure only — no actual asset loading, decoding, fetching, or parsing. **Asset Model**: 12 asset categories (models, textures, materials, environment, audio, animations, fonts, videos, UI, icons, debug, future-custom), 6 priority levels (critical → idle), 8 asset groups (hero, intro, services, gallery, booking, footer, global, debug), 7 lifecycle states (registered → queued → loading → loaded → ready → failed → disposed), 7 compression types (none, draco, ktx2, meshopt, basis, gzip, brotli). **Manager (`asset-manager.ts`)**: Singleton following exact environment-manager pattern — module-level Maps for asset definitions/states, bundle definitions/states, category states, cache entries, Sets for subscribers/selector subscribers, RAF batching (one rebuildSnapshot per frame), immutable frozen snapshots, selector-based subscriptions. Manages asset registration (idempotent by ID), lifecycle state transitions, bundle coordination, dependency graph construction (cycle detection, topological sort), cache entry metadata, quality adaptation (5 presets — texture budgets, polygon budgets, concurrent load limits, memory budgets), reduced-motion adaptation (tightened constraints). Integrates with threePerformanceManager for quality and prefersReducedMotion for SSR-safe reads. **Config (`asset.config.ts`)**: Pure derivation functions — type guards for AssetCategory/AssetPriority/AssetState, quality profile derivation (5 quality presets → texture size, polygon count, concurrent loads, memory limits, feature enable flags), constraint derivation with reduced-motion adaptation, dependency graph validation (DFS cycle detection), topological sort for load ordering, priority clamping. **Constants (`asset.constants.ts`)**: 4 description records, 4 ordering records, 5 quality profiles (ultra: 4096px textures, 2M polygons, 8 concurrent loads, 512MB memory → minimal: 256px textures, 50K polygons, 1 concurrent load, 32MB memory), default constraints (200 assets, 2GB memory, 256MB per asset, depth 10, 32 per bundle, 16 bundles), 12 default categories, 8 default bundles, default snapshot. **React Components (2)**: AssetRoot (lifecycle owner, reads ThreeContext, initializes assetManager, provides AssetContext — renders inside MaterialsRoot), AssetContext (context creation, no JSX, Fast Refresh compliant). **6 Hooks**: useAssets (full snapshot or selector slice via useSyncExternalStore), useAssetManager (memoized bound methods — 14 methods), useAssetState (derived asset counts, memory totals, progress), useAssetProgress (per-bundle progress/state, per-category counts), useAssetPriority (priority-based groupings, critical/high loaded states), useAssetRegistry (read-only registry queries — 18 methods). **Types** (`asset.types.ts`): Complete type system — 7 union constants + 15 interfaces (AssetOptions, AssetDefinition, AssetBundleOptions/Definition/State, AssetRuntimeState, AssetDependencyNode/Graph, AssetCacheEntry, AssetQualityProfile, AssetConstraints, AssetSnapshot, AssetRegistry, AssetManager). All readonly, no any. **Files Created**: asset.types.ts, asset.constants.ts, asset.config.ts, asset-manager.ts, asset-provider.tsx, asset-root.tsx, hooks/use-assets.ts, hooks/use-asset-manager.ts, hooks/use-asset-state.ts, hooks/use-asset-progress.ts, hooks/use-asset-priority.ts, hooks/use-asset-registry.ts. **Files Modified**: index.ts (added Asset Pipeline Components, Asset Pipeline Hooks, Asset Pipeline Hook Return Types, Asset Pipeline Types, Asset Pipeline Constants sections). **Verification**: TypeScript strict mode clean (zero asset errors), ESLint clean (zero warnings), all pre-existing errors only in hero/dev files.
+
+**Phase 6.8 — Performance Budget**
+Status: Completed
+
+Built the complete performance budget architecture in `features/three/`. Infrastructure only — no actual measurements, FPS monitoring, or dynamic quality switching. **Budget Model**: 18 budget categories (geometry, materials, textures, environment, lighting, shadows, particles, postprocessing, animation, physics, audio, network, memory, GPU, CPU, draw-calls, triangles, shader-complexity), 5 priority levels (critical → advisory), 5 lifecycle states (registered → active → suspended → exceeded → disposed), 13 metric identifiers (frameTime, fps, drawCalls, triangleCount, textureMemory, geometryMemory, shaderCount, materialCount, lightCount, particleCount, gpuTime, cpuTime, assetMemory), 5 threshold operators (lt/lte/eq/gte/gt). **Manager (`performance-budget-manager.ts`)**: Singleton following exact asset-manager pattern — module-level Maps for budget/metric/profile definitions and states, Sets for subscribers/selector subscribers, RAF batching (one rebuildSnapshot per frame), immutable frozen snapshots, selector-based subscriptions. Manages budget registration (idempotent by ID), metric value recording, linked budget state updates, threshold evaluation, lifecycle state transitions (active ↔ exceeded), recommendation generation (severity: info/warning/critical; action: reduce-quality/reduce-complexity/disable-feature/monitor), profile management, quality adaptation (5 presets), reduced-motion adaptation. Integrates with threePerformanceManager for quality and prefersReducedMotion for SSR-safe reads. **Config (`performance-budget.config.ts`)**: Pure derivation functions — type guards for BudgetCategory/BudgetPriority/BudgetLifecycle/BudgetMetricId/BudgetThresholdOperator, quality profile derivation (5 quality presets → frame time, draw calls, triangles, texture memory, geometry memory, shader/material/light/particle counts, GPU/CPU time, asset memory limits), constraint derivation with reduced-motion adaptation, threshold evaluation (comparator-based), utilization calculation, lifecycle transition validation (state machine), priority clamping. **Constants (`performance-budget.constants.ts`)**: 3 description records, 3 ordering records, 5 quality profiles (ultra: 500 draw calls, 2M triangles, 512MB texture memory → minimal: 50 draw calls, 50K triangles, 32MB texture memory), default constraints (200 budgets, 50 metrics, 10 profiles, 50 recommendations, depth 10), 18 default categories, 13 default metrics (with units), default snapshot. **React Components (2)**: PerformanceBudgetRoot (lifecycle owner, reads ThreeContext, initializes performanceBudgetManager, provides PerformanceBudgetContext — renders inside AssetRoot), PerformanceBudgetContext (context creation, no JSX, Fast Refresh compliant). **6 Hooks**: usePerformanceBudget (full snapshot or selector slice via useSyncExternalStore), usePerformanceBudgetManager (memoized bound methods — 15 methods), usePerformanceBudgetState (derived budget/metric/profile counts, exceeded count, recommendation count, health ratio), usePerformanceBudgetMetrics (metric info, per-category groupings, latest value accessor), usePerformanceBudgetQuality (quality profile with 11 convenience booleans), usePerformanceBudgetRegistry (read-only registry queries — 16 methods). **Types** (`performance-budget.types.ts`): Complete type system — 5 union constants + 16 interfaces (BudgetOptions, BudgetDefinition, MetricOptions/Definition, BudgetProfileOptions/Definition, BudgetRuntimeState, MetricRuntimeState, BudgetProfileRuntimeState, BudgetRecommendation, PerformanceBudgetQualityProfile, BudgetConstraints, BudgetSnapshot, BudgetRegistry, BudgetManager). All readonly, no any. **Files Created**: performance-budget.types.ts, performance-budget.constants.ts, performance-budget.config.ts, performance-budget-manager.ts, performance-budget-provider.tsx, performance-budget-root.tsx, hooks/use-performance-budget.ts, hooks/use-performance-budget-manager.ts, hooks/use-performance-budget-state.ts, hooks/use-performance-budget-metrics.ts, hooks/use-performance-budget-quality.ts, hooks/use-performance-budget-registry.ts. **Files Modified**: index.ts (added Performance Budget Components, Performance Budget Hooks, Performance Budget Hook Return Types, Performance Budget Types, Performance Budget Constants sections). **Verification**: TypeScript strict mode clean (zero performance-budget errors), ESLint clean (zero warnings), all pre-existing errors only in hero/dev files.
 
 ### 2026-07-14
 
